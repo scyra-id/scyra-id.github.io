@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Tryout - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/riwayat.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                <main class="riwayat-container">
+                    <div class="riwayat-header">
+                        <h1>📚 Riwayat Tryout</h1>
+                        <p>Lihat hasil tryout yang sudah kamu kerjakan.</p>
+                    </div>
+
+                    <div class="riwayat-grid">
+                        <a href="riwayat-snbt.html" class="riwayat-card">
+                            <div class="riwayat-icon">📝</div>
+                            <h3>Tryout SNBT</h3>
+                            <p>Lihat hasil tryout SNBT yang sudah dikerjakan.</p>
+                            <span class="btn-riwayat">Lihat Hasil</span>
+                        </a>
+
+                        <div class="riwayat-card" style="opacity: 0.6;">
+                            <div class="riwayat-icon">📊</div>
+                            <h3>Tryout Mandiri</h3>
+                            <p>Fitur ini akan hadir segera.</p>
+                            <span class="btn-riwayat" style="background: var(--text-muted);">Segera</span>
+                        </div>
+                    </div>
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+.materi-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* HEADER & JENJANG SELECTOR */
+.materi-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+.page-title {
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin: 0 0 0.4rem 0;
+}
+.page-subtitle {
+    color: var(--text-secondary);
+    margin: 0;
+}
+.form-select {
+    padding: 0.7rem 1.2rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 2px 8px var(--shadow-color);
+    outline: none;
+    transition: all 0.2s;
+}
+.form-select:hover, .form-select:focus {
+    border-color: var(--brand-primary);
+}
+
+/* MAPEL GRID (Tampilan Utama) */
+.mapel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+}
+.mapel-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    position: relative; 
+    overflow: hidden;
+}
+.mapel-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* Mengambil link gambar dari JS, kalau kosong otomatis hilang */
+    background-image: var(--bg-image); 
+    background-size: contain; 
+    background-position: right center; 
+    background-repeat: no-repeat;
+    opacity: 0.25; /* 👈 ATUR TRANSPARANSI DI SINI (0.15 = 15% Terlihat) */
+    z-index: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; /* Biar mouse tetap bisa nge-klik card-nya */
+}
+
+/* (Opsional) Gambarnya jadi sedikit lebih terang saat di-hover */
+.mapel-card:hover::before {
+    opacity: 0.5; 
+}
+.mapel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px var(--shadow-color);
+    border-color: var(--brand-primary);
+}
+.mapel-icon {
+    font-size: 2.2rem;
+    background: var(--bg-tertiary);
+    width: 65px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    flex-shrink: 0;
+}
+.mapel-info h3 {
+    margin: 0 0 0.3rem 0;
+    font-size: 1.15rem;
+    color: var(--text-primary);
+}
+.mapel-info p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+/* TAMPILAN DALAM MAPEL (Daftar Bab) */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    margin-bottom: 1.5rem;
+    transition: color 0.2s;
+}
+.btn-back:hover {
+    color: var(--brand-primary);
+}
+.bab-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--brand-primary);
+    border-radius: 12px;
+    color: white;
+}
+.bab-icon-large {
+    font-size: 3rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+}
+.bab-header h2 { margin: 0 0 0.3rem 0; color: white; font-size: 1.6rem; }
+.bab-header p { margin: 0; color: rgba(255, 255, 255, 0.9); }
+
+/* LIST ITEM BAB */
+.bab-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.bab-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.2rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+.bab-item:hover {
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+.bab-item-left h4 {
+    margin: 0 0 0.3rem 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+.bab-item-left p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+.btn-baca {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.btn-baca:hover {
+    background: var(--brand-primary-dark);
+}
+
+/* GOD MODE TETAP DIPAKAI */
+html, body.dashboard-page { overflow: hidden !important; height: 100vh !important; }
+.dashboard-layout { height: 100vh !important; overflow: hidden !important; }
+.main-content { flex: 1 1 auto !important; height: 100vh !important; min-height: 0 !important; overflow: hidden !important; }
+.dashboard-body { flex: 1 1 auto !important; overflow-y: auto !important; height: 100% !important; min-height: 0 !important; display: block !important; padding-bottom: 5rem !important; }
+
+/* =======================================================
+   LAYOUT 2 KOLOM (MATERI & UJIAN)
+   ======================================================= */
+.mapel-content-grid {
+    display: grid;
+    /* Default untuk HP (Atas Bawah) */
+    grid-template-columns: 1fr; 
+    gap: 1.5rem;
+    align-items: start;
+}
+
+/* Untuk Desktop (Kiri Kanan) */
+@media (min-width: 992px) {
+    .mapel-content-grid {
+        grid-template-columns: 1.3fr 1fr; /* Kolom kiri (Materi) sedikit lebih lebar */
+        gap: 2rem;
+    }
+}
+
+.content-panel {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.panel-header {
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+.panel-header h3 {
+    margin: 0 0 0.4rem 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+.panel-header p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Modifikasi Item Bab Biar Muat 2 Tombol */
+.bab-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+.bab-item-header {
+    width: 100%;
+}
+.bab-actions {
+    display: flex;
+    gap: 0.8rem;
+    width: 100%;
+    flex-wrap: wrap; /* Biar kalau di HP tombolnya turun rapi */
+}
+.btn-outline {
+    background: transparent;
+    color: var(--brand-primary);
+    border: 1px solid var(--brand-primary);
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-outline:hover {
+    background: rgba(107, 143, 92, 0.1); /* Sesuaikan dengan warna primer lo */
+}
+
+/* =======================================================
+   🔒 STYLE BAB TERKUNCI (PREMIUM)
+======================================================= */
+.bab-item.locked {
+    background: rgba(128, 128, 128, 0.05);
+    border: 1px dashed var(--border-color);
+    opacity: 0.85;
+    position: relative;
+}
+
+.bab-item.locked h4 {
+    color: var(--text-muted);
+}
+
+.btn-locked {
+    background: var(--bg-tertiary) !important;
+    color: var(--text-muted) !important;
+    border: 1px solid var(--border-color) !important;
+    cursor: pointer !important; /* Tetap pointer biar bisa diklik untuk munculin modal */
+    opacity: 0.9;
+}
+
+.btn-locked:hover {
+    background: var(--bg-tertiary) !important;
+    transform: none !important;
+    border-color: var(--brand-primary) !important;
+    color: var(--brand-primary) !important;
+}

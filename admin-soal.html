@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Bank Soal - Admin Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-soal.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            
+            <div id="topbar-placeholder"></div>
+            
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+
+    <main class="admin-container">
+        <div class="admin-header">
+            <h1>📄 Upload Bank Soal (Auto-Scan)</h1>
+            <p>Upload PDF berisi soal UTBK. AI akan otomatis mendeteksi pertanyaan, opsi A-E, kunci, dan pembahasan.</p>
+            <a href="admin.html" class="btn-back-admin">← Kembali ke Dashboard</a>
+        </div>
+
+        <div class="upload-card">
+            <form id="soalForm">
+                
+                <div class="form-group">
+                    <label for="kategoriSoal">Kategori Mapel</label>
+                    <select id="kategoriSoal" required>
+                        <option value="">Pilih Kategori...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="materiSoal">Bab / Materi</label>
+                    <select id="materiSoal" required disabled>
+                        <option value="">Pilih Bab / Materi...</option>
+                    </select>
+                    <p class="form-hint" id="hintMateri">💡 Pilih kategori mapel terlebih dahulu untuk memunculkan daftar bab.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="pdfSoalFile">Pilih File PDF Soal (Bisa Banyak Sekaligus)</label>
+                    <input type="file" id="pdfSoalFile" accept="application/pdf" multiple required>
+                    <p class="form-hint">💡 Format PDF: Nomor soal (1.), Opsi (A.), Kunci:, Pembahasan:</p>
+                </div>
+
+                <button type="submit" class="btn-admin btn-gold" id="btnScan">⚡ Scan & Simpan ke Database</button>
+            </form>
+
+            <div id="scanResults" class="scan-results" style="display:none;">
+                <h3>🤖 Hasil Deteksi AI</h3>
+                <div id="resultsList"></div>
+                <button id="btnConfirmSave" class="btn-admin" style="margin-top: 1rem; background: var(--success);">✅ Konfirmasi & Simpan Semua ke Database</button>
+            </div>
+        </div>
+        <!-- =======================================================
+            🖼️ CARD UPLOAD GAMBAR UNTUK SOAL
+        ======================================================= -->
+        <div class="upload-card" style="margin-top: 2rem;">
+            <h2 style="color: var(--text-primary); margin-bottom: 0.5rem;">🖼️ Upload Gambar untuk Soal</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Upload gambar ke server, lalu salin URL-nya untuk digunakan di PDF soal.
+            </p>
+            
+            <div style="background: rgba(33, 150, 243, 0.08); padding: 1rem; border-radius: 8px; border-left: 4px solid #2196f3; margin-bottom: 1.5rem;">
+                <p style="margin: 0; color: var(--text-primary); font-size: 0.9rem;">
+                    💡 <strong>Cara Pakai:</strong> Di file PDF soal, harus tertulis format ini di tempat gambar harus muncul:<br>
+                    <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.85rem; margin-top: 0.3rem; display: inline-block;">[GAMBAR: https://qqouccbtjywanmgktdty.supabase.co/storage/v1/object/public/soal-images/NAMA-FILE]</code>
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label for="gambarSoalFile">Pilih File Gambar (WAJIB .webp)</label>
+                <input type="file" id="gambarSoalFile" accept="image/webp" multiple style="padding: 0.5rem;">
+                <small class="form-hint">💡 Bisa pilih banyak gambar sekaligus (tahan Ctrl/Cmd). Maksimal 5MB per file.</small>
+            </div>
+            
+            <button id="btnUploadGambar" class="btn-gold" style="width: 100%; padding: 1rem; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: 700;">
+                📤 Upload ke Storage
+            </button>
+            
+            <div id="uploadGambarResults" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px dashed var(--border-color);">
+                <h3 style="color: var(--brand-primary); margin-bottom: 1rem;">✅ URL Gambar Siap Pakai</h3>
+                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">Klik tombol 📋 untuk menyalin URL ke clipboard.</p>
+                <div id="listUrlGambar"></div>
+            </div>
+        </div>
+        <!-- =======================================================
+            📚 SECTION BARU: DAFTAR SOAL DI DATABASE
+        ======================================================= -->
+        <div class="upload-card" style="margin-top: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h2 style="color: var(--text-primary); margin: 0 0 0.3rem 0; font-size: 1.5rem;">📚 Bank Soal Tersimpan</h2>
+                    <p style="color: var(--text-secondary); margin: 0; font-size: 0.9rem;">Kelola semua soal yang sudah masuk ke database</p>
+                </div>
+                <div style="background: var(--bg-tertiary); padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;">Total: </span>
+                    <strong id="totalSoalCount" style="color: var(--brand-primary); font-size: 1.1rem;">0</strong>
+                    <span style="color: var(--text-secondary); font-size: 0.85rem;"> soal</span>
+                </div>
+            </div>
+
+            <!-- Search Box -->
+            <div class="search-container">
+                <div class="search-box">
+                    <span class="search-icon">🔍</span>
+                    <input 
+                        type="text" 
+                        id="searchSoalInput" 
+                        placeholder="Cari berdasarkan pertanyaan atau UUID..."
+                        autocomplete="off"
+                    >
+                    <button id="btnClearSearch" class="btn-clear-search" style="display: none;">✕</button>
+                </div>
+                <div class="search-hint">
+                    💡 Tip: Paste UUID lengkap untuk cari soal spesifik, atau ketik kata kunci dari pertanyaan
+                </div>
+            </div>
+
+            <!-- Filter Kategori -->
+            <div style="display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <select id="filterKategori" class="form-select" style="flex: 1; min-width: 200px;">
+                    <option value="">Semua Kategori</option>
+                </select>
+                <select id="filterMateri" class="form-select" style="flex: 1; min-width: 200px;" disabled>
+                    <option value="">Pilih kategori dulu</option>
+                </select>
+            </div>
+
+            <!-- Tabel Daftar Soal -->
+            <div class="table-container" style="max-height: 600px; overflow-y: auto;">
+                <table class="admin-table soal-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">UUID</th>
+                            <th>Pertanyaan</th>
+                            <th style="width: 120px;">Mapel</th>
+                            <th style="width: 150px;">Bab</th>
+                            <th style="width: 70px;">Tipe</th>
+                            <th style="width: 70px;">Kunci</th>
+                            <th style="width: 100px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="soalTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                ⏳ Memuat daftar soal...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Load More Button -->
+            <div id="loadMoreContainer" style="text-align: center; margin-top: 1.5rem; display: none;">
+                <button id="btnLoadMore" class="btn-outline" style="padding: 0.8rem 2rem;">
+                    📥 Muat Lebih Banyak
+                </button>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 0.5rem;">
+                    Menampilkan <span id="displayedCount">0</span> dari <span id="totalCount">0</span> soal
+                </p>
+            </div>
+    <!-- =======================================================
+        ✏️ MODAL EDIT SOAL
+    ======================================================= -->
+    <div id="editSoalModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h2>✏️ Edit Soal</h2>
+                <button id="btnCloseEditModal" class="btn-close">&times;</button>
+            </div>
+            <form id="editSoalForm">
+                <input type="hidden" id="editSoalId">
+                
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div class="form-group">
+                        <label>Tipe Soal</label>
+                        <select id="editTipeSoal" required>
+                            <option value="pg">📝 Pilihan Ganda (A-E)</option>
+                            <option value="bs">⚖️ Benar / Salah</option>
+                            <option value="isian">✏️ Isian Singkat</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Mapel</label>
+                        <select id="editKategoriSoal" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label>Bab / Materi</label>
+                        <select id="editMateriSoal" required></select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Pertanyaan (Bisa pakai HTML / Teks Bacaan)</label>
+                    <textarea id="editPertanyaan" rows="4" required style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-family: monospace;"></textarea>
+                </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div class="form-group"><label>Opsi A</label><input type="text" id="editOpsiA" required></div>
+                    <div class="form-group"><label>Opsi B</label><input type="text" id="editOpsiB" required></div>
+                    <div class="form-group"><label>Opsi C</label><input type="text" id="editOpsiC" required></div>
+                    <div class="form-group"><label>Opsi D</label><input type="text" id="editOpsiD" required></div>
+                    <div class="form-group"><label>Opsi E</label><input type="text" id="editOpsiE" required></div>
+                    <div class="form-group">
+                        <label>Kunci Jawaban</label>
+                        <select id="editKunci" required>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Pembahasan</label>
+                    <textarea id="editPembahasan" rows="3" style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);"></textarea>
+                </div>
+
+                <button type="submit" class="btn-gold" style="width:100%; padding:1rem; font-size:1.1rem; border:none; border-radius:8px; cursor:pointer; font-weight:700;">💾 Simpan Perubahan</button>
+            </form>
+        </div>
+    </div>
+</div>
+    </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-soal.js"></script>
+</body>
+</html>

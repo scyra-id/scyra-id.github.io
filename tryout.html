@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalog Tryout - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tryout.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+    
+    <!-- Script Tema -->
+    <script>
+        const savedTheme = localStorage.getItem('scyra_theme') || localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark', 'dark-mode', 'dark-theme');
+            window.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('dark', 'dark-mode', 'dark-theme');
+            });
+        }
+    </script>
+
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <!-- Komponen Modular -->
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            
+            <div class="dashboard-body">
+                <div style="margin-bottom: 2rem;">
+                    <h1 style="color: var(--brand-primary); margin-bottom: 0.5rem;">Katalog Tryout SNBT</h1>
+                    <p style="color: var(--text-secondary);">Ukur kemampuanmu dengan simulasi ujian terstandarisasi.</p>
+                </div>
+
+                <!-- Wadah Kartu Tryout -->
+                <div class="tryout-grid" id="katalogTryout">
+                    <p>⏳ Memuat daftar tryout...</p>
+                    <!-- Dirender oleh JS -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/katalog-tryout.js"></script>
+    <script src="js/session.js"></script>
+</body>
+</html>

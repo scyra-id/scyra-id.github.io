@@ -1,0 +1,158 @@
+.dashboard-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+}
+.welcome-section h1 { 
+    color: var(--text-primary); 
+    font-size: 2rem; 
+    margin-bottom: 0.5rem; 
+}
+.welcome-section h1 span { 
+    color: var(--brand-primary); 
+}
+.welcome-section p { 
+    color: var(--text-secondary); 
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.dash-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.dash-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px var(--shadow-color);
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.stat-info h3 { 
+    font-size: 1.8rem; 
+    color: var(--text-primary); 
+    margin-bottom: 0.2rem; 
+}
+.stat-info p { 
+    color: var(--text-secondary); 
+    font-size: 0.9rem; 
+    margin: 0; 
+}
+
+/* Continue Learning Section */
+.continue-section { 
+    margin-bottom: 3rem; 
+}
+.continue-section h2 { 
+    color: var(--text-primary); 
+    margin-bottom: 1.5rem; 
+    font-size: 1.5rem; 
+}
+
+.continue-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.course-badge {
+    display: inline-block;
+    background: rgba(135, 168, 120, 0.15);
+    color: var(--brand-primary-dark);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+body.dark-mode .course-badge {
+    background: rgba(163, 196, 145, 0.15);
+    color: var(--brand-primary-light);
+}
+
+.course-card h3 { 
+    color: var(--text-primary); 
+    margin-bottom: 0.5rem; 
+}
+.course-card p { 
+    color: var(--text-secondary); 
+    font-size: 0.9rem; 
+    margin-bottom: 1.5rem; 
+    min-height: 40px; 
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-primary);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent));
+    border-radius: 10px;
+    transition: width 0.5s ease;
+}
+.progress-text { 
+    font-size: 0.8rem; 
+    color: var(--text-muted); 
+}
+
+.btn-continue {
+    display: inline-block;
+    margin-top: 1rem;
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+}
+.btn-continue:hover { 
+    transform: translateX(5px); 
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .welcome-section { 
+        flex-direction: column; 
+        align-items: flex-start; 
+    }
+    .welcome-section .btn-primary-lg { 
+        width: 100%; 
+        text-align: center; 
+    }
+}

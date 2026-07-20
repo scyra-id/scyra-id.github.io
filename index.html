@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar UTBK - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body>
+    <div id="auth-loading" class="auth-loading">
+        <div class="spinner-sage"></div>
+        <p>Memuat ruang belajarmu...</p>
+    </div>
+    <!-- Header akan dimuat di sini secara otomatis -->
+    <div id="header-placeholder"></div>
+
+    <main>
+    <!-- ================= HERO SECTION ================= -->
+        <section class="hero">
+            <div class="container hero-container">
+                <div class="hero-text">
+                    <span class="badge-new">🚀 Siap SNBT 2026</span>
+                    <h1>Tembus PTN Impianmu dengan <span class="text-gradient">Strategi Terukur</span></h1>
+                    <p class="hero-subtitle">
+                        Jangan buang waktumu mencari soal yang berantakan di internet. 
+                        Dapatkan ribuan soal terkurasi, materi terstruktur, dan simulasi Tryout mirip ujian asli dalam satu platform.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="register.html" class="btn-primary-lg">Mulai Belajar Gratis</a>
+                        <a href="#features" class="btn-secondary-lg">Lihat Fitur Unggulan ↓</a>
+                    </div>
+                </div>
+                <div class="hero-trust">
+                    <div class="avatars-stack">
+                        <div class="mini-avatar" style="background: #ef4444;">A</div>
+                        <div class="mini-avatar" style="background: #f59e0b;">B</div>
+                        <div class="mini-avatar" style="background: #10b981;">C</div>
+                    </div>
+                    <span>bergabung dengan <strong>1,000+</strong> pejuang PTN lainnya</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- Placeholder untuk ilustrasi/mockup nanti -->
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-question">
+                            <p class="q-label" id="mockupMapel">Memuat soal...</p>
+                            <p class="q-text" id="mockupTeks">Mohon tunggu sebentar...</p>
+                            <div class="q-options" id="mockupOptions"></div>
+                            <div class="mockup-feedback" id="mockupFeedback" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- ================= STATS BAR ================= -->
+    <section class="stats-bar">
+        <div class="container stats-container">
+            <div class="stat-item">
+                <h3>5,000+</h3>
+                <p>Bank Soal Terkurasi</p>
+            </div>
+            <div class="stat-item">
+                <h3>7</h3>
+                <p>Subtes UTBK Lengkap</p>
+            </div>
+            <div class="stat-item">
+                <h3>100%</h3>
+                <p>Gratis & Tanpa Iklan</p>
+            </div>
+            <div class="stat-item">
+                <h3>24/7</h3>
+                <p>Akses Materi Fleksibel</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Nanti kita lanjut ke section Features & Problem-Solution di langkah berikutnya -->
+</main>
+
+    <!-- Footer akan dimuat di sini secara otomatis -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Memuat script utama -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/landing.js"></script>
+</body>
+</html>

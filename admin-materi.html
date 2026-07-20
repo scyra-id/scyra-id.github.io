@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Materi - Admin Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-materi.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            
+            <div id="topbar-placeholder"></div>
+            
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <main class="admin-container">
+                    <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h1>📚 Kelola Materi</h1>
+                            <p>Tambah dan atur materi pembelajaran UTBK</p>
+                        </div>
+                        <button class="btn-admin" id="btnOpenModal" style="width: auto; padding: 0.7rem 1.5rem;">+ Tambah Materi</button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Judul Materi</th>
+                                    <th>Kategori</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="materiTableBody">
+                                <tr><td colspan="5" style="text-align:center;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+
+            </div> </div> </div> <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Materi Baru</h2>
+                <button class="btn-close" id="btnCloseModal">&times;</button>
+                <button class="btn-admin btn-auto-upload" id="btnOpenAutoModal" style="width: auto; padding: 0.7rem 1.5rem;">📥 Upload PDF (Auto)</button>
+            </div>
+            <form id="materiForm">
+                <input type="hidden" id="materiId">
+                
+                <div class="form-group">
+                    <label for="judul">Judul Materi</label>
+                    <input type="text" id="judul" required placeholder="Contoh: Tips Mengerjakan Silogisme">
+                </div>
+
+                <div class="form-group">
+                    <label for="kategori">Kategori Mapel</label>
+                    <select id="kategori" required>
+                        <option value="">Pilih Kategori...</option>
+                        </select>
+                </div>
+
+                <!-- KOLOM NOMOR BAB (BARU) -->
+                <div class="form-group">
+                    <label for="nomorBab">Nomor Bab (Urutan)</label>
+                    <input type="number" id="nomorBab" min="1" step="1" placeholder="Contoh: 1" required>
+                    <small style="color: var(--text-muted); display: block; margin-top: 0.3rem; font-size: 0.85rem;">
+                            💡 <strong>Bab 1</strong> = Gratis (User), <strong>Bab 2+</strong> = Premium (Silver/Gold)
+                        </small>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; justify-content: space-between; align-items: flex-end;">
+                        <span>Konten Materi</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted);">Gunakan template infografis agar materi lebih menarik</span>
+                    </label>
+                    
+                    <!-- 🚨 MAGIC TOOLBAR TEMPLATE 🚨 -->
+                    <div class="template-toolbar" style="background: var(--bg-secondary); padding: 0.5rem; border: 1px solid var(--border-color); border-bottom: none; border-radius: 8px 8px 0 0; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button type="button" class="btn-action" onclick="insertTemplate('peta')" style="background: rgba(135, 168, 120, 0.1); color: var(--brand-primary-dark); border-color: var(--brand-primary);">📑 Peta Konsep</button>
+                        <button type="button" class="btn-action" onclick="insertTemplate('algo')" style="background: rgba(212, 175, 55, 0.1); color: #b8962e; border-color: var(--brand-accent);">🪜 Step Algo</button>
+                        <button type="button" class="btn-action" onclick="insertTemplate('fyi')" style="background: rgba(79, 195, 247, 0.1); color: #0277bd; border-color: #4fc3f7;">ℹ️ FYI Box</button>
+                        <button type="button" class="btn-action" onclick="insertTemplate('trap')" style="background: rgba(244, 67, 54, 0.1); color: var(--error); border-color: var(--error);">🚨 Trap Alert</button>
+                        <button type="button" class="btn-action" onclick="insertTemplate('bahas')" style="background: var(--bg-primary); border-color: var(--border-color);">💡 Toggle Bahas</button>
+                        
+                        <button type="button" class="btn-action" onclick="document.getElementById('gambarFileInput').click()" style="background: rgba(156, 39, 176, 0.1); color: #9c27b0; border-color: #ba68c8; font-weight: bold;">🖼️ Upload Gambar (Kanan)</button>
+                        <input type="file" id="gambarFileInput" accept="image/*" style="display: none;">
+                    </div>
+
+                    <div id="editor-container" style="height: 400px; background: var(--bg-primary); border-radius: 0 0 8px 8px;"></div>
+                </div>
+
+                <div class="form-group" style="display: flex; align-items: center; gap: 1rem;">
+                    <label for="status" style="margin:0;">Status:</label>
+                    <select id="status" style="width: auto;">
+                        <option value="draft">Draft</option>
+                        <option value="publik">Publikasikan</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-admin" style="margin-top: 1rem;">Simpan Materi</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="autoModalOverlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>🚀 Auto-Upload PDF</h2>
+                <button class="btn-close" id="btnCloseAutoModal">&times;</button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                <strong>🤖 Sistem AI akan otomatis mendeteksi:</strong><br>
+                • <strong>Judul</strong> dari baris pertama<br>
+                • <strong>Kategori Mapel</strong> dari isi materi<br>
+                • <strong>Heading & Paragraf</strong> otomatis terformat<br>
+                • <strong>Bab</strong> Sistem akan membaca nama file untuk menentukan urutan bab.<br>
+                Contoh: <code style="background: rgba(0,0,0,0.1); padding: 2px 4px; border-radius: 4px;">BAB1_Penalaran.pdf</code> ➔ Disimpan sebagai <strong>Bab 1</strong>.
+            </p>
+            <form id="autoUploadForm">
+                <div class="form-group">
+                    <label for="autoPdfFile">Pilih File PDF (Bisa Banyak Sekaligus)</label>
+                    <input type="file" id="autoPdfFile" accept="application/pdf" multiple required style="padding: 0.5rem;">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.5rem;">💡 Tip: Tahan Ctrl (atau Cmd) saat klik untuk memilih banyak file.</p>
+                </div>
+
+                <button type="submit" class="btn-admin" style="background: var(--brand-accent); color: #1A1A1A;">⚡ Deteksi & Publish Otomatis</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script> <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script> <script src="js/admin.js"></script> <script src="js/admin-materi.js"></script> </body>
+</html>

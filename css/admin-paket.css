@@ -1,0 +1,270 @@
+/* ================= ADMIN PAKET TRYOUT PAGE ================= */
+.admin-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+}
+
+.admin-header h1 {
+    color: var(--text-primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.admin-header p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+
+.btn-back-admin {
+    display: inline-block;
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.btn-back-admin:hover {
+    color: var(--brand-primary-dark);
+}
+
+/* ================= BUTTONS ================= */
+.btn-admin {
+    display: inline-block;
+    padding: 0.8rem 1.5rem;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+}
+.btn-admin:hover {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+}
+.btn-admin.btn-gold {
+    background: var(--brand-accent);
+    color: #1A1A1A;
+}
+.btn-admin.btn-gold:hover {
+    background: #b8962e;
+}
+
+/* ================= TABLE ================= */
+.admin-table-wrapper {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table thead {
+    background: var(--bg-tertiary);
+}
+
+.admin-table th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.admin-table td {
+    padding: 1rem 1.5rem;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    font-size: 0.95rem;
+}
+
+.admin-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+    background: rgba(135, 168, 120, 0.05);
+}
+
+/* ================= BADGES ================= */
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-publik {
+    background: rgba(107, 143, 92, 0.15);
+    color: var(--success);
+}
+
+.badge-draft {
+    background: rgba(136, 136, 136, 0.15);
+    color: var(--text-muted);
+}
+
+/* ================= ACTION BUTTONS ================= */
+.btn-action {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: transparent;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-edit {
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+}
+.btn-edit:hover {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.btn-delete {
+    color: var(--error);
+    border-color: var(--error);
+}
+.btn-delete:hover {
+    background: var(--error);
+    color: white;
+}
+
+/* ================= MODAL ================= */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-box {
+    background: var(--bg-secondary);
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-box {
+    transform: translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+.btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.btn-close-modal:hover {
+    color: var(--error);
+}
+
+/* ================= FORMS ================= */
+.modal-box form {
+    padding: 1.5rem;
+}
+
+.modal-box .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.modal-box .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.modal-box .form-group input,
+.modal-box .form-group textarea,
+.modal-box .form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.modal-box .form-group input:focus,
+.modal-box .form-group textarea:focus,
+.modal-box .form-group select:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .admin-container {
+        padding: 1rem;
+    }
+    .admin-table-wrapper {
+        overflow-x: auto;
+    }
+    .admin-table {
+        min-width: 600px;
+    }
+}

@@ -1,0 +1,104 @@
+<!-- SCYRA MODULAR HEADER (KHUSUS LANDING PAGE) -->
+<header class="site-header">  
+  <div class="header-container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">  
+    
+    <!-- 1. LOGO SCYRA (Paling Kiri) -->  
+    <a href="index.html" class="logo">  
+      <img src="images/logo.svg" alt="Scyra Logo" class="logo-img">  
+      <h2>Scyra</h2>  
+    </a>  
+    
+    <!-- 2. KELOMPOK KANAN -->
+    <div class="header-right-group" style="display: flex; align-items: center; gap: 1.5rem;">
+      
+      <!-- A. TOMBOL TEMA (Selalu Muncul, Di Luar Hamburger) -->
+      <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+
+      <!-- B. NAVIGASI DESKTOP (Akan Sembunyi di HP) -->  
+      <nav class="desktop-nav">  
+        <ul style="display: flex; gap: 1.5rem; list-style: none; margin: 0; padding: 0;">  
+          <li><a href="index.html" class="active">Beranda</a></li>  
+          <li><a href="paketbelajar.html">Paket Belajar</a></li>  
+          <li><a href="#tentang">Tentang</a></li>  
+          <li><a href="#kontak">Kontak</a></li>  
+        </ul>  
+      </nav>
+      
+      <!-- C. AREA MASUK/DAFTAR DESKTOP (Akan Sembunyi di HP) -->
+      <div id="guest-area" class="auth-buttons">
+        <a href="login.html" class="btn-login">Masuk</a>
+        <a href="register.html" class="btn-daftar">Daftar</a>
+      </div>
+      
+      <!-- D. AREA PROFILE DESKTOP (Akan Sembunyi di HP) -->
+      <div id="profile-area" class="profile-dropdown-container">
+        <button id="headerAvatarBtn" class="avatar-btn" type="button">
+          <img id="headerAvatar" class="avatar" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg3QTg3OCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ii8+PHBhdGggZD0iTTEyIDE0Yy02LjEgMC0xMCA0LTEwIDEwaDIwYzAtNi0zLjktMTAtMTAtMTB6Ii8+PC9zdmc+" alt="Avatar">
+        </button>
+        <div id="profile-dropdown" class="profile-dropdown">
+          <div class="dropdown-header">
+            <img id="dropdownAvatar" class="avatar-large" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg3QTg3OCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ii8+PHBhdGggZD0iTTEyIDE0Yy02LjEgMC0xMCA0LTEwIDEwaDIwYzAtNi0zLjktMTAtMTAtMTB6Ii8+PC9zdmc+" alt="Avatar">
+            <div>
+              <div id="dropdownName" class="dropdown-name">Memuat...</div>
+              <div id="dropdownEmail" class="dropdown-email">email@user.com</div>
+            </div>
+          </div>
+          <div class="dropdown-menu">
+            <a href="dashboard.html" class="dropdown-item">📊 Ke Dashboard</a>
+            <a href="profile.html" class="dropdown-item">⚙️ Setting Profile</a>
+            <a id="admin-link" href="admin.html" class="dropdown-item" style="display:none;">🛡️ Dashboard Admin</a>
+            <button id="logout-btn-desktop" class="dropdown-item logout-btn">🚪 Keluar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- E. HAMBURGER MENU (Muncul di HP) -->  
+      <button class="hamburger" id="hamburgerBtn" aria-label="Menu">  
+        <span class="bar"></span><span class="bar"></span><span class="bar"></span>  
+      </button>
+
+    </div>
+  </div>  
+</header>
+
+<!-- OVERLAY BACKDROP -->
+<div class="overlay" id="drawer-backdrop"></div>
+
+<!-- ======================================================= -->
+<!-- MOBILE DRAWER (Isi dari Hamburger Menu) -->
+<!-- ======================================================= -->
+<div id="mobile-drawer" class="nav-wrapper">
+  
+  <!-- Profile HP (Jika sudah login) -->
+  <div id="mobile-profile-area" class="mobile-profile-container">
+    <div class="mobile-profile-header">
+      <img id="mobileAvatar" class="avatar-large" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0iIzg3QTg3OCI+PGNpcmNsZSBjeD0iMTIiIGN5PSI4IiByPSI0Ii8+PHBhdGggZD0iTTEyIDE0Yy02LjEgMC0xMCA0LTEwIDEwaDIwYzAtNi0zLjktMTAtMTAtMTB6Ii8+PC9zdmc+" alt="Avatar">
+      <div>
+        <div id="mobileName" class="dropdown-name">Memuat...</div>
+        <div id="mobileEmail" class="dropdown-email">email@user.com</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- SEMUA NAVIGASI MASUK KE SINI -->
+  <nav class="mobile-nav">
+    <ul>
+      <li><a href="index.html">Beranda</a></li>
+      <li><a href="paketbelajar.html">Paket Belajar</a></li>
+      <li><a href="#tentang">Tentang</a></li>
+      <li><a href="#kontak">Kontak</a></li>
+      <li id="mobile-admin-link" style="display:none;"><a href="admin.html">Dashboard Admin</a></li>
+    </ul>
+  </nav>
+
+  <!-- SEMUA TOMBOL MASUK/DAFTAR MASUK KE SINI -->
+  <div id="mobile-guest-area" class="mobile-auth-buttons">
+    <a href="login.html" class="btn-login">Masuk</a>
+    <a href="register.html" class="btn-daftar">Daftar</a>
+  </div>
+  
+  <button id="logout-btn-mobile" class="btn-primary-lg" style="margin-top:1.5rem; display:none; width:100%; background:var(--error); box-shadow:none;">Keluar</button>
+</div>

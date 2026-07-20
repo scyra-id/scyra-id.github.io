@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Scyra</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    
+    <!-- CSS Global & Khusus -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <!-- 1️⃣ SIDEBAR (Auto-fetch dari components/sidebar.html) -->
+        <div id="sidebar-placeholder"></div>
+        
+        <!-- 2️⃣ MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOPBAR (Auto-fetch dari components/topbar.html) -->
+            <div id="topbar-placeholder"></div>
+            
+            <!-- Overlay untuk mobile sidebar -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- 📝 KONTEN HALAMAN DASHBOARD -->
+            <section class="dashboard-body">
+                <h1 class="page-title" style="font-size: 1.8rem; font-weight: 700; color: var(--text-primary); margin-bottom: 1.5rem;">
+                    Dashboard
+                </h1>
+                <div class="dashboard-container">
+                    
+                    <!-- Welcome Section -->
+                    <div class="welcome-section">
+                        <div>
+                            <h1>Halo, <span id="dashUserName">Pejuang PTN</span>! 👋</h1>
+                            <p>Siap melanjutkan perjalanan menembus PTN impianmu hari ini?</p>
+                        </div>
+                        <a href="tryout.html" class="btn-primary-lg">🚀 Mulai Tryout Harian</a>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="stats-grid">
+                        <div class="dash-card stat-card">
+                            <div class="stat-icon" style="background: rgba(135, 168, 120, 0.15); color: var(--brand-primary);">📚</div>
+                            <div class="stat-info">
+                                <h3>12</h3>
+                                <p>Materi Dibaca</p>
+                            </div>
+                        </div>
+                        <div class="dash-card stat-card">
+                            <div class="stat-icon" style="background: rgba(212, 175, 55, 0.15); color: var(--brand-accent);">📝</div>
+                            <div class="stat-info">
+                                <h3>145</h3>
+                                <p>Soal Dijawab</p>
+                            </div>
+                        </div>
+                        <div class="dash-card stat-card">
+                            <div class="stat-icon" style="background: rgba(107, 143, 92, 0.15); color: var(--success);">🏆</div>
+                            <div class="stat-info">
+                                <h3>680</h3>
+                                <p>Rata-rata Skor</p>
+                            </div>
+                        </div>
+                        <div class="dash-card stat-card">
+                            <div class="stat-icon" style="background: rgba(229, 115, 115, 0.15); color: var(--error);">🔥</div>
+                            <div class="stat-info">
+                                <h3>5 Hari</h3>
+                                <p>Streak Belajar</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Continue Learning -->
+                    <div class="continue-section">
+                        <h2>Lanjutkan Belajar 📖</h2>
+                        <div class="continue-grid">
+                            <div class="dash-card course-card">
+                                <span class="course-badge">Penalaran Umum</span>
+                                <h3>Silogisme & Modus Ponens</h3>
+                                <p>Pelajari cara menarik kesimpulan logis dari dua premis atau lebih.</p>
+                                <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
+                                <div class="progress-text">65% Selesai</div>
+                                <a href="detail-materi.html" class="btn-continue">Lanjut Baca →</a>
+                            </div>
+                            <div class="dash-card course-card">
+                                <span class="course-badge">Literasi B. Inggris</span>
+                                <h3>Reading Comprehension: Main Idea</h3>
+                                <p>Tips cepat menemukan gagasan utama dalam teks bahasa Inggris.</p>
+                                <div class="progress-bar"><div class="progress-fill" style="width: 20%;"></div></div>
+                                <div class="progress-text">20% Selesai</div>
+                                <a href="detail-materi.html" class="btn-continue">Lanjut Baca →</a>
+                            </div>
+                        </div>
+                    </div>
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    
+
+    <!-- 🧠 SCRIPTS (URUTAN PENTING!) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/billing.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="dashboard-body">
+                <div class="billing-container">
+                    <div class="billing-header">
+                        <h1>💳 Pembayaran</h1>
+                        <p>Selesaikan pembayaran untuk mengaktifkan paketmu</p>
+                    </div>
+
+                    <div class="billing-grid">
+                        <!-- Kiri: Metode Pembayaran -->
+                        <div class="payment-section">
+                            <div class="payment-card">
+                                <h2>Metode Pembayaran</h2>
+                                <div class="payment-method">
+                                    <div class="qris-container">
+                                        <div class="qris-header">
+                                            <img src="images/Logo_QRIS.svg.webp" alt="QRIS" class="qris-logo">
+                                            <span>Scan QRIS untuk membayar</span>
+                                        </div>
+                                        <div class="qris-code" id="qrisContainer">
+                                            <p style="color: var(--text-muted);">Memuat QRIS...</p>
+                                        </div>
+                                        <div class="payment-timer">
+                                            <span class="timer-label">Selesaikan pembayaran dalam:</span>
+                                            <span class="timer-value" id="countdown">15:00</span>
+                                        </div>
+                                        <div class="payment-info">
+                                            <p><strong>Total Pembayaran:</strong></p>
+                                            <p class="total-amount" id="totalAmount">Rp 0</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Kanan: Ringkasan Pesanan -->
+                        <div class="summary-section">
+                            <div class="summary-card">
+                                <h2>Ringkasan Pesanan</h2>
+                                <div class="order-details">
+                                    <div class="order-item">
+                                        <span>Paket:</span>
+                                        <strong id="paketName">-</strong>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>Periode:</span>
+                                        <strong>1 Bulan</strong>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>Harga:</span>
+                                        <strong id="paketPrice">Rp 0</strong>
+                                    </div>
+                                    <div class="order-item">
+                                        <span>Diskon:</span>
+                                        <strong id="discountAmount">- Rp 0</strong>
+                                    </div>
+                                    <div class="order-divider"></div>
+                                    <div class="order-item total">
+                                        <span>Total:</span>
+                                        <strong id="finalTotal">Rp 0</strong>
+                                    </div>
+                                </div>
+
+                                <div class="coupon-section">
+                                    <label for="couponInput">Kupon Diskon (Opsional)</label>
+                                    <div class="coupon-input-group">
+                                        <input type="text" id="couponInput" placeholder="Masukkan kode kupon">
+                                        <button id="applyCouponBtn" class="btn-apply-coupon">Terapkan</button>
+                                    </div>
+                                    <p class="coupon-message" id="couponMessage"></p>
+                                </div>
+
+                                <div class="terms-section">
+                                    <label class="checkbox-container">
+                                        <input type="checkbox" id="termsCheckbox">
+                                        <span class="checkmark"></span>
+                                        <span>Saya setuju dengan <a href="#" id="termsLink">Syarat & Ketentuan</a></span>
+                                    </label>
+                                </div>
+
+                                <button id="confirmPaymentBtn" class="btn-confirm-payment" disabled>
+                                    Saya Sudah Bayar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/billing.js"></script>
+</body>
+</html>

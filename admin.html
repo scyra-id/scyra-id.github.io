@@ -1,0 +1,98 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Admin - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            
+            <div id="topbar-placeholder"></div>
+            
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <main class="admin-container">
+                    <div id="admin-loading" class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Memverifikasi akses administrator...</p>
+                    </div>
+
+                    <div id="admin-content" class="admin-grid" style="display: none;">
+                        <div class="admin-card">
+                            <div class="card-icon">📚</div>
+                            <h3>Materi Belajar</h3>
+                            <p>Kelola modul, video, dan ringkasan materi untuk user.</p>
+                            <a href="admin-materi.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Kelola Materi</a>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-icon">🏷️</div>
+                            <h3>Kelola Mapel</h3>
+                            <p>Atur daftar mata pelajaran, icon, dan jenjang pendidikan (UTBK/SMA/SMP).</p>
+                            <a href="admin-kategori.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Kelola Mapel</a>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-icon">📄</div>
+                            <h3>Upload PDF Soal</h3>
+                            <p>Upload file PDF dan biarkan sistem mendeteksi soalnya secara otomatis.</p>
+                            <a href="admin-soal.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Buka Menu Upload</a>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-icon">🎮</div>
+                            <h3>Manajemen Simulasi</h3>
+                            <p>Upload file HTML interaktif ke Cloud & generate sandi untuk disisipkan ke materi belajar.</p>
+                            <a href="admin-simulasi.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Buka Menu Upload</a>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-icon">📦</div>
+                            <h3>Paket Tryout</h3>
+                            <p>Buat dan kelola paket ujian yang tersedia untuk user.</p>
+                            <a href="admin-paket.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Kelola Paket</a>
+                        </div>
+
+                        <div class="admin-card">
+                            <div class="card-icon">👥</div>
+                            <h3>Manajemen User</h3>
+                            <p>Lihat daftar pengguna yang terdaftar di sistem database SQL.</p>
+                            <button class="btn-admin">Lihat Data User</button>
+                        </div>
+                        <div class="admin-card">
+                            <div class="card-icon">🔄</div>
+                            <h3>Reset Tryout User</h3>
+                            <p>Hapus semua hasil tryout milik user agar mereka bisa mengerjakan ulang dari awal.</p>
+                            <select id="resetUserSelect" class="form-select" style="width: 100%; margin-bottom: 1rem; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary);">
+                                <option value="">-- Memuat user... --</option>
+                            </select>
+                            <button id="btnResetTryout" class="btn-admin" style="width: 100%;">Reset Hasil Tryout</button>
+                            <div id="resetResult" style="display: none; margin-top: 0.8rem; font-size: 0.9rem; font-weight: 600;"></div>
+                        </div>
+
+                    </div>
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+
+            </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
+
+

@@ -1,0 +1,260 @@
+.paket-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.paket-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.paket-header h1 {
+    color: var(--brand-primary);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+
+.paket-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+.paket-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.paket-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.paket-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px var(--shadow-color);
+    border-color: var(--brand-primary);
+}
+
+.paket-card.recommended {
+    border-color: var(--brand-accent);
+    transform: scale(1.05);
+}
+
+.paket-card.recommended:hover {
+    transform: scale(1.05) translateY(-8px);
+}
+
+.recommended-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--brand-accent);
+    color: #1a1a1a;
+    padding: 0.4rem 1.2rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.paket-header-info {
+    margin-bottom: 1.5rem;
+}
+
+.paket-name {
+    color: var(--brand-primary);
+    font-size: 1.8rem;
+    margin-bottom: 0.3rem;
+    font-weight: 700;
+}
+
+.paket-slogan {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+/* Ganti bagian .paket-price yang lama dengan ini */
+.paket-price {
+    display: flex;
+    flex-direction: column; /* Biar harga coret ada di atas harga asli */
+    align-items: flex-start;
+    gap: 0.2rem;
+    margin-bottom: 1rem;
+}
+
+/* 🚨 TAMBAHAN BARU: Style untuk harga asli yang dicoret */
+.original-price {
+    color: var(--text-muted);
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: line-through;
+    text-decoration-color: var(--error); /* Garis coret warna merah biar eye-catching */
+    text-decoration-thickness: 2px;
+    line-height: 1;
+}
+
+/* Bungkus harga diskon biar rapi */
+.current-price {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+}
+
+.paket-price .currency {
+    color: var(--text-secondary);
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.paket-price .amount {
+    color: var(--text-primary);
+    font-size: 2.5rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1;
+}
+
+.paket-price .period {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.paket-badge {
+    margin-bottom: 1.5rem;
+}
+
+.discount-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--error);
+    color: white;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 12px rgba(229, 115, 115, 0.4);
+    z-index: 2;
+}
+
+.badge-year {
+    display: inline-block;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+.paket-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    flex: 1;
+}
+
+.paket-features li {
+    padding: 0.6rem 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.paket-features li:last-child {
+    border-bottom: none;
+}
+
+.paket-features .check {
+    color: var(--brand-primary);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.btn-pilih-paket {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(135, 168, 120, 0.3);
+}
+
+.btn-pilih-paket:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(135, 168, 120, 0.4);
+}
+
+.btn-pilih-paket:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .paket-grid {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+        margin: 2rem auto 0;
+    }
+    
+    .paket-card.recommended {
+        transform: scale(1);
+    }
+    
+    .paket-card.recommended:hover {
+        transform: translateY(-8px);
+    }
+}
+
+@media (max-width: 768px) {
+    .paket-container {
+        padding: 1rem;
+    }
+    
+    .paket-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .paket-header p {
+        font-size: 1rem;
+    }
+    
+    .paket-card {
+        padding: 1.5rem;
+    }
+    
+    .paket-name {
+        font-size: 1.5rem;
+    }
+    
+    .paket-price .amount {
+        font-size: 2rem;
+    }
+}

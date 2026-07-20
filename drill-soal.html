@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drill Soal - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/drill.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    
+    <!-- 🚨 SCRIPT PENARIK TEMA OTOMATIS (UDAH DISINKRONKAN DENGAN MAIN.JS) 🚨 -->
+    <script>
+        const savedTheme = localStorage.getItem('scyra_theme') || localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark', 'dark-mode', 'dark-theme');
+            
+            window.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('dark', 'dark-mode', 'dark-theme');
+            });
+        }
+    </script>
+</head>
+<body class="drill-page">
+    
+    <!-- 🚨 MODAL PILIH TINGKAT KESULITAN (Muncul otomatis) 🚨 -->
+    <div id="setupModal" class="modal-overlay">
+        <div class="modal-content">
+            <h2>Pilih Tingkat Kesulitan</h2>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0.5rem 0 1.5rem;">
+                Waktu akan disesuaikan otomatis dengan patokan resmi subtes UTBK SNBT 2026.
+            </p>
+            <div class="difficulty-grid" id="diffGrid">
+                <!-- Tombol di-generate otomatis oleh Javascript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- HEADER DRILL & TOOLBAR KANVAS -->
+    <header class="drill-header">
+        <div class="header-left">
+            <button onclick="window.history.back()" class="btn-outline" style="padding: 0.4rem 0.8rem;">🔙 Keluar</button>
+        </div>
+        
+        <div class="drawing-tools">
+            <button id="btnModeJawab" class="tool-btn active">👆 Pilih Jawaban</button>
+            <button id="btnModeCoret" class="tool-btn">✏️ Mode Coret</button>
+            <button id="btnModeHapus" class="tool-btn" style="display:none;">🧽 Penghapus</button>
+            <button id="btnClear" class="tool-btn" style="display:none;">🗑️ Bersihkan</button>
+        </div>
+
+        <div class="zoom-tools">
+            <button class="tool-btn" onclick="adjustZoom(-0.1)" title="Perkecil Teks">A-</button>
+            <button class="tool-btn" onclick="adjustZoom(0.1)" title="Perbesar Teks">A+</button>
+        </div>
+        
+        <div class="header-right">
+            <div class="timer">⏱️ 00:00</div>
+        </div>
+    </header>
+
+    <!-- WADAH UTAMA -->
+    <main class="drill-container">
+        
+        <!-- KANVAS CORETAN -->
+        <canvas id="scratchpad"></canvas>
+
+        <!-- KONTEN SOAL -->
+        <div class="soal-content">
+            <div class="soal-header">
+                <span class="badge badge-publik">Soal 1</span>
+            </div>
+            
+            <div class="soal-text">
+                <p>Diketahui sebuah juring lingkaran memiliki sudut pusat 72° dan jari-jari 14 cm. Jika nilai π = 22/7, berapakah panjang busur lingkaran tersebut?</p>
+            </div>
+            
+            <div class="opsi-jawaban">
+                <label class="opsi-item"><input type="radio" name="jawaban"> <span>A. 15,4 cm</span></label>
+                <label class="opsi-item"><input type="radio" name="jawaban"> <span>B. 17,6 cm</span></label>
+                <label class="opsi-item"><input type="radio" name="jawaban"> <span>C. 20,2 cm</span></label>
+                <label class="opsi-item"><input type="radio" name="jawaban"> <span>D. 22,5 cm</span></label>
+                <label class="opsi-item"><input type="radio" name="jawaban"> <span>E. 25,0 cm</span></label>
+            </div>
+        </div>
+        
+        <!-- NAVIGASI BAWAH -->
+        <div class="drill-navigation" id="navDrill">
+            <button class="btn-drill-prev" onclick="akhiriDrill()" style="border-color: var(--error); color: var(--error);">🛑 Akhiri Drill</button>
+            <button class="btn-drill-next" onclick="nextSoal()">Soal Selanjutnya ➡️</button>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/drill.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

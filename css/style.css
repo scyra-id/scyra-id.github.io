@@ -1,0 +1,1173 @@
+* {  
+  margin: 0;  
+  padding: 0;  
+  box-sizing: border-box;  
+}
+/* ================= CSS VARIABLES (SAGE & GOLD THEME) ================= */
+:root {
+    /* LIGHT MODE (Cream & Sage) */
+    --bg-primary: #F5F5DC;      /* Cream - Background utama */
+    --bg-secondary: #FFFFFF;    /* Putih murni - Untuk card agar pop-out */
+    --bg-tertiary: #FAFAF0;     /* Cream terang */
+    --text-primary: #2C2C2C;    /* Dark Gray (bukan hitam pekat, lebih lembut) */
+    --text-secondary: #555555;  
+    --text-muted: #888888;      
+    --brand-primary: #87A878;       /* Sage Green */
+    --brand-primary-light: #A3C491; /* Sage Light (hover) */
+    --brand-primary-dark: #6B8F5C;  /* Sage Dark (active/success) */
+    --brand-accent: #D4AF37;        /* Soft Gold */
+    --border-color: #E0DFD0;    /* Border lembut turunan cream */
+    --shadow-color: rgba(107, 143, 92, 0.08); /* Shadow dengan hint sage */
+    --footer-bg: #1A1A1A;       /* Charcoal */
+    --footer-text: #B8B8B8;
+    
+    /* Functional Colors */
+    --success: #6B8F5C;   /* Sage Dark */
+    --error: #E57373;     /* Soft Red */
+    --warning: #FFB74D;   /* Soft Orange */
+    --info: #A8D8EA;      /* Sky Blue */
+    
+    /* Accent Colors (untuk kategori mapel) */
+    --accent-lavender: #9B89B3;
+    --accent-pink: #F4C2C2;
+    --accent-sky: #A8D8EA;
+    --accent-peach: #FFDAB9;
+}
+
+/* DARK MODE (Rich Black & Sage Light) */
+body.dark-mode {
+    --bg-primary: #0A0A0A;      /* Rich Black */
+    --bg-secondary: #1A1A1A;    /* Charcoal - Untuk card */
+    --bg-tertiary: #2C2C2C;     /* Dark Gray */
+    --text-primary: #F0F0F0;    /* Off White */
+    --text-secondary: #B8B8B8;  
+    --text-muted: #888888;      
+    --brand-primary: #A3C491;       /* Sage Light (lebih terang agar terbaca) */
+    --brand-primary-light: #87A878; 
+    --brand-primary-dark: #6B8F5C;  
+    --brand-accent: #D4AF37;        /* Gold (tetap mewah di dark mode) */
+    --border-color: #2C2C2C;    
+    --shadow-color: rgba(0, 0, 0, 0.5); 
+    --footer-bg: #000000;       
+    --footer-text: #B8B8B8;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    padding-top: 85px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ================= HEADER ================= */
+.site-header {
+    background: var(--bg-primary); /* Sewarna dengan background halaman */
+    padding: 1rem 2rem;
+    position: fixed;
+    top: 0; 
+    left: 0; 
+    width: 100%;
+    z-index: 900;
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease, border-color 0.3s ease;
+}
+
+/* Efek Blur saat Scroll untuk Header Landing Page */
+.site-header.scrolled {
+    background: rgba(245, 245, 220, 0.7); /* Cream transparan */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px var(--shadow-color);
+    border-bottom: 1px solid var(--border-color);
+}
+
+body.dark-mode .site-header.scrolled {
+    background: rgba(10, 10, 10, 0.7); /* Rich Black transparan */
+}
+
+.header-container {
+    max-width: 1200px; margin: 0 auto;
+    display: flex; justify-content: space-between; align-items: center;
+}
+
+/* ================= LOGO BRANDING ================= */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    text-decoration: none;
+}
+
+.logo-img {
+    height: 38px;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.logo:hover .logo-img {
+    transform: scale(1.05) rotate(-3deg);
+}
+
+.logo h2 {
+    color: var(--brand-primary);
+    font-weight: 800;
+    font-size: 1.6rem;
+    margin: 0;
+    letter-spacing: -0.5px;
+}
+
+/* ================= DESKTOP NAVIGATION ================= */
+.desktop-nav ul { display: flex; list-style: none; gap: 2rem; }
+.desktop-nav a {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+.desktop-nav a.active, .desktop-nav a:hover { color: var(--brand-primary); }
+
+/* ================= HEADER ACTIONS ================= */
+.header-actions { display: flex; align-items: center; gap: 1rem; }
+.theme-toggle {
+    background: transparent; border: none; cursor: pointer;
+    font-size: 1.3rem; padding: 0.4rem;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform 0.3s ease; color: var(--text-primary);
+}
+.theme-toggle:hover { transform: rotate(20deg) scale(1.1); }
+.icon-moon { display: none; }
+body.dark-mode .icon-sun { display: none; }
+body.dark-mode .icon-moon { display: inline-block; }
+.auth-buttons { display: flex; gap: 0.5rem; }
+.auth-buttons a {
+    padding: 0.5rem 1rem; border-radius: 8px; text-decoration: none;
+    transition: all 0.2s ease; font-weight: 500; font-size: 0.95rem;
+}
+.btn-login { color: var(--brand-primary); border: 1.5px solid var(--brand-primary); }
+.btn-login:hover { background: rgba(135, 168, 120, 0.1); }
+.btn-daftar { background: var(--brand-primary); color: white; }
+.btn-daftar:hover { background: var(--brand-primary-dark); }
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 28px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 1000;
+}
+
+.hamburger .bar {
+    width: 100%;
+    height: 3px;
+    background-color: var(--text-primary);
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+
+.overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.6); z-index: 998;
+    opacity: 0; visibility: hidden; transition: all 0.3s ease;
+}
+.overlay.active { opacity: 1; visibility: visible; }
+
+/* ================= USER PROFILE DROPDOWN ================= */
+.profile-dropdown-container { position: relative; display: none; }
+.profile-dropdown-container.active { display: flex; align-items: center; }
+/* =========================================================
+   KUNCI UKURAN AVATAR (ANTI MBLUDAK)
+   ========================================================= */
+
+/* 1. Kurungan untuk tombol avatar di Topbar & Header */
+.avatar-btn {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    border: 2px solid var(--brand-primary) !important;
+    overflow: hidden !important; /* Kunci rahasianya: potong gambar yang lewat batas */
+    padding: 0 !important;
+    background: var(--bg-tertiary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0 !important; /* Biar tombolnya gak gepeng ditekan elemen lain */
+}
+
+/* 2. Gambar di dalam tombol (Pasti proporsional) */
+.avatar-btn img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important; /* Biar gambar gak penyok/melar */
+    display: block !important;
+}
+
+/* 3. Kurungan untuk avatar yang agak gede di dalam Dropdown Menu */
+.dropdown-header img, 
+.avatar-large, 
+#dropdownAvatar, 
+#mobileAvatar {
+    width: 48px !important;
+    height: 48px !important;
+    border-radius: 50% !important;
+    object-fit: cover !important;
+    flex-shrink: 0 !important;
+    border: 1px solid var(--border-color);
+}
+
+.avatar-btn:hover { transform: scale(1.05); }
+.profile-dropdown {
+    position: absolute; top: calc(100% + 15px); right: 0;
+    width: 280px; background: var(--bg-secondary);
+    border: 1px solid var(--border-color); border-radius: 12px;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    opacity: 0; visibility: hidden; transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 1001;
+}
+.profile-dropdown.active { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown-header { padding: 1rem; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 1rem; }
+.avatar, .avatar-large { background: var(--brand-primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+.avatar { width: 38px; height: 38px; font-size: 1rem; }
+.avatar-large { width: 48px; height: 48px; font-size: 1.2rem; flex-shrink: 0; }
+.dropdown-name { font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+.dropdown-email { font-size: 0.8rem; color: var(--text-muted); word-break: break-all; }
+.dropdown-menu { padding: 0.5rem; }
+.dropdown-item {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.75rem 1rem; border-radius: 8px; text-decoration: none;
+    color: var(--text-primary); width: 100%; text-align: left;
+    background: transparent; border: none; cursor: pointer;
+    font-size: 0.95rem; transition: background 0.2s; font-family: inherit;
+}
+.dropdown-item:hover { background: var(--bg-tertiary); }
+.logout-btn { color: var(--error); font-weight: 500; }
+.logout-btn:hover { background: rgba(229, 115, 115, 0.1); }
+.mobile-profile-container { display: none; width: 100%; margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); }
+.mobile-profile-header { display: flex; align-items: center; gap: 1rem; padding: 0 0.5rem 1rem 0.5rem; }
+
+/* ================= MAIN CONTENT ================= */
+.container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+.container h1 { color: var(--brand-primary); margin-bottom: 1rem; }
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+.card {
+    background: var(--bg-secondary); padding: 1.5rem; border-radius: 12px;
+    box-shadow: 0 4px 6px var(--shadow-color); transition: transform 0.2s, background-color 0.3s ease;
+    border: 1px solid var(--border-color);
+}
+.card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px var(--shadow-color); }
+.card h3 { color: var(--brand-primary); margin-bottom: 0.5rem; }
+.card p { color: var(--text-secondary); margin-bottom: 1rem; }
+.card a { display: inline-block; margin-top: 0.5rem; color: var(--brand-primary); text-decoration: none; font-weight: 600; }
+
+/* ================= FOOTER ================= */
+.site-footer {
+    background-color: var(--bg-primary); /* Otomatis ngikutin dark/light mode */
+    padding: 4rem 2rem 1.5rem;
+    margin-top: auto;
+    border-top: 1px solid var(--border-color);
+}
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Bagian Atas */
+.footer-top { margin-bottom: 2.5rem; }
+.footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 1rem;
+}
+.footer-logo-img { width: 36px; height: 36px; }
+.footer-logo-text {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.footer-tagline {
+    color: var(--text-secondary);
+    max-width: 450px;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+/* Sosmed Button */
+.social-links { display: flex; gap: 1rem; }
+.social-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    background: var(--bg-secondary);
+}
+.social-links a:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    transform: translateY(-3px);
+}
+
+/* Garis Pembatas */
+.footer-divider {
+    border: none;
+    border-top: 1px solid var(--border-color);
+    margin: 2.5rem 0;
+}
+
+/* Grid 4 Kolom */
+.footer-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+.footer-col h4 {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    font-weight: 700;
+}
+.footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.footer-col a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: color 0.2s;
+    font-size: 0.95rem;
+}
+.footer-col a:hover { color: var(--brand-primary); }
+
+/* Copyright */
+.footer-bottom {
+    text-align: center;
+    padding-top: 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+.micro-footer {
+    text-align: center;
+    padding: 1.5rem 1rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: auto; /* Mendorong footer selalu ke paling bawah */
+    border-top: 1px solid var(--border-color);
+    background-color: transparent;
+}
+
+/* ================= MOBILE DRAWER ================= */
+.nav-wrapper {
+    position: fixed; top: 0; right: 0;
+    width: 75%; max-width: 320px; height: 100vh;
+    background: var(--bg-secondary);
+    box-shadow: -5px 0 15px var(--shadow-color);
+    transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 5rem 1.5rem 2rem; flex-direction: column;
+    align-items: flex-start; gap: 1rem; z-index: 999;
+}
+.nav-wrapper.active { transform: translateX(0); }
+.mobile-nav ul { list-style: none; width: 100%; }
+.mobile-nav a { display: block; padding: 1rem 0; border-bottom: 1px solid var(--border-color); width: 100%; text-decoration: none; color: var(--text-primary); font-weight: 500; }
+.mobile-auth-buttons { display: flex; flex-direction: column; width: 100%; gap: 0.8rem; margin-top: 1.5rem; }
+.mobile-auth-buttons a { text-align: center; padding: 0.8rem; width: 100%; border-radius: 8px; text-decoration: none; font-weight: 500; }
+.mobile-auth-buttons .btn-login { border: 1.5px solid var(--brand-primary); color: var(--brand-primary); background: transparent; }
+.mobile-auth-buttons .btn-daftar { background: var(--brand-primary); color: white; }
+
+/* ================= GLOBAL BUTTONS ================= */
+.btn-primary-lg {
+    background: var(--brand-primary);
+    color: white;
+    padding: 0.9rem 1.8rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    box-shadow: 0 8px 16px rgba(107, 143, 92, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+.btn-primary-lg:hover {
+    transform: translateY(-3px);
+    background: var(--brand-primary-dark);
+    box-shadow: 0 12px 20px rgba(107, 143, 92, 0.3);
+}
+.btn-secondary-lg {
+    background: transparent;
+    color: var(--text-primary);
+    padding: 0.9rem 1.8rem;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border: 2px solid var(--border-color);
+    transition: all 0.2s;
+    display: inline-block;
+    cursor: pointer;
+}
+.btn-secondary-lg:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+/* ================= 🎨 GLOBAL SCYRA MODAL ================= */
+.scyra-modal {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.scyra-modal.active { opacity: 1; visibility: visible; }
+.scyra-modal-box {
+    background: var(--bg-secondary);
+    padding: 2.5rem 2rem;
+    border-radius: 20px;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.scyra-modal.active .scyra-modal-box { transform: scale(1) translateY(0); }
+.scyra-modal-icon { font-size: 3.5rem; margin-bottom: 1rem; line-height: 1; }
+.scyra-modal-box h3 { color: var(--text-primary); font-size: 1.5rem; margin-bottom: 0.8rem; font-weight: 700; }
+.scyra-modal-box p { color: var(--text-secondary); line-height: 1.6; margin-bottom: 2rem; white-space: pre-line; }
+.scyra-modal-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn-modal { padding: 0.8rem 2rem; border-radius: 12px; border: none; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; min-width: 120px; }
+.btn-modal.ok { background: var(--brand-primary); color: white; }
+.btn-modal.ok:hover { background: var(--brand-primary-dark); transform: translateY(-2px); }
+.btn-modal.cancel { background: transparent; color: var(--text-primary); border: 2px solid var(--border-color); }
+.btn-modal.cancel:hover { border-color: var(--error); color: var(--error); }
+
+/* ================= TOMBOL SUBMIT (BULLETPROOF) ================= */
+.btn-submit {
+    width: 100% !important;
+    padding: 0.9rem !important;
+    background-color: #87A878 !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 8px 16px rgba(107, 143, 92, 0.2) !important;
+    display: block !important;
+    text-align: center !important;
+    margin-top: 1rem !important;
+}
+.btn-submit:hover {
+    background-color: #6B8F5C !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 12px 20px rgba(107, 143, 92, 0.3) !important;
+}
+.btn-submit:disabled {
+    background-color: #888888 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* =========================================================
+   🎯 PROFILE PAGE GRID (Profile Atas, Email & Password Bawah Berdampingan)
+   ========================================================= */
+.profile-page-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.profile-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 kolom untuk Email & Password */
+    gap: 2rem;
+    align-items: start;
+}
+
+/* 🎯 KARTU PROFILE: Span 2 kolom, dibatasi lebar, dipaksa TENGAH */
+.main-profile-card {
+    grid-column: 1 / -1;
+    max-width: 650px;      /* Batasi agar tidak melebar ke pinggir */
+    width: 100%;
+    margin: 0 auto;        /* KUNCI: Memaksa kartu center horizontal */
+    border-left: 5px solid var(--brand-primary);
+}
+
+/* Kartu Email & Password otomatis turun ke baris kedua */
+.security-card {
+    border-left: 5px solid var(--brand-accent);
+}
+
+/* =========================================================
+   🃏 KARTU PROFIL (Base Style)
+   ========================================================= */
+.profile-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.profile-card .card-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.profile-card .card-header h2,
+.profile-card .card-header h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.3rem;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.profile-card .card-desc {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* =========================================================
+   👤 KARTU UTAMA (Profile Info) - Avatar Section
+   ========================================================= */
+.main-profile-card .avatar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px dashed var(--border-color);
+}
+
+.main-profile-card .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid var(--brand-primary);
+    box-shadow: 0 8px 20px rgba(135, 168, 120, 0.3);
+}
+
+.main-profile-card .btn-ganti-foto {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.main-profile-card .btn-ganti-foto:hover {
+    background: var(--brand-primary);
+    color: white;
+}
+
+/* =========================================================
+   📝 FORM STYLING (Terisolasi)
+   ========================================================= */
+.profile-card .security-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.profile-card .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.profile-card .form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.profile-card .form-group input,
+.profile-card .form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.profile-card .form-group input:focus,
+.profile-card .form-group textarea:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(135, 168, 120, 0.15);
+}
+
+.profile-card .form-group input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   🤖 CAPTCHA WIDGET
+   ========================================================= */
+.profile-card .captcha-box {
+    background: rgba(212, 175, 55, 0.08);
+    border: 2px dashed var(--brand-accent);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-card .captcha-box > label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brand-accent);
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.profile-card .captcha-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.profile-card .captcha-question {
+    background: var(--bg-primary);
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--brand-accent);
+    border: 1px solid var(--border-color);
+    white-space: nowrap;
+    min-width: 100px;
+    text-align: center;
+}
+
+.profile-card .btn-refresh-captcha {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 0.6rem;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: transform 0.3s;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.profile-card .btn-refresh-captcha:hover {
+    transform: rotate(180deg);
+    background: var(--bg-primary);
+}
+
+.profile-card .captcha-row input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    text-align: center;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    letter-spacing: 2px;
+}
+
+.profile-card .captcha-row input:focus {
+    outline: none;
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+/* =========================================================
+   🔘 TOMBOL SUBMIT
+   ========================================================= */
+.profile-card .btn-submit {
+    width: 100%;
+    padding: 0.9rem;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+    box-sizing: border-box;
+}
+
+.profile-card .btn-submit:hover {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 15px rgba(107, 143, 92, 0.3);
+}
+
+.profile-card .btn-submit:disabled {
+    background: #555;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* =========================================================
+   DASHBOARD & SIDEBAR LAYOUT (Khusus User Login)
+   ========================================================= */
+body.dashboard-page {
+    padding-top: 0; /* Hilangkan padding header landing page */
+    margin: 0;
+    overflow: hidden; /* Biar scroll cuma di area konten */
+}
+
+.dashboard-layout {
+    display: flex;
+    height: 100vh;
+    background: var(--bg-primary);
+}
+
+/* --- SIDEBAR (Kiri) --- */
+.sidebar {
+    width: 260px;
+    background: var(--bg-secondary);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 100;
+    /*  FIX: PAKSA TINGGI FULL LAYAR */
+    height: 100vh; 
+    position: sticky;
+    top: 0;
+    flex-shrink: 0;
+}
+
+/* State Sidebar pas ditutup (Desktop) */
+.sidebar.collapsed {
+    width: 80px;
+}
+
+.sidebar-header {
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sidebar .logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    overflow: hidden;
+}
+
+.sidebar .logo h2 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    transition: opacity 0.2s;
+}
+
+.sidebar.collapsed .logo h2 {
+    opacity: 0;
+    width: 0;
+}
+
+.btn-toggle-sidebar {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.btn-toggle-sidebar:hover {
+    background: var(--bg-tertiary);
+    color: var(--brand-primary);
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 1.5rem 1rem;
+    overflow-y: auto;
+}
+
+.sidebar-nav ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0;
+}
+
+.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.sidebar-nav a:hover, .sidebar-nav a.active {
+    background: var(--bg-tertiary);
+    color: var(--brand-primary);
+}
+
+.sidebar-nav a.active {
+    background: var(--brand-primary);
+    color: white;
+}
+
+.nav-icon {
+    font-size: 1.2rem;
+    min-width: 24px;
+    display: flex;
+    justify-content: center;
+}
+
+.sidebar.collapsed .nav-text {
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* --- MAIN CONTENT & TOPBAR (Kanan) --- */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.topbar {
+    height: 80px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+    z-index: 90;
+}
+
+.topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.topbar-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.btn-mobile-sidebar {
+    display: none; /* Sembunyi di Desktop */
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+}
+
+/* Tombol Lingkaran (Notif & Tema) */
+.btn-icon-topbar {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer; /* PAKSA KURSOR JARI */
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    position: relative;
+    z-index: 10; /* PASTIKAN DI ATAS ELEMEN LAIN */
+}
+
+.btn-icon-topbar:hover {
+    background: var(--brand-primary-light);
+    color: var(--bg-secondary);
+    border-color: var(--brand-primary);
+}
+
+/* Dot Merah Notifikasi */
+.notif-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: var(--error);
+    color: white;
+    font-size: 0.65rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    border: 2px solid var(--bg-secondary);
+}
+
+/* Area Konten Scrollable */
+.dashboard-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2rem;
+    background: var(--bg-primary);
+}
+
+/* Pastikan dropdown ngumpet secara default */
+.profile-dropdown {
+    display: none;
+    position: absolute;
+    top: 120%;
+    right: 0;
+    /* ... styling box shadow dan warna kamu ... */
+}
+
+/* Ini yang bikin dia muncul pas diklik avatar */
+.profile-dropdown.active {
+    display: block;
+    animation: fadeInDown 0.2s ease-out forwards;
+}
+
+/* Untuk menutupi keteledoran innerHTML dari Qwen */
+.avatar-btn img, .avatar-large, #mobileAvatar {
+    object-fit: cover;
+}
+
+/* =========================================================
+   REVISI TOPBAR BLUR & SIDEBAR MOBILE
+   ========================================================= */
+
+/* Pindahkan scroll dari body ke main-content agar topbar bisa lengket (sticky) */
+.main-content {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    min-height: 0 !important; /* KUNCI ANTI MACET 1 */
+    min-width: 0 !important;
+    overflow: hidden !important; 
+    position: relative;
+}
+
+/* 2. Area Konten yang Boleh Di-scroll */
+.dashboard-body {
+    flex: 1 1 auto !important; /* Paksa dia mengisi sisa ruang secara dinamis */
+    overflow-y: auto !important; 
+    min-height: 0 !important; /* KUNCI ANTI MACET 2 */
+    padding: 2rem;
+    overflow-x: hidden;
+}
+
+/* 3. Topbar Terkunci Mati (Pinned) */
+.topbar {
+    flex-shrink: 0 !important; /* Jangan biarkan topbar menyusut */
+    z-index: 999 !important; /* Selalu di paling depan */
+    background: var(--bg-primary);
+    border-bottom: 1px solid transparent;
+    transition: background 0.3s, backdrop-filter 0.3s, border-color 0.3s;
+}
+
+/* 4. Efek Ngeblur Saat Di-scroll */
+.topbar.scrolled {
+    background: rgba(245, 245, 220, 0.7); /* Cream transparan */
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+}
+body.dark-mode .topbar.scrolled {
+    background: rgba(30, 30, 30, 0.7); /* Darkmode transparan */
+}
+
+/* 5. Logo di Topbar Khusus HP */
+.topbar-logo {
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+}
+.topbar-logo h2 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    margin: 0;
+}
+.topbar-logo img { width: 32px; }
+
+/* ANIMASI SLIDE SIDEBAR MOBILE (Poin 3) */
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; /* Poin 3: Efek Slide HP */
+        z-index: 1000;
+    }
+    .sidebar.mobile-open {
+        left: 0;
+    }
+    .topbar-logo.mobile-only {
+        display: flex; /* Poin 4: Tampilkan Logo di Topbar saat di HP */
+    }
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 992px) {
+    .sidebar {
+        position: fixed;
+        left: -260px; /* Ngumpet di luar layar */
+        height: 100vh;
+        width: 260px !important; /* Paksa lebar utuh pas dibuka */
+    }
+    
+    .sidebar.mobile-open {
+        left: 0;
+    }
+
+    .btn-toggle-sidebar {
+        display: none; /* Hilangkan tombol tutup desktop di HP */
+    }
+
+    .btn-mobile-sidebar {
+        display: flex; /* Munculkan hamburger di Topbar HP */
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        backdrop-filter: blur(2px);
+        z-index: 95;
+        display: none;
+    }
+    
+    .sidebar-overlay.active {
+        display: block;
+    }
+
+    .hamburger {
+        display: flex !important;
+    }
+
+    .site-header .desktop-nav,
+    .site-header #guest-area,
+    .site-header #profile-area {
+        display: none !important;
+    }
+
+    /* Pastikan Tombol Tema Tetap Muncul di Luar Hamburger */
+    .theme-toggle {
+        display: flex !important;
+    }
+}
+
+
+
+/* =========================================================
+   📱 RESPONSIVE (Stack di Mobile)
+   ========================================================= */
+@media (max-width: 1100px) {
+    .profile-grid {
+        grid-template-columns: 1fr; /* 1 kolom di tablet */
+        max-width: 600px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-grid {
+        grid-template-columns: 1fr;
+    }
+    .main-profile-card {
+        grid-column: auto;
+        max-width: 100%;
+        margin: 0;
+    }
+    .profile-page-container {
+        padding: 1rem;
+    }
+    .profile-card {
+        padding: 1.5rem;
+    }
+    .profile-card .captcha-row {
+        flex-wrap: wrap;
+    }
+    .profile-card .captcha-question {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+    .profile-card .captcha-row input {
+        width: 100%;
+    }
+    .footer-grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .site-footer { padding: 3rem 1.5rem 1.5rem; }
+}
+
+@media (max-width: 480px) {
+    .footer-grid-4 { grid-template-columns: 1fr; gap: 2.5rem; }
+}

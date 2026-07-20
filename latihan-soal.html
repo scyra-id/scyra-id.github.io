@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latihan Soal - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/latihan-soal.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body class="dashboard-page">
+    
+    <audio id="sfxBenar" src="audio/benar.mp3" preload="auto"></audio>
+    <audio id="sfxSalah" src="audio/salah.mp3" preload="auto"></audio>
+
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body" style="padding-top: 1rem;">
+                
+                <div class="latihan-container">
+                    
+                    <div class="latihan-header">
+                        <span class="badge" id="latihanBadge">⏳ Memuat Latihan...</span>
+                        <div class="zoom-tools">
+                            <button class="tool-btn" onclick="adjustZoom(-0.1)" title="Perkecil Teks">A-</button>
+                            <button class="tool-btn" onclick="adjustZoom(0.1)" title="Perbesar Teks">A+</button>
+                        </div>
+                        <a href="materi.html" class="btn-outline btn-keluar">🛑 Keluar</a>
+                    </div>
+
+                    <div class="latihan-content" id="latihanContent">
+                        <div class="soal-text" id="soalText">Mengambil data soal dari server...</div>
+                        
+                        <div class="opsi-container" id="opsiContainer"></div>
+                        
+                        <div id="instanPembahasan" class="pembahasan-box" style="display:none;"></div>
+
+                        <button id="btnLanjutSoal" class="btn-admin" style="display:none; width:100%; margin-top: 2rem; padding: 1rem; background: var(--brand-primary); font-size: 1.1rem;">Lanjut ke Soal Berikutnya ➡️</button>
+                    </div>
+
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    
+    <script src="js/latihan-soal.js"></script>
+</body>
+</html>

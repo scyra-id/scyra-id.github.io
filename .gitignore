@@ -1,0 +1,30 @@
+# Folder yang di-exclude
+.commandcode/
+.vscode/
+migrations/
+pdf/
+scripts/
+simulasi/
+
+# File yang di-exclude
+zcatatan.txt
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node modules (jika ada)
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Supabase local
+.supabase/

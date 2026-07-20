@@ -1,0 +1,133 @@
+.admin-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    min-height: 60vh;
+}
+
+.loading-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 50vh;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border-color);
+    border-top: 5px solid var(--brand-primary); /* Ganti ke Sage Green */
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.admin-header {
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+}
+
+.admin-header h1 { 
+    color: var(--brand-primary); /* Ganti ke Sage Green */
+    margin-bottom: 0.5rem; 
+}
+
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.admin-card {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 6px var(--shadow-color);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.admin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px var(--shadow-color);
+}
+
+.card-icon { 
+    font-size: 2.5rem; 
+    margin-bottom: 1rem; 
+}
+
+.admin-card h3 { 
+    color: var(--text-primary); 
+    margin-bottom: 0.5rem; 
+}
+
+.admin-card p { 
+    color: var(--text-secondary); 
+    margin-bottom: 1.5rem; 
+}
+
+/* PERBAIKAN TOMBOL ADMIN */
+.btn-admin {
+    background: var(--brand-primary); /* Sage Green */
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-admin:hover { 
+    background: var(--brand-primary-dark); /* Sage Dark saat hover */
+    transform: translateY(-2px);
+}
+
+/* Jika ada tombol admin yang di-disable */
+.btn-admin:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* ===================================================
+   GOD MODE: PAKSA SCROLL NYALA (ANTI MACET)
+   =================================================== */
+html, body.dashboard-page {
+    overflow: hidden !important; /* Paksa body luar gak boleh scroll */
+    height: 100vh !important;
+}
+
+.dashboard-layout {
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+.main-content {
+    flex: 1 1 auto !important;
+    height: 100vh !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+.dashboard-body {
+    flex: 1 1 auto !important;
+    overflow-y: auto !important; /* INI KUNCI UTAMANYA */
+    height: 100% !important;
+    min-height: 0 !important;
+    display: block !important; /* Jaga-jaga kalau materi.css ngubah jadi flex yang salah sumbu */
+    padding-bottom: 5rem !important; /* Biar konten paling bawah gak ketutup layar */
+}

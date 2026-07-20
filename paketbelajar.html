@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paket Belajar - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/paketbelajar.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body>
+    <!-- 🚨 GUEST HEADER (ID diubah biar main.js gak otomatis fetch & gak bikin tabrakan ID) -->
+    <div id="guest-header"></div>
+
+    <!-- 🚨 DASHBOARD LAYOUT (Khusus User Login, Hidden by Default) -->
+    <div id="dashboard-layout" class="dashboard-layout" style="display: none;">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="dashboard-body" id="dashboard-body-target"></div>
+        </div>
+    </div>
+
+    <!-- 🚨 SHARED CONTENT (Konten Utama, Aman dari display:none) -->
+    <main class="container" id="page-content">
+        <div class="paket-container">
+            <div class="paket-header">
+                <h1>🎓 Pilih Paket Belajar</h1>
+                <p>Investasi terbaik untuk masa depanmu. Pilih paket yang sesuai dengan kebutuhanmu.</p>
+            </div>
+
+            <div class="paket-grid">
+                <!-- Paket User (Free) -->
+                <div class="paket-card">
+                    <div class="paket-header-info">
+                        <h2 class="paket-name">Free</h2>
+                        <p class="paket-slogan">Mulai perjalanan belajarmu</p>
+                        <div class="paket-price">
+                            <span class="currency">Rp
+                            <span class="amount"> Credit</span>
+                        </div>
+                    </div>
+                    <div class="paket-badge"><span class="badge-year">2026/2027</span></div>
+                    <ul class="paket-features">
+                        <li><span class="check">✓</span> Akses 1x bab materi tiap subtest</li>
+                        <li><span class="check">✓</span> 1x Trial tryout</li>
+                        <li><span class="check">✓</span> 1x Trial drill soal</li>
+                    </ul>
+                    <button class="btn-pilih-paket" data-paket="user" data-harga="0" disabled>Paket Aktif</button>
+                </div>
+
+                <!-- Paket Silver -->
+                <div class="paket-card">
+                  <span class="discount-badge">DISKON 43,4%</span>
+                    <div class="paket-header-info">
+                        <h2 class="paket-name">Silver</h2>
+                        <p class="paket-slogan">Tingkatkan kemampuanmu</p>
+                        <div class="paket-price">
+                            <span class="original-price">Rp 69.000</span> 
+                            <div class="current-price">
+                                <span class="currency">Rp</span>
+                                <span class="amount">39.000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paket-badge"><span class="badge-year">2026/2027</span></div>
+                    <ul class="paket-features">
+                        <li><span class="check">✓</span> Akses Materi</li>
+                        <li><span class="check">✓</span> Drill Soal</li>
+                        <li><span class="check">✓</span> 3x Tryout</li>
+                    </ul>
+                    <button class="btn-pilih-paket" data-paket="silver" data-harga="39000">Pilih Paket Silver</button>
+                </div>
+
+                <!-- Paket Gold (Recommended) -->
+                <div class="paket-card recommended">
+                    <div class="recommended-badge">⭐ RECOMMENDED</div>
+                    <span class="discount-badge">DISKON 41,4%</span>
+                    <div class="paket-header-info">
+                        <h2 class="paket-name">Gold</h2>
+                        <p class="paket-slogan">Raih skor impianmu</p>
+                        <div class="paket-price">
+                            <span class="original-price">Rp 169.000</span> 
+                            <div class="current-price">
+                                <span class="currency">Rp</span>
+                                <span class="amount">99.000</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="paket-badge"><span class="badge-year">2026/2027</span></div>
+                    <ul class="paket-features">
+                        <li><span class="check">✓</span> Akses SEMUA materi</li>
+                        <li><span class="check">✓</span> Unlimited tryout</li>
+                        <li><span class="check">✓</span> Pembahasan lengkap + video</li>
+                        <li><span class="check">✓</span> Simulasi interaktif premium</li>
+                        <li><span class="check">✓</span> 1-on-1 mentoring</li>
+                        <li><span class="check">✓</span> Garansi skor 650+</li>
+                        <li><span class="check">✓</span> Early access materi baru</li>
+                    </ul>
+                    <button class="btn-pilih-paket" data-paket="gold" data-harga="99000">Pilih Paket Gold</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 🚨 GUEST FOOTER -->
+    <div id="guest-footer"></div>
+
+    <!-- Load Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/paketbelajar.js"></script>
+</body>
+</html>

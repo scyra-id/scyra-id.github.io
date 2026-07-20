@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Kategori Mapel - Admin Scyra</title>
+    
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-materi.css"> 
+    
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <main class="admin-container">
+                    
+                    <div class="admin-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;">
+                        <div>
+                            <h1 style="color: var(--text-primary); margin: 0 0 0.5rem 0;">🏷️ Kelola Mapel</h1>
+                            <p style="color: var(--text-secondary); margin: 0;">Atur daftar mata pelajaran dan jenjang pendidikan</p>
+                        </div>
+                        <button class="btn-admin" id="btnOpenModal" style="width: auto; padding: 0.7rem 1.5rem;">
+                            + Tambah Mapel
+                        </button>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">Icon</th>
+                                    <th>Nama Mapel</th>
+                                    <th>Jenjang</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kategoriTableBody">
+                                <tr><td colspan="4" style="text-align: center; padding: 2rem;">Memuat data...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </main>
+                
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div> 
+        </div> 
+    </div> 
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Mapel Baru</h2>
+                <button class="btn-close" id="btnCloseModal">&times;</button>
+            </div>
+            
+            <form id="kategoriForm">
+                <input type="hidden" id="kategoriId">
+                
+                <div class="form-group">
+                    <label for="icon">Icon / Emoji</label>
+                    <input type="text" id="icon" required placeholder="Contoh: 🧠, 📐, ⚛️" maxlength="5">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.3rem;">Gunakan emoji dari keyboard (Win + . atau Cmd + Ctrl + Space)</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="nama_mapel">Nama Mata Pelajaran</label>
+                    <input type="text" id="nama_mapel" required placeholder="Contoh: Penalaran Umum">
+                </div>
+                
+                <div class="form-group">
+                    <label for="jenjang">Jenjang Pendidikan</label>
+                    <select id="jenjang" required>
+                        <option value="utbk">🎯 UTBK / SNBT 2026</option>
+                        <option value="sma">🏫 SMA / SMK</option>
+                        <option value="smp">🎒 SMP / MTs</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-admin" style="margin-top: 1rem; width: 100%;">💾 Simpan Mapel</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-kategori.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Membaca Materi - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/detail-materi.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body class="dashboard-page">
+    
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <div id="detailLoading" class="detail-loading">
+                    <div class="spinner-sage"></div>
+                    <p>Memuat materi...</p>
+                </div>
+
+                <article id="detailContent" class="detail-container" style="display: none;">
+                    
+                    <a href="materi.html" class="btn-back">← Kembali ke Katalog Materi</a>
+
+                    <header class="detail-header" style="margin-top: 1.5rem;">
+                        <span class="detail-badge" id="detailKategori">Kategori</span>
+                        <h1 id="detailJudul">Judul Materi</h1>
+                        <div class="detail-meta"><span id="detailTanggal">Tanggal</span></div>
+                    </header>
+
+                    <div class="detail-divider"></div>
+
+                    <div class="detail-body" id="detailBody">
+                        </div>
+
+                    <footer class="detail-footer" style="margin-top: 4rem; text-align: center;">
+                        <button id="btnGoToDrill" class="btn-latihan-bottom">
+                            📝 Mulai Latihan Soal
+                        </button>
+                    </footer>
+                </article>
+
+                <div id="detailError" class="detail-error" style="display: none;">
+                    <h2>😔 Materi Tidak Ditemukan</h2>
+                    <a href="materi.html" class="btn-primary-lg">Lihat Katalog Materi</a>
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/detail-materi.js"></script>
+</body>
+</html>

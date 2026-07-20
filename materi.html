@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pusat Materi - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/materi.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            
+            <div id="topbar-placeholder"></div>
+            
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <main class="materi-container">
+                    
+                    <section class="materi-header">
+                        <div class="header-teks">
+                            <h1 class="page-title">Pilih Materi Belajar 📚</h1>
+                            <p class="page-subtitle">Kuasai konsepnya, taklukkan ujiannya.</p>
+                        </div>
+                        <div class="jenjang-selector">
+                            <select id="jenjangSelect" class="form-select" aria-label="Pilih Jenjang">
+                                <option value="utbk">🎯 UTBK / SNBT 2026</option>
+                                <option value="sma">🏫 SMA / SMK</option>
+                                <option value="smp">🎒 SMP / MTs</option>
+                            </select>
+                        </div>
+                    </section>
+
+                    <div id="mapelView">
+                        <div class="mapel-grid" id="mapelGrid">
+                            </div>
+                    </div>
+
+                    <div id="babView" style="display: none;">
+                        <button id="btnBackToMapel" class="btn-back">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                            Kembali ke Daftar Mapel
+                        </button>
+                        
+                        <div class="bab-header">
+                            <div class="bab-icon-large" id="babIconLarge">🧠</div>
+                            <div>
+                                <h2 id="babTitle">Nama Mapel</h2>
+                                <p id="babSubtitle">Selesaikan materi dan uji kemampuanmu.</p>
+                            </div>
+                        </div>
+
+                        <div class="mapel-content-grid">
+                            
+                            <div class="content-panel">
+                                <div class="panel-header">
+                                    <h3>📚 Modul & Pemantapan</h3>
+                                    <p>Pelajari materi dan kerjakan tugas harian per bab.</p>
+                                </div>
+                                <div class="bab-list" id="babList">
+                                    </div>
+                            </div>
+
+                            <div class="content-panel">
+                                <div class="panel-header">
+                                    <h3>🎯 Evaluasi & Ujian</h3>
+                                    <p>Uji pemahamanmu secara menyeluruh di mapel ini.</p>
+                                </div>
+                                <div class="ujian-list" id="ujianList">
+                                    </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>>
+
+            </div> </div> </div> <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/materi.js"></script>
+</body>
+</html>

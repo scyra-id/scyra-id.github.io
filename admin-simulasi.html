@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Simulasi - Admin Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin-simulasi.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body class="dashboard-page">
+    
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                
+                <div class="admin-header">
+                    <h1 class="page-title">🎮 Manajemen Simulasi Interaktif</h1>
+                    <p class="page-subtitle">Upload file simulasi buatanmu (.html) dan dapatkan kode sandi untuk disisipkan ke materi.</p>
+                </div>
+
+                <div class="simulasi-card form-section">
+                    <h2 style="margin-bottom: 1.5rem; color: var(--brand-primary);">➕ Upload Simulasi Baru</h2>
+                    <form id="formSimulasi">
+                        <div class="form-group">
+                            <label for="judulSimulasi">Judul / Nama Simulasi</label>
+                            <input type="text" id="judulSimulasi" class="form-input" placeholder="Contoh: Geometri Panjang Busur" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="tipeSimulasi">Tipe Sumber</label>
+                            <select id="tipeSimulasi" class="form-select" required>
+                                <option value="upload">📂 Upload File (.html) ke Server</option>
+                                <option value="eksternal">🌐 Link Web Eksternal (Website Luar)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="groupUpload">
+                            <label for="fileSimulasi">Pilih File Simulasi (.html)</label>
+                            <input type="file" id="fileSimulasi" class="form-input" accept=".html" required>
+                            <p class="form-hint">💡 File HTML akan otomatis di-upload ke Supabase Storage (Bucket: simulasi).</p>
+                        </div>
+
+                        <div class="form-group" id="groupLink" style="display: none;">
+                            <label for="linkSimulasi">URL Website Luar</label>
+                            <input type="url" id="linkSimulasi" class="form-input" placeholder="Contoh: https://phet.colorado.edu/...">
+                        </div>
+
+                        <button type="submit" class="btn-admin" id="btnSaveSimulasi" style="width: 100%; padding: 1rem; font-size: 1.1rem; margin-top: 1rem;">🚀 Upload & Generate Kode</button>
+                    </form>
+                </div>
+
+                <div class="simulasi-card list-section" style="margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1.5rem; color: var(--text-primary);">📚 Daftar Simulasi Tersedia</h2>
+                    <div id="loadingSimulasi" style="text-align: center; color: var(--text-muted); padding: 2rem;">⏳ Memuat data simulasi...</div>
+                    
+                    <div class="simulasi-grid" id="simulasiGrid" style="display: none;">
+                        </div>
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-simulasi.js"></script>
+</body>
+</html>

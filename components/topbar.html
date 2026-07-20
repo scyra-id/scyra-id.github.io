@@ -1,0 +1,48 @@
+<header class="topbar" id="topbar">
+    <div class="topbar-left">
+        <button class="btn-icon-topbar" id="mainSidebarBtn" aria-label="Toggle Menu" style="background:transparent; border:none; box-shadow:none;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="3" y1="6" x2="21" y2="6"></line>
+                <line x1="3" y1="12" x2="21" y2="12"></line>
+                <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+        </button>
+        
+        <a href="dashboard.html" class="topbar-logo mobile-only">
+            <img src="images/logo.svg" alt="Scyra" class="logo-img">
+            <h2>Scyra</h2>
+        </a>
+    </div>
+    
+    <div class="topbar-right">
+        <button class="btn-icon-topbar" id="notifBtn" aria-label="Notifikasi">
+            🔔
+            <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+        </button>
+        
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode">
+        <span class="icon-sun">☀️</span>
+        <span class="icon-moon">🌙</span>
+      </button>
+        
+        <div id="profile-area" class="profile-dropdown-container">
+            <button class="avatar-btn" id="headerAvatarBtn" aria-label="Menu Profile">
+                <img id="headerAvatar" src="" alt="User">
+            </button>
+            <div class="profile-dropdown" id="profile-dropdown">
+                <div class="dropdown-header">
+                    <img id="dropdownAvatar" src="" alt="User">
+                    <div>
+                        <div class="dropdown-name" id="dropdownName">Memuat...</div>
+                        <div class="dropdown-email" id="dropdownEmail">email@user.com</div>
+                    </div>
+                </div>
+                <div class="dropdown-menu">
+                    <a href="profile.html" class="dropdown-item">⚙️ Setting Profile</a>
+                    <a href="admin.html" class="dropdown-item" id="admin-link" style="display:none;">🛡️ Dashboard Admin</a>
+                    <button class="dropdown-item logout-btn" id="logout-btn-desktop">🚪 Keluar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>

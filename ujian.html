@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ruang Ujian - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/ujian.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="exam-mode">
+    <!-- Loading State -->
+    <div id="examLoading" class="exam-loading">
+        <div class="spinner-sage"></div>
+        <p>Memuat soal dari Bank Data...</p>
+    </div>
+
+    <!-- Layout Ujian -->
+    <div id="examContainer" class="exam-container" style="display: none;">
+        <!-- Header Ujian (Timer & Info) -->
+        <header class="exam-header">
+            <div class="exam-info">
+                <h2 id="examTitle">Memuat Tryout...</h2>
+                <span id="examMapel" class="exam-badge">Memuat Subtes...</span>
+            </div>
+            <div class="zoom-tools">
+                <button class="tool-btn" onclick="adjustZoom(-0.1)" title="Perkecil Teks">A-</button>
+                <button class="tool-btn" onclick="adjustZoom(0.1)" title="Perbesar Teks">A+</button>
+            </div>
+            <div class="exam-timer" id="examTimer">
+                <span class="timer-icon">⏱️</span>
+                <span id="timerDisplay">00:00</span>
+            </div>
+        </header>
+
+        <!-- Area Konten (Soal & Navigator) -->
+        <main class="exam-main">
+            <!-- Kiri: Soal -->
+            <section class="exam-question-area">
+                <div class="question-card">
+                    <div class="question-number">Soal <span id="currentNum">1</span> dari <span id="totalNum">-</span></div>
+                    <div class="question-text" id="questionText">Memuat pertanyaan...</div>
+                    
+                    <div class="options-list" id="optionsList">
+                        <!-- Opsi A-E di-generate oleh JS -->
+                    </div>
+                </div>
+
+                <div class="question-nav-buttons">
+                    <button id="btnPrev" class="btn-nav">← Sebelumnya</button>
+                    <button id="btnNext" class="btn-nav primary">Selanjutnya →</button>
+                    <button id="btnFinish" class="btn-nav finish" style="display:none;">🏁 Selesai & Kumpulkan</button>
+                </div>
+            </section>
+
+            <!-- Kanan: Navigasi Nomor -->
+            <aside class="exam-sidebar">
+                <h3>Navigasi Soal</h3>
+                <div class="navigator-grid" id="navigatorGrid"></div>
+                <div class="sidebar-legend">
+                    <div class="legend-item"><span class="dot-current"></span> Aktif</div>
+                    <div class="legend-item"><span class="dot-answered"></span> Dijawab</div>
+                    <div class="legend-item"><span class="dot-empty"></span> Belum</div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- 🚨 MODAL PERINGATAN PELANGGARAN -->
+    <div id="violationModal" class="violation-modal" style="display: none;">
+        <div class="violation-box">
+            <h2>⚠️ PERINGATAN KERAS!</h2>
+            <p id="violationText">Anda terdeteksi meninggalkan halaman ujian.</p>
+            <button id="btnCloseViolation" class="btn-nav" style="margin-top: 2rem; background: white; color: var(--error); font-weight:bold; padding: 1rem 2rem;">Saya Mengerti & Kembali Mengerjakan</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <!-- Urutan Wajib: main.js di atas ujian.js agar Alert & Confirm Native aktif -->
+    <script src="js/main.js"></script>
+    <script src="js/ujian.js"></script>
+</body>
+</html>
