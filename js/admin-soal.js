@@ -561,6 +561,8 @@ function parseQuestions(text, katId, matId) {
 
         questions.push(q);
     }
+
+    return questions;
 }
 
 function showPreview() {
