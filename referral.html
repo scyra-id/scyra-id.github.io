@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Referral - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/referral.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="dashboard-body">
+                <div class="referral-container">
+                    <div class="referral-header">
+                        <h1>🎁 Program Referral</h1>
+                        <p>Ajak temanmu bergabung dan dapatkan credit gratis!</p>
+                    </div>
+
+                    <div class="referral-grid">
+                        <!-- Section 1: Input Referral Code -->
+                        <div class="referral-card" id="inputReferralCard">
+                            <div class="card-header">
+                                <h2>📝 Gunakan Kode Referral</h2>
+                                <p>Masukkan kode referral dari temanmu untuk mendapatkan 2 credit gratis!</p>
+                            </div>
+                            
+                            <!-- Eligibility Check -->
+                            <div class="eligibility-notice" id="eligibilityNotice" style="display: none;">
+                                <div class="notice-icon">⚠️</div>
+                                <div class="notice-content">
+                                    <strong>Syarat Belum Terpenuhi</strong>
+                                    <p id="eligibilityMessage">Kamu harus menyelesaikan minimal 1 mini drill atau 1 materi beserta soal untuk menggunakan referral.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Already Used Notice -->
+                            <div class="already-used-notice" id="alreadyUsedNotice" style="display: none;">
+                                <div class="notice-icon">✅</div>
+                                <div class="notice-content">
+                                    <strong>Sudah Menggunakan Referral</strong>
+                                    <p>Kamu sudah pernah menggunakan kode referral sebelumnya.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Referral Form -->
+                            <form id="referralForm" class="referral-form">
+                                <div class="form-group">
+                                    <label for="referralCodeInput">Kode Referral</label>
+                                    <input type="text" id="referralCodeInput" placeholder="Contoh: SCYRAABC123" 
+                                        maxlength="11" autocomplete="off" style="text-transform: uppercase;">
+                                    <small>Format: SCYRA + 6 karakter alphanumeric</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="phoneNumberInput">Nomor WhatsApp</label>
+                                    <input type="tel" id="phoneNumberInput" placeholder="08xxxxxxxxxx" 
+                                        maxlength="15" autocomplete="off">
+                                    <small>Nomor ini akan menerima kode OTP untuk verifikasi</small>
+                                </div>
+                                
+                                <button type="submit" class="btn-primary" id="btnSubmitReferral" disabled>
+                                    Kirim OTP
+                                </button>
+                            </form>
+                            
+                            <!-- OTP Verification Form (Hidden by default) -->
+                            <form id="otpForm" class="otp-form" style="display: none;">
+                                <div class="otp-info">
+                                    <p>📱 Kode OTP telah dikirim ke <strong id="otpPhoneNumber"></strong></p>
+                                    <p class="otp-note">Cek WhatsApp kamu untuk mendapatkan kode 6 digit</p>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="otpInput">Kode OTP</label>
+                                    <input type="text" id="otpInput" placeholder="000000" 
+                                        maxlength="6" autocomplete="off" style="text-align: center; font-size: 1.5rem; letter-spacing: 0.5rem;">
+                                    <small id="otpTimer">Berlaku selama 10 menit</small>
+                                </div>
+                                
+                                <div class="otp-actions">
+                                    <button type="submit" class="btn-primary" id="btnVerifyOTP">
+                                        Verifikasi
+                                    </button>
+                                    <button type="button" class="btn-secondary" id="btnResendOTP">
+                                        Kirim Ulang OTP
+                                    </button>
+                                    <button type="button" class="btn-text" id="btnCancelOTP">
+                                        Batal
+                                    </button>
+                                </div>
+                            </form>
+                            
+                            <!-- Success Message (Hidden by default) -->
+                            <div class="referral-success" id="referralSuccess" style="display: none;">
+                                <div class="success-icon">🎉</div>
+                                <h3>Referral Berhasil!</h3>
+                                <p id="successMessage">Kamu mendapatkan 2 credit gratis!</p>
+                                <button class="btn-primary" onclick="window.location.reload()">
+                                    Selesai
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section 2: Free Credit via IG -->
+                        <div class="referral-card" id="igCreditCard">
+                            <div class="card-header">
+                                <h2>📱 Free Credit via Instagram</h2>
+                                <p>Follow Instagram kami dan dapatkan 5 credit gratis!</p>
+                            </div>
+                            
+                            <!-- Status Check -->
+                            <div class="ig-status" id="igStatus" style="display: none;">
+                                <div class="status-icon">⏳</div>
+                                <div class="status-content">
+                                    <strong id="statusTitle">Menunggu Approval</strong>
+                                    <p id="statusMessage">Permintaan kamu sedang direview oleh admin.</p>
+                                </div>
+                            </div>
+                            
+                            <!-- IG Form -->
+                            <form id="igForm" class="referral-form">
+                                <div class="form-group">
+                                    <label for="igUsernameInput">Username Instagram</label>
+                                    <input type="text" id="igUsernameInput" placeholder="@username" 
+                                        maxlength="30" autocomplete="off">
+                                    <small>Tanpa @, contoh: scyra_edu</small>
+                                </div>
+                                
+                                <div class="ig-instructions">
+                                    <h4>📋 Cara Mendapatkan Credit:</h4>
+                                    <ol>
+                                        <li>Follow Instagram <strong>@scyra_edu</strong></li>
+                                        <li>Like 3 post terakhir kami</li>
+                                        <li>Masukkan username IG kamu di form ini</li>
+                                        <li>Tunggu approval dari admin (1x24 jam)</li>
+<li>Credit 5 <img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;"> akan otomatis ditambahkan!</li>
+                                    </ol>
+                                </div>
+                                
+                                <button type="submit" class="btn-primary" id="btnSubmitIG">
+                                    Kirim Permintaan
+                                </button>
+                            </form>
+                            
+                            <!-- Success Message -->
+                            <div class="referral-success" id="igSuccess" style="display: none;">
+                                <div class="success-icon">📨</div>
+                                <h3>Permintaan Terkirim!</h3>
+                                <p>Admin akan mereview permintaan kamu dalam 1x24 jam.</p>
+                                <button class="btn-primary" onclick="window.location.reload()">
+                                    OK
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Section 3: My Referral Code -->
+                        <div class="referral-card" id="myReferralCard">
+                            <div class="card-header">
+                                <h2>🔗 Kode Referral Kamu</h2>
+                                <p>Bagikan kode ini ke temanmu dan dapatkan 2 credit untuk setiap teman yang bergabung!</p>
+                            </div>
+                            
+                            <div class="my-referral-code">
+                                <div class="code-display">
+                                    <span id="myReferralCode">Loading...</span>
+                                    <button class="btn-copy" id="btnCopyCode" title="Copy kode">
+                                        📋
+                                    </button>
+                                </div>
+                                <button class="btn-share" id="btnShareCode">
+                                    📤 Bagikan ke Teman
+                                </button>
+                            </div>
+                            
+                            <div class="referral-info">
+                                <div class="info-item">
+<span class="info-icon"><img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;"></span>
+                                    <div>
+                                        <strong>2 Credit</strong>
+                                        <p>Untuk kamu dan temanmu</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-icon">👥</span>
+                                    <div>
+                                        <strong id="referralCount">0/5</strong>
+                                        <p>Referral berhasil</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="referral-terms">
+                                <h4>Syarat & Ketentuan:</h4>
+                                <ul>
+                                    <li>Temanmu harus menyelesaikan minimal 1 mini drill atau 1 materi</li>
+                                    <li>Maksimal 5 referral per user</li>
+                                    <li>Credit akan otomatis ditambahkan setelah verifikasi</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/referral.js"></script>
+    <script src="js/referral-ui.js"></script>
+</body>
+</html>

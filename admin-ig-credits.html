@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - IG Credit Requests - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-ig-credits.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    
+    <script>
+        const savedTheme = localStorage.getItem('scyra_theme') || localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark', 'dark-mode', 'dark-theme');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark', 'dark-mode', 'dark-theme'));
+        }
+    </script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            
+            <div class="dashboard-body">
+                
+                <!-- Header -->
+                <div class="ig-header">
+                    <div class="ig-header-left">
+                        <h1>📱 IG Credit Requests</h1>
+                        <p>Kelola permintaan free credit dari Instagram followers</p>
+                    </div>
+                    <div class="ig-header-right">
+                        <div class="ig-search-box">
+                            <span class="search-icon">🔍</span>
+                            <input type="text" id="searchInput" placeholder="Cari user atau IG...">
+                        </div>
+                        <button class="btn-refresh" id="btnRefresh" title="Refresh data">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <polyline points="1 20 1 14 7 14"></polyline>
+                                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+                            </svg>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats Cards -->
+                <div class="ig-stats-row" id="statsRow">
+                    <div class="ig-stat-card">
+                        <div class="ig-stat-icon pending">⏳</div>
+                        <div class="ig-stat-info">
+                            <span class="ig-stat-value" id="statPending">-</span>
+                            <span class="ig-stat-label">Pending</span>
+                        </div>
+                    </div>
+                    <div class="ig-stat-card">
+                        <div class="ig-stat-icon approved">✅</div>
+                        <div class="ig-stat-info">
+                            <span class="ig-stat-value" id="statApproved">-</span>
+                            <span class="ig-stat-label">Approved</span>
+                        </div>
+                    </div>
+                    <div class="ig-stat-card">
+                        <div class="ig-stat-icon rejected">❌</div>
+                        <div class="ig-stat-info">
+                            <span class="ig-stat-value" id="statRejected">-</span>
+                            <span class="ig-stat-label">Rejected</span>
+                        </div>
+                    </div>
+                    <div class="ig-stat-card">
+                        <div class="ig-stat-icon total">📊</div>
+                        <div class="ig-stat-info">
+                            <span class="ig-stat-value" id="statTotal">-</span>
+                            <span class="ig-stat-label">Total Request</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Tabs -->
+                <div class="ig-filter-tabs">
+                    <button class="ig-tab-btn active" data-status="pending">
+                        ⏳ Pending <span class="ig-tab-count" id="tabCountPending">0</span>
+                    </button>
+                    <button class="ig-tab-btn" data-status="approved">
+                        ✅ Approved <span class="ig-tab-count" id="tabCountApproved">0</span>
+                    </button>
+                    <button class="ig-tab-btn" data-status="rejected">
+                        ❌ Rejected <span class="ig-tab-count" id="tabCountRejected">0</span>
+                    </button>
+                    <button class="ig-tab-btn" data-status="all">
+                        📋 Semua <span class="ig-tab-count" id="tabCountAll">0</span>
+                    </button>
+                </div>
+
+                <!-- Table -->
+                <div class="ig-table-container">
+                    <div class="ig-table-wrapper">
+                        <table class="ig-table">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Instagram</th>
+                                    <th>Credit</th>
+                                    <th>Status</th>
+                                    <th>Tanggal</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requestsTableBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="ig-loading-state">
+                                            <div class="ig-loading-spinner"></div>
+                                            <div class="ig-loading-text">Memuat data request...</div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal Approve/Reject -->
+    <div id="actionModal" class="ig-modal-overlay">
+        <div class="ig-modal">
+            <div class="ig-modal-header">
+                <h3 id="modalTitle">Konfirmasi Aksi</h3>
+                <button class="ig-modal-close" onclick="closeActionModal()">&times;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div class="ig-modal-message" id="modalMessage">
+                    Apakah Anda yakin?
+                </div>
+                
+                <div class="ig-modal-form-group" id="notesGroup" style="display: none;">
+                    <label for="adminNotes">Catatan Admin (opsional)</label>
+                    <textarea id="adminNotes" rows="3" placeholder="Alasan reject, catatan, dll..."></textarea>
+                </div>
+            </div>
+            <div class="ig-modal-actions">
+                <button class="ig-modal-btn ig-modal-btn-cancel" onclick="closeActionModal()">
+                    Batal
+                </button>
+                <button class="ig-modal-btn ig-modal-btn-approve" id="btnConfirmAction">
+                    Konfirmasi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div id="detailModal" class="ig-modal-overlay">
+        <div class="ig-modal">
+            <div class="ig-modal-header">
+                <h3>📋 Detail Request</h3>
+                <button class="ig-modal-close" onclick="closeDetailModal()">&times;</button>
+            </div>
+            <div class="ig-modal-body">
+                <div class="ig-detail-grid" id="detailContent">
+                </div>
+            </div>
+            <div class="ig-modal-actions">
+                <button class="ig-modal-btn ig-modal-btn-cancel" onclick="closeDetailModal()">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="ig-toast">
+        <span class="ig-toast-icon" id="toastIcon">✅</span>
+        <span class="ig-toast-text" id="toastText">Berhasil!</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/admin-ig-credits.js"></script>
+</body>
+</html>

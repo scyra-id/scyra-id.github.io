@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Paket Tryout - Admin Scyra</title>
+    <link rel="icon" type="image/png" href="images/logo.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-paket.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                <main class="admin-container">
+                    <div class="admin-header">
+                        <h1>📦 Kelola Paket Tryout</h1>
+                        <p>Buat paket tryout SNBT. Sistem akan <b>otomatis mengenerate 7 Subtes</b> untuk setiap paket yang dibuat.</p>
+                        <a href="admin.html" class="btn-back-admin">← Kembali ke Dashboard Admin</a>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <button id="btnOpenPaketModal" class="btn-admin btn-gold">➕ Buat Paket Baru</button>
+                    </div>
+
+                    <div id="paketContainer" class="paket-grid">
+                        <p>⏳ Memuat daftar paket tryout...</p>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="paketModalOverlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="paketModalTitle">Buat Paket Tryout</h3>
+                <button class="btn-close-modal" id="btnClosePaketModal">&times;</button>
+            </div>
+            
+            <form id="formPaket">
+                <input type="hidden" id="paketId">
+                <div class="form-group">
+                    <label>Nama Paket *</label>
+                    <input type="text" id="namaPaket" placeholder="Contoh: TRYOUT 0 SNBT" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Waktu Mulai Tryout 📅</label>
+                        <input type="datetime-local" id="waktuMulai" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Waktu Ditutup ⏳</label>
+                        <input type="datetime-local" id="waktuSelesai" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Status Publikasi</label>
+                    <select id="statusPaket">
+                        <option value="aktif">Aktif (Tampil di Katalog)</option>
+                        <option value="nonaktif">Nonaktif (Disembunyikan)</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-admin" style="width:100%;">💾 Simpan & Generate Subtes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/admin-paket.js"></script>
+    <script src="js/session.js"></script>
+</body>
+</html>

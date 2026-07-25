@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail Hasil Tryout SNBT - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/riwayat.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                <main class="riwayat-container">
+                    <div class="riwayat-header">
+                        <h1 id="detailTitle">📝 Detail Hasil Tryout</h1>
+                        <p id="detailSubtitle">Memuat data...</p>
+                        <a href="riwayat-snbt.html" class="btn-back">← Kembali ke Daftar Tryout</a>
+                    </div>
+
+                    <div id="detailContent" class="detail-snbt-layout" style="display: none;">
+                        <!-- Left Column -->
+                        <div class="detail-left">
+                            <!-- Card 1: Identitas Siswa -->
+                            <div class="detail-card">
+                                <h2>👤 Identitas Siswa</h2>
+                                <div id="identityContent">
+                                    <div class="identity-row">
+                                        <span class="identity-label">Nama Lengkap</span>
+                                        <span class="identity-value" id="idNama">-</span>
+                                    </div>
+                                    <div class="identity-row">
+                                        <span class="identity-label">Username</span>
+                                        <span class="identity-value" id="idUsername">-</span>
+                                    </div>
+                                    <div class="identity-row">
+                                        <span class="identity-label">Email</span>
+                                        <span class="identity-value" id="idEmail">-</span>
+                                    </div>
+                                    <div class="identity-row">
+                                        <span class="identity-label">Asal Sekolah</span>
+                                        <span class="identity-value">-</span>
+                                    </div>
+                                    <div class="identity-row">
+                                        <span class="identity-label">Nomor Ujian</span>
+                                        <span class="identity-value">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: Perolehan Skor -->
+                            <div class="detail-card">
+                                <h2>📊 Perolehan Skor (Skala IRT 0-1000)</h2>
+                                <div id="barChart" class="bar-chart-container">
+                                    <!-- Bars rendered by JS -->
+                                </div>
+
+                                <table class="score-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subtes</th>
+                                            <th>Benar</th>
+                                            <th>Bobot</th>
+                                            <th>Skor</th>
+                                            <th>Waktu</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="scoreTableBody">
+                                        <!-- Rows rendered by JS -->
+                                    </tbody>
+                                </table>
+
+                                <button class="btn-distribusi" id="btnDistribusi" style="display: none;">
+                                    Lihat Distribusi Jawaban
+                                </button>
+                            </div>
+
+                            <!-- Card 3: Rekap Pelanggaran -->
+                            <div class="detail-card">
+                                <h2>🚨 Rekap Pelanggaran</h2>
+                                <table class="violation-table">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Bidang Studi</th>
+                                            <th>Jumlah Pelanggaran</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="violationTableBody">
+                                        <tr>
+                                            <td colspan="3" style="text-align: center; color: var(--text-secondary);">Data pelanggaran belum tersedia.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div class="detail-right">
+                            <!-- Card 4: PTN & Rekomendasi -->
+                            <div class="detail-card ptn-card">
+                                <h2>🎓 Rekomendasi PTN</h2>
+                                <p>Data pilihan PTN dan analisis kelulusan akan ditampilkan di sini.</p>
+                                <div class="ptn-list">
+                                    <div class="ptn-item">
+                                        <h4>PTN Pilihan 1</h4>
+                                        <span>Belum ditentukan</span>
+                                    </div>
+                                    <div class="ptn-item">
+                                        <h4>PTN Pilihan 2</h4>
+                                        <span>Belum ditentukan</span>
+                                    </div>
+                                    <div class="ptn-item">
+                                        <h4>PTN Pilihan 3</h4>
+                                        <span>Belum ditentukan</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/detail-snbt.js"></script>
+</body>
+</html>

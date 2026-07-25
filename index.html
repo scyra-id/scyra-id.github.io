@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar UTBK - Home</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/path-of-light.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body>
+    <div id="auth-loading" class="auth-loading">
+        <div class="spinner-sage"></div>
+        <p>Memuat ruang belajarmu...</p>
+    </div>
+    <!-- Header akan dimuat di sini secara otomatis -->
+    <div id="header-placeholder"></div>
+
+    <main>
+    <!-- ================= HERO SECTION ================= -->
+        <section class="hero">
+            <div class="container hero-container">
+                <div class="hero-text">
+                    <span class="badge-new">🚀 Siap SNBT 2026</span>
+                    <h1>Tembus PTN Impianmu dengan <span class="text-gradient">Strategi Terukur</span></h1>
+                    <p class="hero-subtitle">
+                        Jangan buang waktumu mencari soal yang berantakan di internet. 
+                        Dapatkan ribuan soal terkurasi, materi terstruktur, dan simulasi Tryout mirip ujian asli dalam satu platform.
+                    </p>
+                    <div class="hero-cta">
+                        <a href="#" class="btn-primary-lg" id="btn-mulai-belajar" onclick="handleMulaiBelajar(event)">Mulai Belajar Gratis</a>
+                        <a href="#features" class="btn-secondary-lg">Lihat Fitur Unggulan ↓</a>
+                    </div>
+                </div>
+                <div class="hero-trust">
+                    <div class="avatars-stack">
+                        <div class="mini-avatar" style="background: #ef4444;">A</div>
+                        <div class="mini-avatar" style="background: #f59e0b;">B</div>
+                        <div class="mini-avatar" style="background: #10b981;">C</div>
+                    </div>
+                    <span>bergabung dengan <strong>1,000+</strong> pejuang PTN lainnya</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <!-- Placeholder untuk ilustrasi/mockup nanti -->
+                <div class="mockup-card">
+                    <div class="mockup-header">
+                        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                    </div>
+                    <div class="mockup-body">
+                        <div class="mockup-question">
+                            <p class="q-label" id="mockupMapel">Memuat soal...</p>
+                            <p class="q-text" id="mockupTeks">Mohon tunggu sebentar...</p>
+                            <div class="q-options" id="mockupOptions"></div>
+                            <div class="mockup-feedback" id="mockupFeedback" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    <!-- ================= PATH OF LIGHT (INTERACTIVE WEB-GAME JOURNEY) ================= -->
+    <section class="path-of-light-section" id="path-of-light-section" aria-label="Path of Light — Perjalanan menuju kampus impian">
+        <div class="pol-stars" aria-hidden="true"></div>
+        <div class="pol-vignette" aria-hidden="true"></div>
+        <div class="pol-godrays" aria-hidden="true"></div>
+
+        <!-- Kyra — sticky companion & sumber cahaya (fixed, mengikuti zona) -->
+        <div id="pol-companion" aria-hidden="true">
+            <div class="pol-spotlight"></div>
+            <div class="pol-kyra" id="kyra-companion">
+                <div class="pol-kyra-float">
+                    <div class="pol-kyra-aura"></div>
+                    <img src="images/maskot.webp" alt="" class="pol-kyra-img" loading="lazy">
+                    <div class="pol-kyra-beam"></div>
+                </div>
+            </div>
+            <!-- RPG chat bubble: zone-aware, typewriter with interrupt -->
+            <div class="pol-chat" id="pol-chat">
+                <p class="pol-chat-text" id="pol-chat-text"></p>
+            </div>
+        </div>
+
+        <!-- ========== LEVEL 0: TRANSITION ZONE (seamless entryway) ========== -->
+        <div class="pol-level pol-level-0" data-kyra-pos="hidden">
+            <div class="pol-entry-fog fog-a" aria-hidden="true"></div>
+            <div class="pol-entry-fog fog-b" aria-hidden="true"></div>
+            <p class="pol-entry-caption">Memasuki hutan berkabut…</p>
+            <div class="pol-entry-veil" aria-hidden="true"></div>
+        </div>
+
+        <!-- ========== LEVEL 1: NPC ENCOUNTER (Kyra's introduction) ========== -->
+        <div class="pol-level pol-level-1" data-kyra-pos="center">
+            <div class="pol-forest pol-forest-far" data-speed="0.12" aria-hidden="true"></div>
+            <div class="pol-forest pol-forest-near" data-speed="0.3" aria-hidden="true"></div>
+            <div class="pol-fog pol-fog-a" aria-hidden="true"></div>
+            <div class="pol-fog pol-fog-b" aria-hidden="true"></div>
+
+            <div class="pol-hero-content">
+                <div class="pol-dialogue">
+                    <span class="pol-dialogue-name">KYRA</span>
+                    <p class="pol-typewriter"><span id="pol-typewriter-text"></span><span class="pol-caret" aria-hidden="true"></span></p>
+                    <p class="pol-dialogue-hint">▼ Gulir untuk menerima misi</p>
+                </div>
+            </div>
+        </div>
+
+         <!-- ========== LEVEL 2: HALLWAY OF ILLUSIONS (5 myths vs facts) - 2D CINEMATIC ========== -->
+         <div class="pol-level pol-level-2" data-kyra-pos="corner" data-kyra-line="Lima bayangan ini sudah lama menghalangi banyak pejuang. Mari kita bongkar kebohongannya.">
+             <div class="pol-level-2-container">
+                 <div class="pol-level-head pol-reveal">
+                     <h2 class="pol-h2">Lorong Ilusi</h2>
+                     <p class="pol-lead">Lima bayangan menakutkan menghalangi jalan. Dekati mereka — biarkan <strong>cahaya Kyra</strong> membongkar kebohongannya satu per satu.</p>
+                 </div>
+
+                 <!-- 2D Theme Morph Backdrop -->
+                 <div class="pol-l2-backdrop" aria-hidden="true">
+                     <div class="pol-l2-noise"></div>
+                 </div>
+
+                 <!-- Scroll Velocity Particles -->
+                 <canvas class="pol-l2-particles" aria-hidden="true"></canvas>
+
+                  <!-- Illusion 1: The Exhausted Wraith -->
+                  <div class="pol-illusion pol-reveal" style="--d:2">
+                      <div class="pol-myth-frame">
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Belajar efektif itu harus begadang tanpa henti.&rdquo;</div>
+                      </div>
+                      <div class="pol-illusion-stage">
+                          <div class="pol-spook pol-wraith" aria-hidden="true">
+                              <div class="pol-wraith-body">
+                                  <span class="pol-wraith-eye left"></span>
+                                  <span class="pol-wraith-eye right"></span>
+                              </div>
+                          </div>
+                          <div class="pol-fact-card">
+                              <strong>FAKTA</strong>
+                              <p>Otak butuh jeda. Belajar teratur (Spaced Repetition) jauh lebih efektif.</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Illusion 2: The Wall of Division -->
+                  <div class="pol-illusion pol-reveal" style="--d:3">
+                      <div class="pol-myth-frame">
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Anak IPA dan IPS cuma punya peluang di jalurnya masing-masing.&rdquo;</div>
+                      </div>
+                      <div class="pol-illusion-stage">
+                          <svg class="pol-spook pol-wall" viewBox="0 0 220 180" aria-hidden="true">
+                              <g class="wall-bricks">
+                                  <rect x="0" y="0" width="54" height="28"/><rect x="56" y="0" width="54" height="28"/><rect x="112" y="0" width="54" height="28"/><rect x="168" y="0" width="52" height="28"/>
+                                  <rect x="0" y="30" width="26" height="28"/><rect x="28" y="30" width="54" height="28"/><rect x="84" y="30" width="54" height="28"/><rect x="140" y="30" width="54" height="28"/><rect x="196" y="30" width="24" height="28"/>
+                                  <rect x="0" y="60" width="54" height="28"/><rect x="56" y="60" width="54" height="28"/><rect x="112" y="60" width="54" height="28"/><rect x="168" y="60" width="52" height="28"/>
+                                  <rect x="0" y="90" width="26" height="28"/><rect x="28" y="90" width="54" height="28"/><rect x="84" y="90" width="54" height="28"/><rect x="140" y="90" width="54" height="28"/><rect x="196" y="90" width="24" height="28"/>
+                                  <rect x="0" y="120" width="54" height="28"/><rect x="56" y="120" width="54" height="28"/><rect x="112" y="120" width="54" height="28"/><rect x="168" y="120" width="52" height="28"/>
+                                  <rect x="0" y="150" width="26" height="28"/><rect x="28" y="150" width="54" height="28"/><rect x="84" y="150" width="54" height="28"/><rect x="140" y="150" width="54" height="28"/><rect x="196" y="150" width="24" height="28"/>
+                              </g>
+                              <path class="wall-crack" d="M110 0 L100 32 L120 58 L104 88 L118 116 L106 148 L112 180"/>
+                              <circle class="wall-eye" cx="96" cy="72" r="5"/>
+                              <circle class="wall-eye" cx="124" cy="98" r="5"/>
+                          </svg>
+                          <div class="pol-fact-card">
+                              <strong>FAKTA</strong>
+                              <p>Tes TPS dan Literasi berlaku universal. Siapapun yang menguasai logika dasar punya peluang yang sama.</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Illusion 3: The Deceitful Scales -->
+                  <div class="pol-illusion pol-reveal" style="--d:4">
+                      <div class="pol-myth-frame">
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Semua soal nilainya sama — kerjakan yang mudah saja.&rdquo;</div>
+                      </div>
+                      <div class="pol-illusion-stage">
+                          <svg class="pol-spook pol-scales scales-glow" viewBox="0 0 220 190" aria-hidden="true">
+                              <path class="scales-base" d="M82 168 h56 l10 14 H72 z"/>
+                              <line class="scales-metal" x1="110" y1="30" x2="110" y2="168"/>
+                              <g class="scales-beam-group">
+                                  <line class="scales-metal" x1="34" y1="50" x2="186" y2="18"/>
+                                  <line class="scales-chain" x1="34" y1="50" x2="22" y2="96"/>
+                                  <line class="scales-chain" x1="34" y1="50" x2="46" y2="96"/>
+                                  <path class="scales-pan" d="M14 96 a28 13 0 0 0 56 0 z"/>
+                                  <line class="scales-chain" x1="186" y1="18" x2="174" y2="62"/>
+                                  <line class="scales-chain" x1="186" y1="18" x2="198" y2="62"/>
+                                  <path class="scales-pan" d="M166 62 a28 13 0 0 0 56 0 z"/>
+                              </g>
+                          </svg>
+                          <div class="pol-fact-card">
+                              <strong>FAKTA</strong>
+                              <p>Sistem IRT memberikan poin lebih tinggi pada soal yang sulit dan banyak dijawab salah.</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Illusion 4: The Overloaded Scholar -->
+                  <div class="pol-illusion pol-reveal" style="--d:5">
+                      <div class="pol-myth-frame">
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Kuantitatif = hafalkan semua rumus yang ada.&rdquo;</div>
+                      </div>
+                      <div class="pol-illusion-stage">
+                          <div class="pol-spook pol-scholar" aria-hidden="true">
+                              <div class="pol-scholar-books">
+                                  <div class="pol-book"></div>
+                                  <div class="pol-book"></div>
+                                  <div class="pol-book"></div>
+                                  <div class="pol-book"></div>
+                                  <div class="pol-book"></div>
+                                  <div class="pol-book"></div>
+                              </div>
+                              <div class="pol-scholar-head"></div>
+                          </div>
+                          <div class="pol-fact-card">
+                              <strong>FAKTA</strong>
+                              <p>Penalaran Kuantitatif menguji caramu memecahkan masalah dengan logika angka, bukan hafalan buta.</p>
+                          </div>
+                      </div>
+                  </div>
+
+                  <!-- Illusion 5: The Mirror of Despair -->
+                  <div class="pol-illusion pol-reveal" style="--d:6">
+                      <div class="pol-myth-frame">
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Skor tryout awal rendah berarti sudah pasti gagal.&rdquo;</div>
+                      </div>
+                      <div class="pol-illusion-stage">
+                          <div class="pol-spook pol-mirror" aria-hidden="true">
+                              <div class="pol-mirror-frame">
+                                  <div class="pol-mirror-glass"></div>
+                              </div>
+                          </div>
+                          <div class="pol-fact-card">
+                              <strong>FAKTA</strong>
+                              <p>Tryout awal hanyalah peta kelemahanmu. Evaluasi dan progres adalah kunci kelulusan.</p>
+                          </div>
+                      </div>
+                  </div>
+             </div>
+         </div>
+
+        <!-- ========== LEVEL 3: FOREST OF WISDOM (7 subtest pillars) ========== -->
+        <div class="pol-level pol-level-3" data-kyra-pos="corner" data-kyra-line="Pilar-pilar ini menyimpan segel tujuh subtes UTBK. Sentuh untuk membacanya.">
+            <div class="pol-level-head pol-reveal">
+                <h2 class="pol-h2">Hutan Kebijaksanaan</h2>
+                <p class="pol-lead">Tujuh pilar kuno menjaga jalan ini — tujuh subtes UTBK SNBT. <strong>Sentuh sebuah pilar</strong> untuk membaca segel yang tersimpan di dalamnya.</p>
+            </div>
+
+            <div class="pol-pillar-path">
+                <!-- Magical winding trail connecting the pillars -->
+                <svg class="pol-mystic-trail" viewBox="0 0 860 2100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="trailGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" style="stop-color:#7fe7c4;stop-opacity:0.15"/>
+                            <stop offset="50%" style="stop-color:#8fd8ff;stop-opacity:0.25"/>
+                            <stop offset="100%" style="stop-color:#7fe7c4;stop-opacity:0.15"/>
+                        </linearGradient>
+                        <filter id="trailGlow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
+                    </defs>
+                    <!-- Winding path that connects staggered pillars (left-right-left-right pattern) -->
+                    <path class="trail-bg" d="M 120 80 Q 240 160, 320 240 Q 520 360, 680 480 Q 760 560, 180 700 Q 60 780, 140 920 Q 240 1080, 700 1220 Q 800 1280, 720 1400 Q 620 1540, 200 1680 Q 80 1760, 160 1900" fill="none" stroke="url(#trailGradient)" stroke-width="80" stroke-linecap="round" opacity="0.4" filter="url(#trailGlow)"/>
+                    <path class="trail-line" d="M 120 80 Q 240 160, 320 240 Q 520 360, 680 480 Q 760 560, 180 700 Q 60 780, 140 920 Q 240 1080, 700 1220 Q 800 1280, 720 1400 Q 620 1540, 200 1680 Q 80 1760, 160 1900" fill="none" stroke="#7fe7c4" stroke-width="2" stroke-linecap="round" stroke-dasharray="12,8" opacity="0.6"/>
+                    <!-- Glowing step markers at key positions -->
+                    <circle class="trail-marker" cx="120" cy="80" r="6"/>
+                    <circle class="trail-marker" cx="680" cy="480" r="6"/>
+                    <circle class="trail-marker" cx="180" cy="700" r="6"/>
+                    <circle class="trail-marker" cx="700" cy="1220" r="6"/>
+                    <circle class="trail-marker" cx="720" cy="1400" r="6"/>
+                    <circle class="trail-marker" cx="200" cy="1680" r="6"/>
+                    <circle class="trail-marker" cx="160" cy="1900" r="6"/>
+                </svg>
+                
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᚠ</span>
+                            <span class="pol-rune" style="--r:1">ᚢ</span>
+                            <span class="pol-rune" style="--r:2">ᚦ</span>
+                            <span class="pol-rune" style="--r:3">ᚨ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Penalaran Umum</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Penalaran Umum (PU)</h4>
+                        <p>Ujian nalar dan logika.</p>
+                        <span class="pol-tooltip-meta">30 Soal • 30 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᚱ</span>
+                            <span class="pol-rune" style="--r:1">ᚲ</span>
+                            <span class="pol-rune" style="--r:2">ᚷ</span>
+                            <span class="pol-rune" style="--r:3">ᚹ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Pengetahuan &amp; Pemahaman Umum</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Pengetahuan &amp; Pemahaman Umum (PPU)</h4>
+                        <p>Makna kata dan informasi umum.</p>
+                        <span class="pol-tooltip-meta">20 Soal • 15 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᚺ</span>
+                            <span class="pol-rune" style="--r:1">ᚾ</span>
+                            <span class="pol-rune" style="--r:2">ᛁ</span>
+                            <span class="pol-rune" style="--r:3">ᛃ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Kemampuan Memahami Bacaan &amp; Menulis</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Kemampuan Memahami Bacaan dan Menulis (KMBM)</h4>
+                        <p>Seni membedah tata bahasa.</p>
+                        <span class="pol-tooltip-meta">20 Soal • 25 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᛇ</span>
+                            <span class="pol-rune" style="--r:1">ᛈ</span>
+                            <span class="pol-rune" style="--r:2">ᛉ</span>
+                            <span class="pol-rune" style="--r:3">ᛊ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Pengetahuan Kuantitatif</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Pengetahuan Kuantitatif (PK)</h4>
+                        <p>Hitungan teknis dan keluwesan konsep.</p>
+                        <span class="pol-tooltip-meta">20 Soal • 20 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᛏ</span>
+                            <span class="pol-rune" style="--r:1">ᛒ</span>
+                            <span class="pol-rune" style="--r:2">ᛖ</span>
+                            <span class="pol-rune" style="--r:3">ᛗ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Penalaran Matematika</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Penalaran Matematika (PM)</h4>
+                        <p>Memecahkan masalah kontekstual nyata.</p>
+                        <span class="pol-tooltip-meta">20 Soal • 42,5 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᛚ</span>
+                            <span class="pol-rune" style="--r:1">ᛜ</span>
+                            <span class="pol-rune" style="--r:2">ᛞ</span>
+                            <span class="pol-rune" style="--r:3">ᛟ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">Literasi Bahasa Indonesia</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>Literasi dalam Bahasa Indonesia (LBI)</h4>
+                        <p>Mengolah informasi teks presisi.</p>
+                        <span class="pol-tooltip-meta">30 Soal • 42,5 Menit</span>
+                    </div>
+                </div>
+
+                <div class="pol-pillar" tabindex="0">
+                    <div class="pol-pillar-body">
+                        <div class="pol-pillar-runes">
+                            <span class="pol-rune" style="--r:0">ᚨ</span>
+                            <span class="pol-rune" style="--r:1">ᚱ</span>
+                            <span class="pol-rune" style="--r:2">ᛊ</span>
+                            <span class="pol-rune" style="--r:3">ᛟ</span>
+                        </div>
+                    </div>
+                    <div class="pol-pillar-label">English Literacy</div>
+                    <div class="pol-tooltip" role="tooltip">
+                        <h4>English Literacy (Litbing)</h4>
+                        <p>Skimming and scanning techniques.</p>
+                        <span class="pol-tooltip-meta">20 Soal • 20 Menit</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== LEVEL 4: THE GUARDIAN SPIRITS (6 question species) ========== -->
+        <div class="pol-level pol-level-4" data-kyra-pos="corner" data-kyra-line="Roh-roh ini menjaga rahasia jenis-jenis soal. Ketuk untuk melihat bestiary-nya.">
+            <div class="pol-level-head pol-reveal">
+                <h2 class="pol-h2">Roh Penjaga</h2>
+                <p class="pol-lead">Enam roh cahaya melayang menghadang jalan. Masing-masing menjaga rahasia <strong>jenis soal UTBK</strong>. Sentuh mereka untuk membuka bestiary-nya.</p>
+            </div>
+
+            <div class="pol-wisp-grid">
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:45; --wd:0s; --d:0">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">PG Biasa</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Pilihan Ganda Biasa</h4>
+                        <p class="pol-wisp-format">Satu jawaban benar dari opsi A–E.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Bahasa buatan &ldquo;Nenek merajut baju = Nkhono o liapara loha&rdquo;. Bagaimana mengatakan &ldquo;Baju dirajut Paman&rdquo;?</p>
+                    </div>
+                </div>
+
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:190; --wd:.6s; --d:1">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">Isian</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Isian</h4>
+                        <p class="pol-wisp-format">Menjawab dengan mengetik nilai tanpa opsi.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Jika u = 5/6, nilai u sama dengan…</p>
+                    </div>
+                </div>
+
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:265; --wd:1.2s; --d:2">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">Kompleks Kategori</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Pilihan Ganda Kompleks Kategori</h4>
+                        <p class="pol-wisp-format">Menentukan Ya/Tidak untuk setiap pernyataan.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Terdapat kotak bernomor 1-12 berisi kelereng biru dan hijau. Tentukan &ldquo;Ya/Tidak&rdquo; pada pernyataan jumlah kelereng di kotak tertentu.</p>
+                    </div>
+                </div>
+
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:150; --wd:.3s; --d:3">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">Perbandingan P–Q</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Perbandingan Kuantitas</h4>
+                        <p class="pol-wisp-format">Menentukan hubungan antara kuantitas P dan Q.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Diketahui persegipanjang EFGH. Tentukan hubungan antara kuantitas P (Keliling 1) dan Q (Keliling 2).</p>
+                    </div>
+                </div>
+
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:320; --wd:.9s; --d:4">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">Kecukupan</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Kecukupan Pernyataan</h4>
+                        <p class="pol-wisp-format">Menganalisis kecukupan informasi untuk menjawab soal.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Diberikan 2 informasi. Tentukan informasi mana yang cukup untuk menjawab pertanyaan &ldquo;Berapakah jumlah anggota yang hadir?&rdquo;</p>
+                    </div>
+                </div>
+
+                <div class="pol-wisp pol-reveal" tabindex="0" style="--h:25; --wd:1.5s; --d:5">
+                    <div class="pol-wisp-orb" aria-hidden="true"></div>
+                    <span class="pol-wisp-name">Pernyataan (1)–(4)</span>
+                    <div class="pol-wisp-card" role="tooltip">
+                        <h4>Pernyataan (1)-(4)</h4>
+                        <p class="pol-wisp-format">Memilih kombinasi pernyataan yang benar.</p>
+                        <p class="pol-wisp-example"><strong>Contoh:</strong> Di antara pilihan berikut yang merupakan faktor persekutuan adalah… (1) 9, (2) 15, (3) 35, (4) 45.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== LEVEL 5: THE ARMORY (feature inventory) ========== -->
+        <div class="pol-level pol-level-5" data-kyra-pos="corner" data-kyra-line="Altar senjata ini menyimpan sembilan artefak kuat untuk perjalananmu.">
+            <div class="pol-level-head pol-reveal">
+                <h2 class="pol-h2">Gudang Senjata</h2>
+                <p class="pol-lead">Kyra berhenti di sebuah altar batu bercahaya dan membuka inventory-nya. <strong>Sembilan artefak</strong> ini akan menjadi senjatamu menghadapi UTBK.</p>
+            </div>
+
+            <div class="pol-altar pol-reveal" style="--d:1" aria-hidden="true"></div>
+
+            <div class="pol-armory-grid">
+
+                <article class="pol-artifact pol-reveal" style="--d:1">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <radialGradient id="fg-glow" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#ffd97a" stop-opacity=".9"/>
+                                    <stop offset="70%" stop-color="#e8a93d" stop-opacity=".2"/>
+                                    <stop offset="100%" stop-color="#e8a93d" stop-opacity="0"/>
+                                </radialGradient>
+                            </defs>
+                            <circle cx="60" cy="60" r="48" fill="url(#fg-glow)" opacity=".55"/>
+                            <circle cx="60" cy="60" r="40" fill="none" stroke="#ffd97a" stroke-width="2" stroke-dasharray="6,3" opacity=".7"/>
+                            <circle cx="60" cy="60" r="18" fill="none" stroke="#ffd97a" stroke-width="1.5" opacity=".8"/>
+                            <circle cx="60" cy="60" r="6" fill="#ffd97a"/>
+                            <path d="M60 20 L60 14 M60 100 L60 106 M20 60 L14 60 M100 60 L106 60" stroke="#ffd97a" stroke-width="1.5" opacity=".6"/>
+                            <g opacity=".7">
+                                <path d="M42 38 Q60 30, 78 38" fill="none" stroke="#ffd97a" stroke-width="1.2"/>
+                                <path d="M42 82 Q60 90, 78 82" fill="none" stroke="#ffd97a" stroke-width="1.2"/>
+                                <line x1="42" y1="38" x2="42" y2="82" stroke="#ffd97a" stroke-width="1.2"/>
+                                <line x1="78" y1="38" x2="78" y2="82" stroke="#ffd97a" stroke-width="1.2"/>
+                            </g>
+                            <path d="M48 46 Q60 40, 72 46 L72 62 Q60 56, 48 62 Z" fill="#ffd97a" opacity=".6"/>
+                            <circle cx="60" cy="80" r="2" fill="#ffd97a" opacity=".8"/>
+                            <circle cx="55" cy="76" r="1.2" fill="#ffd97a" opacity=".6"/>
+                            <circle cx="65" cy="78" r="1.5" fill="#ffd97a" opacity=".7"/>
+                        </svg>
+                    </div>
+                    <h3>UTBK Focus Mode</h3>
+                    <p>Simulasi CBT seperti ujian asli dengan timer, navigasi soal, sistem anti-search, dan deteksi keluar tab.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:2">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="fg-quill" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#fff3c8"/>
+                                    <stop offset="100%" stop-color="#e8a93d"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="24" y="38" width="72" height="56" rx="3" fill="none" stroke="#6b5228" stroke-width="1.5" opacity=".5"/>
+                            <rect x="24" y="38" width="72" height="56" rx="3" fill="#3a2c14" opacity=".3"/>
+                            <line x1="32" y1="52" x2="60" y2="52" stroke="#8a7248" stroke-width="1.2" opacity=".7"/>
+                            <line x1="32" y1="62" x2="88" y2="62" stroke="#8a7248" stroke-width="1.2" opacity=".5"/>
+                            <line x1="32" y1="72" x2="78" y2="72" stroke="#8a7248" stroke-width="1.2" opacity=".5"/>
+                            <line x1="32" y1="82" x2="70" y2="82" stroke="#8a7248" stroke-width="1.2" opacity=".5"/>
+                            <rect x="32" y="48" width="28" height="8" fill="#ffd97a" opacity=".6"/>
+                            <rect x="66" y="58" width="22" height="8" fill="#7fe7c4" opacity=".5"/>
+                            <path d="M86 18 Q80 22, 76 32 L74 40 L78 44 L88 24 Q90 20, 86 18 Z" fill="url(#fg-quill)" stroke="#b8860b" stroke-width="1"/>
+                            <line x1="76" y1="40" x2="72" y2="48" stroke="#ffd97a" stroke-width="1.2" stroke-linecap="round"/>
+                            <circle cx="72" cy="50" r="3" fill="#ffd97a" opacity=".8">
+                                <animate attributeName="opacity" values=".8;.3;.8" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="68" cy="54" r="1.5" fill="#ffd97a" opacity=".5"/>
+                            <circle cx="76" cy="52" r="1.2" fill="#ffd97a" opacity=".4"/>
+                        </svg>
+                    </div>
+                    <h3>Smart Mark</h3>
+                    <p>Tandai premis, kesimpulan, kata kunci, dan informasi penting langsung pada soal.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:3">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <radialGradient id="fg-clock" cx="50%" cy="50%" r="50%">
+                                    <stop offset="0%" stop-color="#ffd97a" stop-opacity=".3"/>
+                                    <stop offset="100%" stop-color="#e8a93d" stop-opacity="0"/>
+                                </radialGradient>
+                            </defs>
+                            <circle cx="60" cy="60" r="50" fill="url(#fg-clock)"/>
+                            <circle cx="60" cy="60" r="36" fill="none" stroke="#4a4468" stroke-width="4"/>
+                            <circle cx="60" cy="60" r="36" fill="none" stroke="#6b5228" stroke-width="2"/>
+                            <circle cx="60" cy="60" r="32" fill="#0d0722"/>
+                            <g stroke="#ffd97a" stroke-width="1.5" opacity=".8">
+                                <line x1="60" y1="28" x2="60" y2="34"/>
+                                <line x1="60" y1="86" x2="60" y2="92"/>
+                                <line x1="28" y1="60" x2="34" y2="60"/>
+                                <line x1="86" y1="60" x2="92" y2="60"/>
+                            </g>
+                            <g fill="#ffd97a" opacity=".6" font-family="Georgia,serif" font-size="7" text-anchor="middle">
+                                <text x="60" y="39">XII</text>
+                                <text x="60" y="85">VI</text>
+                                <text x="39" y="63">IX</text>
+                                <text x="81" y="63">III</text>
+                            </g>
+                            <line x1="60" y1="60" x2="60" y2="40" stroke="#ffd97a" stroke-width="2" stroke-linecap="round"/>
+                            <line x1="60" y1="60" x2="72" y2="54" stroke="#e8a93d" stroke-width="1.5" stroke-linecap="round"/>
+                            <circle cx="60" cy="60" r="2.5" fill="#ffd97a"/>
+                            <circle cx="60" cy="60" r="52" fill="none" stroke="#ffd97a" stroke-width=".5" stroke-dasharray="2,6" opacity=".5">
+                                <animateTransform attributeName="transform" type="rotate" from="0 60 60" to="360 60 60" dur="20s" repeatCount="indefinite"/>
+                            </circle>
+                            <circle cx="100" cy="60" r="6" fill="none" stroke="#7fe7c4" stroke-width="1" opacity=".4">
+                                <animate attributeName="r" values="6;14;6" dur="2s" repeatCount="indefinite"/>
+                                <animate attributeName="opacity" values=".4;0;.4" dur="2s" repeatCount="indefinite"/>
+                            </circle>
+                        </svg>
+                    </div>
+                    <h3>Beat Timer</h3>
+                    <p>Penanda waktu berbunyi untuk membantu mengatur durasi pengerjaan setiap nomor dengan lebih efektif.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:4">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="fg-scroll-bg" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#3d4a6e"/>
+                                    <stop offset="100%" stop-color="#1c2338"/>
+                                </linearGradient>
+                            </defs>
+                            <rect x="28" y="24" width="64" height="72" rx="4" fill="url(#fg-scroll-bg)" stroke="#4a5c8a" stroke-width="1.5"/>
+                            <rect x="28" y="24" width="64" height="10" rx="4" fill="#6b5228" opacity=".8"/>
+                            <rect x="28" y="86" width="64" height="10" rx="4" fill="#6b5228" opacity=".8"/>
+                            <polygon points="45,52 60,42 75,52 75,66 60,76 45,66" fill="none" stroke="#7fe7c4" stroke-width="1.2" opacity=".7"/>
+                            <polygon points="52,56 60,50 68,56 68,62 60,68 52,62" fill="#7fe7c4" opacity=".3"/>
+                            <circle cx="40" cy="48" r="1.5" fill="#8fd8ff"/>
+                            <circle cx="48" cy="44" r="1" fill="#8fd8ff" opacity=".7"/>
+                            <circle cx="80" cy="50" r="1.2" fill="#8fd8ff" opacity=".8"/>
+                            <circle cx="72" cy="42" r=".8" fill="#8fd8ff" opacity=".6"/>
+                            <line x1="40" y1="48" x2="48" y2="44" stroke="#8fd8ff" stroke-width=".5" opacity=".5"/>
+                            <line x1="72" y1="42" x2="80" y2="50" stroke="#8fd8ff" stroke-width=".5" opacity=".5"/>
+                            <rect x="36" y="82" width="20" height="2" rx="1" fill="#ffd97a" opacity=".6"/>
+                            <rect x="60" y="82" width="24" height="2" rx="1" fill="#8fd8ff" opacity=".5"/>
+                            <path d="M40 86 L48 82 L56 86 L64 82 L72 86" fill="none" stroke="#7fe7c4" stroke-width=".8" opacity=".5"/>
+                        </svg>
+                    </div>
+                    <h3>LearnFlow</h3>
+                    <p>Modul interaktif berisi visual, contoh, dan latihan langsung—bukan sekadar membaca PDF panjang.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:5">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <radialGradient id="fg-vault-glow" cx="50%" cy="50%" r="40%">
+                                    <stop offset="0%" stop-color="#ffd97a" stop-opacity=".9"/>
+                                    <stop offset="50%" stop-color="#e8a93d" stop-opacity=".4"/>
+                                    <stop offset="100%" stop-color="#e8a93d" stop-opacity="0"/>
+                                </radialGradient>
+                            </defs>
+                            <rect x="20" y="30" width="80" height="70" rx="6" fill="#2a2438" stroke="#4a4468" stroke-width="2"/>
+                            <rect x="20" y="30" width="80" height="14" rx="6" fill="#3d3224"/>
+                            <rect x="26" y="36" width="4" height="4" rx="1" fill="#6b5228"/>
+                            <rect x="34" y="36" width="4" height="4" rx="1" fill="#6b5228"/>
+                            <rect x="42" y="36" width="4" height="4" rx="1" fill="#6b5228"/>
+                            <circle cx="60" cy="68" r="16" fill="url(#fg-vault-glow)" opacity=".8"/>
+                            <circle cx="60" cy="68" r="10" fill="#1c1430" stroke="#6b5228" stroke-width="2"/>
+                            <rect x="58" y="62" width="4" height="12" rx="1" fill="#ffd97a"/>
+                            <path d="M60 64 L62 62 L60 60 L58 62 Z" fill="#ffd97a"/>
+                            <text x="55" y="58" fill="#ffd97a" opacity=".7" font-family="Georgia,serif" font-size="8">?</text>
+                            <text x="63" y="54" fill="#ffd97a" opacity=".5" font-family="Georgia,serif" font-size="6">?</text>
+                            <text x="50" y="52" fill="#ffd97a" opacity=".4" font-family="Georgia,serif" font-size="5">?</text>
+                            <circle cx="60" cy="68" r="14" fill="none" stroke="#ffd97a" stroke-width=".8" opacity=".4"/>
+                            <rect x="32" y="90" width="56" height="4" rx="2" fill="#1c1430"/>
+                            <rect x="52" y="92" width="16" height="4" rx="2" fill="#6b5228"/>
+                        </svg>
+                    </div>
+                    <h3>Question Vault</h3>
+                    <p>Ribuan soal terstruktur berdasarkan subtes, subbab, dan tingkat kesulitan, lengkap dengan pembahasan yang mudah dipahami.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:6">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <radialGradient id="fg-orb" cx="40%" cy="35%" r="60%">
+                                    <stop offset="0%" stop-color="#fff3c8" stop-opacity=".9"/>
+                                    <stop offset="30%" stop-color="#8fd8ff" stop-opacity=".6"/>
+                                    <stop offset="100%" stop-color="#0a1226" stop-opacity=".95"/>
+                                </radialGradient>
+                            </defs>
+                            <circle cx="60" cy="60" r="36" fill="url(#fg-orb)" stroke="#4a5c8a" stroke-width="1.5"/>
+                            <circle cx="52" cy="48" r="6" fill="#fff" opacity=".2"/>
+                            <circle cx="60" cy="60" r="38" fill="none" stroke="#8fd8ff" stroke-width=".5" stroke-dasharray="2,4" opacity=".6"/>
+                            <g fill="#ffd97a" opacity=".8">
+                                <circle cx="30" cy="40" r="2"/>
+                                <circle cx="50" cy="20" r="1.5"/>
+                                <circle cx="85" cy="35" r="1.8"/>
+                                <circle cx="90" cy="70" r="2"/>
+                                <circle cx="40" cy="90" r="1.5"/>
+                                <circle cx="75" cy="95" r="1.8"/>
+                            </g>
+                            <g stroke="#ffd97a" stroke-width=".8" opacity=".5" fill="none">
+                                <line x1="30" y1="40" x2="50" y2="20"/>
+                                <line x1="50" y1="20" x2="85" y2="35"/>
+                                <line x1="85" y1="35" x2="90" y2="70"/>
+                                <line x1="90" y1="70" x2="75" y2="95"/>
+                                <line x1="75" y1="95" x2="40" y2="90"/>
+                                <line x1="40" y1="90" x2="30" y2="40"/>
+                            </g>
+                            <ellipse cx="60" cy="100" rx="18" ry="3" fill="#0a1226" opacity=".5"/>
+                            <path d="M48 100 L60 96 L72 100 L60 104 Z" fill="#2a2438" stroke="#4a4468" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <h3>Progress Insight</h3>
+                    <p>Pantau nilai, waktu pengerjaan, kekuatan, kelemahan, dan perkembangan belajarmu secara menyeluruh.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:7">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="fg-mirror" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#4a5c8a"/>
+                                    <stop offset="100%" stop-color="#1c2338"/>
+                                </linearGradient>
+                            </defs>
+                            <ellipse cx="60" cy="60" rx="36" ry="46" fill="url(#fg-mirror)" stroke="#6b5228" stroke-width="2"/>
+                            <ellipse cx="60" cy="60" rx="30" ry="40" fill="#0d0722"/>
+                            <ellipse cx="52" cy="48" rx="8" ry="12" fill="#8fd8ff" opacity=".15"/>
+                            <path d="M44 50 Q60 30, 76 50 Q76 70, 60 80 Q44 70, 44 50 Z" fill="#241640" opacity=".6"/>
+                            <circle cx="60" cy="56" r="8" fill="#1c1430" stroke="#ffd97a" stroke-width="1"/>
+                            <path d="M48 46 L54 38 L66 38 L72 46" fill="none" stroke="#8d7bff" stroke-width="2" stroke-linecap="round"/>
+                            <circle cx="60" cy="38" r="3" fill="#8d7bff" opacity=".6"/>
+                            <path d="M50 70 Q60 66, 70 70" fill="none" stroke="#ffd97a" stroke-width="1.5" opacity=".7"/>
+                            <circle cx="55" cy="54" r="1.5" fill="#ffd97a" opacity=".8"/>
+                            <circle cx="65" cy="54" r="1.5" fill="#ffd97a" opacity=".8"/>
+                            <ellipse cx="60" cy="108" rx="14" ry="3" fill="#0a1226" opacity=".5"/>
+                            <rect x="54" y="104" width="12" height="8" rx="2" fill="#3d3224" stroke="#6b5228" stroke-width="1"/>
+                        </svg>
+                    </div>
+                    <h3>Kyra Companion</h3>
+                    <p>Teman belajar virtual yang dapat dikustomisasi dengan pakaian, topi, aksesori, dan berbagai item menarik.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:8">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <radialGradient id="fg-flame" cx="50%" cy="80%" r="50%">
+                                    <stop offset="0%" stop-color="#ffd97a" stop-opacity=".8"/>
+                                    <stop offset="60%" stop-color="#ff9a3d" stop-opacity=".3"/>
+                                    <stop offset="100%" stop-color="#ff5d6c" stop-opacity="0"/>
+                                </radialGradient>
+                            </defs>
+                            <circle cx="60" cy="70" r="40" fill="url(#fg-flame)" opacity=".6"/>
+                            <path d="M54 80 Q50 60, 60 40 Q70 60, 66 80 Q62 74, 60 78 Q58 74, 54 80 Z" fill="#ff9a3d" opacity=".9"/>
+                            <path d="M57 78 Q56 62, 60 48 Q64 62, 63 78 Q61 74, 60 76 Q59 74, 57 78 Z" fill="#ffd97a" opacity=".95"/>
+                            <path d="M59 76 Q58 66, 60 56 Q62 66, 61 76 Z" fill="#fff3c8"/>
+                            <g opacity=".7">
+                                <rect x="20" y="86" width="16" height="22" rx="2" fill="#2a2438" stroke="#4a4468" stroke-width="1"/>
+                                <rect x="40" y="86" width="16" height="22" rx="2" fill="#2a2438" stroke="#4a4468" stroke-width="1"/>
+                                <rect x="64" y="86" width="16" height="22" rx="2" fill="#2a2438" stroke="#4a4468" stroke-width="1"/>
+                                <rect x="84" y="86" width="16" height="22" rx="2" fill="#2a2438" stroke="#4a4468" stroke-width="1"/>
+                                <text x="24" y="100" fill="#7fe7c4" font-size="8" font-family="Georgia,serif">I</text>
+                                <text x="44" y="100" fill="#7fe7c4" font-size="8" font-family="Georgia,serif">II</text>
+                                <text x="68" y="100" fill="#7fe7c4" font-size="8" font-family="Georgia,serif">III</text>
+                                <text x="88" y="100" fill="#7fe7c4" font-size="8" font-family="Georgia,serif">IV</text>
+                            </g>
+                            <line x1="28" y1="92" x2="92" y2="92" stroke="#7fe7c4" stroke-width=".8" stroke-dasharray="3,3" opacity=".5"/>
+                            <circle cx="28" cy="92" r="2" fill="#7fe7c4" opacity=".7"/>
+                            <circle cx="48" cy="92" r="2" fill="#7fe7c4" opacity=".7"/>
+                            <circle cx="72" cy="92" r="2" fill="#7fe7c4" opacity=".7"/>
+                            <circle cx="92" cy="92" r="2" fill="#7fe7c4" opacity=".7"/>
+                        </svg>
+                    </div>
+                    <h3>Streak Quest</h3>
+                    <p>Jaga konsistensi belajar, raih achievement, dan dapatkan hadiah item untuk Kyra.</p>
+                </article>
+
+                <article class="pol-artifact pol-reveal" style="--d:9">
+                    <div class="pol-artifact-visual">
+                        <svg class="pol-illu" viewBox="0 0 120 120" aria-hidden="true">
+                            <defs>
+                                <linearGradient id="fg-amulet-day" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#fff3c8"/>
+                                    <stop offset="100%" stop-color="#ffd97a"/>
+                                </linearGradient>
+                                <linearGradient id="fg-amulet-night" x1="0%" y1="0%" x2="0%" y2="100%">
+                                    <stop offset="0%" stop-color="#0a1226"/>
+                                    <stop offset="100%" stop-color="#1c1430"/>
+                                </linearGradient>
+                                <clipPath id="fg-amulet-left">
+                                    <rect x="0" y="0" width="60" height="120"/>
+                                </clipPath>
+                                <clipPath id="fg-amulet-right">
+                                    <rect x="60" y="0" width="60" height="120"/>
+                                </clipPath>
+                            </defs>
+                            <circle cx="60" cy="60" r="32" fill="url(#fg-amulet-day)" stroke="#6b5228" stroke-width="2.5" clip-path="url(#fg-amulet-left)"/>
+                            <circle cx="60" cy="60" r="32" fill="url(#fg-amulet-night)" stroke="#6b5228" stroke-width="2.5" clip-path="url(#fg-amulet-right)"/>
+                            <circle cx="48" cy="52" r="6" fill="#ff9a3d" opacity=".9"/>
+                            <circle cx="48" cy="52" r="3" fill="#fff3c8"/>
+                            <g clip-path="url(#fg-amulet-right)" fill="#fff3c8" opacity=".9">
+                                <circle cx="70" cy="50" r="1"/>
+                                <circle cx="78" cy="58" r=".8"/>
+                                <circle cx="74" cy="66" r="1.2"/>
+                                <circle cx="66" cy="72" r=".9"/>
+                                <circle cx="82" cy="52" r=".7"/>
+                                <circle cx="70" cy="76" r="1"/>
+                            </g>
+                            <line x1="60" y1="28" x2="60" y2="92" stroke="#ffd97a" stroke-width="1.5" opacity=".6"/>
+                            <line x1="60" y1="28" x2="60" y2="14" stroke="#6b5228" stroke-width="2"/>
+                            <circle cx="60" cy="12" r="4" fill="#6b5228" stroke="#ffd97a" stroke-width="1"/>
+                            <circle cx="60" cy="60" r="34" fill="none" stroke="#ffd97a" stroke-width=".6" stroke-dasharray="3,4" opacity=".4"/>
+                        </svg>
+                    </div>
+                    <h3>Dual Theme</h3>
+                    <p>Belajar lebih nyaman dengan pilihan tampilan terang dan gelap.</p>
+                </article>
+
+            </div>
+
+            <p class="pol-armory-footer pol-reveal" style="--d:10">
+                Belajar lebih fokus, konsisten, dan menyenangkan dalam satu platform UTBK.
+            </p>
+        </div>
+
+        <!-- ========== LEVEL 6: THE BRIDGE & CAMPFIRE ========== -->
+        <div class="pol-level pol-level-6" data-kyra-pos="corner" data-kyra-line="Seberangi jembatan ini, lalu mari beristirahat sebentar. Jangan lupa menjaga bahan bakarmu.">
+            <div class="pol-level-head pol-reveal">
+                <h2 class="pol-h2">Jembatan &amp; Api Unggun</h2>
+                <p class="pol-lead">Seberangi jembatan tua ini, lalu beristirahatlah di api unggun. Kyra pun <strong>melayang turun untuk beristirahat</strong> bersamamu.</p>
+            </div>
+
+            <div class="pol-bridge-zone pol-reveal" style="--d:1">
+                <svg class="pol-bridge-svg" viewBox="0 0 600 220" role="img" aria-label="Jembatan gantung dengan kristal-kristal bercahaya">
+                    <path class="rope" d="M20 60 Q300 140 580 60"/>
+                    <path class="rope rope-lower" d="M20 90 Q300 170 580 90"/>
+                    <line class="hanger" x1="65" y1="72" x2="65" y2="99"/>
+                    <line class="hanger" x1="110" y1="82" x2="110" y2="109"/>
+                    <line class="hanger" x1="154" y1="89" x2="154" y2="116"/>
+                    <line class="hanger" x1="199" y1="95" x2="199" y2="122"/>
+                    <line class="hanger" x1="244" y1="98" x2="244" y2="125"/>
+                    <line class="hanger" x1="289" y1="100" x2="289" y2="127"/>
+                    <line class="hanger" x1="334" y1="99" x2="334" y2="126"/>
+                    <line class="hanger" x1="378" y1="97" x2="378" y2="124"/>
+                    <line class="hanger" x1="423" y1="92" x2="423" y2="119"/>
+                    <line class="hanger" x1="468" y1="86" x2="468" y2="113"/>
+                    <line class="hanger" x1="513" y1="77" x2="513" y2="104"/>
+                    <rect class="plank" x="50" y="98" width="30" height="9" rx="2" transform="rotate(14 65 102)"/>
+                    <rect class="plank" x="95" y="108" width="30" height="9" rx="2" transform="rotate(11 110 112)"/>
+                    <rect class="plank" x="139" y="115" width="30" height="9" rx="2" transform="rotate(8 154 119)"/>
+                    <rect class="plank" x="184" y="121" width="30" height="9" rx="2" transform="rotate(5 199 125)"/>
+                    <rect class="plank" x="229" y="124" width="30" height="9" rx="2" transform="rotate(2 244 128)"/>
+                    <rect class="plank" x="274" y="126" width="30" height="9" rx="2" transform="rotate(-1 289 130)"/>
+                    <rect class="plank" x="319" y="125" width="30" height="9" rx="2" transform="rotate(-4 334 129)"/>
+                    <rect class="plank" x="363" y="123" width="30" height="9" rx="2" transform="rotate(-7 378 127)"/>
+                    <rect class="plank" x="408" y="118" width="30" height="9" rx="2" transform="rotate(-10 423 122)"/>
+                    <rect class="plank" x="453" y="112" width="30" height="9" rx="2" transform="rotate(-12 468 116)"/>
+                    <rect class="plank" x="498" y="103" width="30" height="9" rx="2" transform="rotate(-14 513 107)"/>
+                    <polygon class="crystal" points="110,140 118,152 110,168 102,152"/>
+                    <polygon class="crystal big" points="154,146 168,162 154,192 140,162"/>
+                    <polygon class="crystal" points="244,152 251,163 244,178 237,163"/>
+                    <polygon class="crystal" points="378,150 385,161 378,176 371,161"/>
+                    <polygon class="crystal big" points="423,142 437,158 423,188 409,158"/>
+                    <polygon class="crystal" points="513,136 520,147 513,162 506,147"/>
+                </svg>
+
+                <div class="pol-signpost pol-reveal" style="--d:3">
+                    <div class="pol-sign-board">
+                        <h4>⚠ Sistem Penilaian IRT</h4>
+                        <p>Setiap soal punya bobot berbeda. Soal sulit bernilai tinggi bagaikan kristal berharga. Jangan biarkan jawabanmu kosong!</p>
+                    </div>
+                    <div class="pol-sign-post" aria-hidden="true"></div>
+                </div>
+            </div>
+
+            <div class="pol-camp-zone pol-reveal" style="--d:2">
+                <!-- Pine tree silhouettes framing the clearing -->
+                <div class="pol-camp-trees far" aria-hidden="true"></div>
+                <div class="pol-camp-trees near" aria-hidden="true"></div>
+                
+                <!-- Blended ground mound with firelight reflection -->
+                <div class="pol-camp-ground" aria-hidden="true"></div>
+                
+                <!-- Small tent silhouette, rim-lit by the fire -->
+                <div class="pol-tent" aria-hidden="true"></div>
+                
+                <!-- Floating holographic wisdom cards -->
+                <div class="pol-holo-card pol-holo-1" style="--b:0s">
+                    <strong>⚡ Awas Burnout!</strong>
+                    Lakukan Real Rest (tidur, jalan kaki di luar), bukan Fake Rest (scroll medsos).
+                </div>
+                <div class="pol-holo-card pol-holo-2" style="--b:.4s">
+                    <strong>🔋 Bahan Bakar Otak</strong>
+                    Isi bahan bakar otakmu dengan protein dan air!
+                </div>
+                
+                <!-- Ambient glowing fireflies drifting through the clearing -->
+                <span class="pol-firefly" style="--ft:6.4s; --fd:0s; --fx:42px; left:18%; bottom:28%;"></span>
+                <span class="pol-firefly" style="--ft:8.2s; --fd:1.8s; --fx:-38px; left:72%; bottom:36%;"></span>
+                <span class="pol-firefly" style="--ft:7s; --fd:3.4s; --fx:30px; left:34%; bottom:44%;"></span>
+                <span class="pol-firefly" style="--ft:7.8s; --fd:5.2s; --fx:-44px; left:85%; bottom:32%;"></span>
+                <span class="pol-firefly" style="--ft:6.8s; --fd:2.6s; --fx:36px; left:12%; bottom:48%;"></span>
+                
+                <!-- Central campfire with animated flames -->
+                <div class="pol-campfire-scene">
+                    <div class="pol-warm-glow" aria-hidden="true"></div>
+                    <div class="pol-fire" aria-hidden="true">
+                        <div class="pol-flame pol-flame-outer"></div>
+                        <div class="pol-flame pol-flame-mid"></div>
+                        <div class="pol-flame pol-flame-core"></div>
+                        <span class="pol-ember" style="--e:0s; --ex:-16px; left:36%;"></span>
+                        <span class="pol-ember" style="--e:.7s; --ex:14px; left:52%;"></span>
+                        <span class="pol-ember" style="--e:1.3s; --ex:-10px; left:62%;"></span>
+                        <span class="pol-ember" style="--e:1.9s; --ex:20px; left:44%;"></span>
+                        <span class="pol-ember" style="--e:2.4s; --ex:-22px; left:55%;"></span>
+                    </div>
+                    <div class="pol-logs" aria-hidden="true"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========== LEVEL 7: CLIFF PEAK (destiny scroll & dynamic store) ========== -->
+        <div class="pol-level pol-level-7" data-kyra-pos="corner" data-kyra-line="Ini dia... puncak takdir. Tuliskan harapanmu, dan aku akan mengubahnya menjadi bintang.">
+            <div class="pol-peak-fog" aria-hidden="true"></div>
+
+            <div class="pol-level-head pol-reveal">
+                <h2 class="pol-h2">Puncak Tebing Takdir</h2>
+                <p class="pol-lead">Kau telah tiba di ujung perjalanan. Tuliskan harapanmu pada <strong>Gulungan Takdir</strong>, lalu terbangkan ia menjadi bintang.</p>
+            </div>
+
+            <!-- State 1: ancient parchment form -->
+            <div class="pol-parchment pol-reveal" id="pol-parchment" style="--d:1">
+                <h2>Gulungan Takdir</h2>
+                <p class="pol-parchment-sub">Satu harapan, satu bintang baru di langit.</p>
+                <form id="pol-hope-form">
+                    <input class="pol-field" type="text" name="hopeName" placeholder="Namamu" maxlength="40" required>
+                    <textarea class="pol-field" name="hopeText" placeholder="Harapan terbesarmu (contoh: tembus Kedokteran UI)" maxlength="140"></textarea>
+                    <button type="submit" class="pol-btn-hope">Terbangkan Harapan ✦</button>
+                </form>
+            </div>
+
+            <!-- State 3: grand portal gate + dynamically fetched store -->
+            <div class="pol-destiny" id="pol-destiny" hidden>
+                <div class="pol-portal-gate" aria-hidden="true"></div>
+                <h2 class="pol-h2">Gerbang Takdir Terbuka</h2>
+                <p class="pol-destiny-greeting" id="pol-destiny-greeting"></p>
+
+                <!-- Diisi secara dinamis dari paketbelajar.html via fetch() + DOMParser -->
+                <div class="pol-store-inventory" id="pol-store-inventory"></div>
+
+                <div class="pol-store-fallback" id="pol-store-fallback" hidden>
+                    <p>Gulungan paket tak dapat dibuka dari dalam hutan. Kunjungi tokonya langsung untuk melihat paket belajar terbaru.</p>
+                    <a href="paketbelajar.html">Buka Toko Paket ✦</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+    <!-- Footer akan dimuat di sini secara otomatis -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Memuat script utama -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/landing.js"></script>
+    <script src="js/path-of-light.js"></script>
+</body>
+</html>

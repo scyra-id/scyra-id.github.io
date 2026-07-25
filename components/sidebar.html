@@ -1,0 +1,44 @@
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="dashboard.html" class="logo">
+            <img src="images/logo.svg" alt="Scyra" class="logo-img">
+            <h2>Scyra</h2>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <ul>
+            <li><a href="dashboard.html" id="nav-dashboard"><span class="nav-icon">📊</span><span class="nav-text">Dashboard</span></a></li>
+            <li><a href="materi.html" id="nav-materi"><span class="nav-icon">📚</span><span class="nav-text">Materi</span></a></li>
+            <li><a href="tryout.html" id="nav-tryout"><span class="nav-icon">📝</span><span class="nav-text">Tryout</span></a></li>
+            <li><a href="riwayat.html" id="nav-riwayat"><span class="nav-icon">🕒</span><span class="nav-text">Riwayat</span></a></li>
+            <li><a href="paketbelajar.html" id="nav-paket"><span class="nav-icon">🎓</span><span class="nav-text">Paket Belajar</span></a></li>
+            <li><a href="kontak.html" id="nav-kontak"><span class="nav-icon">💬</span><span class="nav-text">Kontak</span></a></li>
+        </ul>
+    </nav>
+
+    <!-- Sidebar Footer Profile -->
+    <div class="sidebar-footer">
+        <button class="sidebar-profile-btn" id="sidebarProfileBtn">
+            <img id="sidebarAvatar" src="" alt="User">
+            <div class="sidebar-profile-info">
+                <div class="sidebar-profile-name" id="sidebarName">Memuat...</div>
+                <div class="sidebar-profile-credit" id="sidebarCredit">
+                    <img src="images/credit_icon.webp" alt="Credit" style="width: 12px; height: 12px; vertical-align: middle;">
+                    <span id="sidebarCreditAmount">0</span>
+                </div>
+            </div>
+            <svg class="sidebar-chevron" id="sidebarChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </button>
+
+        <!-- Dropdown Menu -->
+        <div class="sidebar-profile-dropdown" id="sidebarProfileDropdown">
+            <a href="referral.html" class="sidebar-dropdown-item" style="color: var(--brand-primary); font-weight: 600;">🎁 Credit Gratis</a>
+            <a href="profile.html" class="sidebar-dropdown-item">⚙️ Setting Profile</a>
+            <a href="admin.html" class="sidebar-dropdown-item" id="sidebar-admin-link" style="display:none;">🛡️ Dashboard Admin</a>
+            <button class="sidebar-dropdown-item logout-btn" id="logout-btn-sidebar">🚪 Keluar</button>
+        </div>
+    </div>
+</aside>

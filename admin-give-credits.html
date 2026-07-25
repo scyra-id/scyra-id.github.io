@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give Free Credits - Admin Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-give-credits.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                <div class="admin-header">
+                    <div>
+                        <h1><img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;"> Give Free Credits</h1>
+                        <p>Berikan credit gratis kepada user untuk testing atau reward</p>
+                    </div>
+                    <a href="admin.html" class="btn-secondary">← Kembali</a>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(135, 168, 120, 0.15); color: var(--brand-primary);">👥</div>
+                        <div class="stat-info">
+                            <h3 id="totalUsers">0</h3>
+                            <p>Total Users</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(212, 175, 55, 0.15); color: var(--brand-accent);">💰</div>
+                        <div class="stat-info">
+                            <h3 id="totalCreditsGiven">0</h3>
+                            <p>Credits Given Today</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Give Credits Form -->
+                <div class="admin-card">
+                    <h2>🎁 Give Credits to User</h2>
+                    
+                    <div class="form-section">
+                        <!-- User Selection Method -->
+                        <div class="form-group">
+                            <label>Metode Pencarian User</label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="searchMethod" value="email" checked>
+                                    <span>Email</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="searchMethod" value="userid">
+                                    <span>User ID</span>
+                                </label>
+                                <label class="radio-label">
+                                    <input type="radio" name="searchMethod" value="all">
+                                    <span>Semua User</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Email Input -->
+                        <div class="form-group" id="emailInputGroup">
+                            <label for="userEmail">Email User</label>
+                            <input type="email" id="userEmail" class="form-input" placeholder="user@example.com">
+                            <button type="button" id="btnSearchUser" class="btn-secondary" style="margin-top: 0.5rem;">🔍 Cari User</button>
+                        </div>
+
+                        <!-- User ID Input -->
+                        <div class="form-group" id="useridInputGroup" style="display: none;">
+                            <label for="userId">User ID</label>
+                            <input type="text" id="userId" class="form-input" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+                            <button type="button" id="btnSearchUserById" class="btn-secondary" style="margin-top: 0.5rem;">🔍 Cari User</button>
+                        </div>
+
+                        <!-- All Users Info -->
+                        <div class="form-group" id="allUsersInfo" style="display: none;">
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Perhatian:</strong> Credit akan diberikan ke SEMUA user yang terdaftar.
+                            </div>
+                        </div>
+
+                        <!-- User Info Display -->
+                        <div id="userInfoDisplay" class="user-info-card" style="display: none;">
+                            <h3>👤 User Information</h3>
+                            <div class="info-grid">
+                                <div>
+                                    <label>Name:</label>
+                                    <span id="displayName">-</span>
+                                </div>
+                                <div>
+                                    <label>Email:</label>
+                                    <span id="displayEmail">-</span>
+                                </div>
+                                <div>
+                                    <label>Role:</label>
+                                    <span id="displayRole">-</span>
+                                </div>
+                                <div>
+                                    <label>Current Credits:</label>
+                                    <span id="displayCredits" style="font-weight: 700; color: var(--brand-primary);">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Credit Amount -->
+                        <div class="form-group">
+                            <label for="creditAmount">Jumlah Credit</label>
+                            <input type="number" id="creditAmount" class="form-input" min="1" max="1000" value="10">
+                            <small class="form-hint">Min: 1, Max: 1000 credits</small>
+                        </div>
+
+                        <!-- Credit Type -->
+                        <div class="form-group">
+                            <label for="creditType">Tipe Credit</label>
+                            <select id="creditType" class="form-select">
+                                <option value="bonus">Bonus Credit</option>
+                                <option value="regular">Regular Credit</option>
+                            </select>
+                            <small class="form-hint">Bonus credit untuk testing, Regular untuk purchase</small>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="form-group">
+                            <label for="creditReason">Alasan / Deskripsi</label>
+                            <textarea id="creditReason" class="form-input" rows="3" placeholder="Contoh: Testing credit system, Reward untuk user aktif, dll"></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="form-actions">
+                            <button type="button" id="btnGiveCredits" class="btn-primary" disabled>
+                                🎁 Give Credits
+                            </button>
+                            <button type="button" id="btnReset" class="btn-secondary">
+                                🔄 Reset Form
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="admin-card">
+                    <h2>📊 Recent Credit Transactions</h2>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>User</th>
+                                    <th>Amount</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; color: var(--text-muted);">
+                                        Loading transactions...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-give-credits.js"></script>
+</body>
+</html>

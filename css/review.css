@@ -1,0 +1,140 @@
+.review-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    min-height: 80vh;
+}
+
+.review-loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    height: 60vh; color: var(--text-secondary);
+}
+.spinner-sage {
+    width: 45px; height: 45px; border: 4px solid var(--border-color); 
+    border-top: 4px solid var(--brand-primary); border-radius: 50%; 
+    animation: spin 0.8s linear infinite; margin-bottom: 1rem;
+}
+@keyframes spin { 100% { transform: rotate(360deg); } }
+
+.review-header { margin-bottom: 2rem; }
+.review-header h1 { color: var(--text-primary); font-size: 2rem; margin-bottom: 0.5rem; }
+.review-subtitle { color: var(--text-secondary); font-size: 1.1rem; }
+
+/* ================= RINGKASAN SKOR ================= */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+.summary-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: transform 0.2s;
+}
+.summary-card:hover { transform: translateY(-3px); }
+
+.summary-label {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-value {
+    display: block;
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.summary-card.score .summary-value { color: var(--brand-primary); }
+.summary-card.correct .summary-value { color: var(--success); }
+.summary-card.wrong .summary-value { color: var(--error); }
+.summary-card.empty .summary-value { color: var(--text-muted); }
+
+/* ================= LIST SOAL ================= */
+.questions-list { display: flex; flex-direction: column; gap: 1.5rem; }
+
+.q-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px var(--shadow-color);
+}
+
+.q-header {
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 700;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.q-status {
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+.q-status.correct { background: rgba(107, 143, 92, 0.15); color: var(--success); }
+.q-status.wrong { background: rgba(229, 115, 115, 0.15); color: var(--error); }
+.q-status.empty { background: rgba(136, 136, 136, 0.15); color: var(--text-muted); }
+
+.q-body { padding: 1.5rem; }
+.q-text { font-size: 1.05rem; line-height: 1.6; color: var(--text-primary); margin-bottom: 1.5rem; }
+
+.q-options { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.5rem; }
+.q-opt {
+    padding: 0.8rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+}
+.q-opt .opt-letter { font-weight: 700; color: var(--text-primary); flex-shrink: 0; }
+
+/* Highlight Jawaban */
+.q-opt.user-correct { border-color: var(--success); background: rgba(107, 143, 92, 0.08); color: var(--success); font-weight: 600; }
+.q-opt.user-wrong { border-color: var(--error); background: rgba(229, 115, 115, 0.08); color: var(--error); text-decoration: line-through; }
+.q-opt.actual-correct { border-color: var(--success); background: rgba(107, 143, 92, 0.08); color: var(--success); font-weight: 600; }
+
+/* Kotak Pembahasan */
+.q-pembahasan {
+    background: var(--bg-tertiary);
+    border-left: 4px solid var(--brand-accent);
+    padding: 1.2rem 1.5rem;
+    border-radius: 0 10px 10px 0;
+}
+.q-pembahasan h4 {
+    color: var(--brand-accent);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+.q-pembahasan p { color: var(--text-secondary); line-height: 1.6; font-size: 0.95rem; }
+
+.review-actions { text-align: center; margin-top: 3rem; margin-bottom: 2rem; }
+
+@media (max-width: 600px) {
+    .review-container { padding: 1rem; }
+    .summary-value { font-size: 2rem; }
+}

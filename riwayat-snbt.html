@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Tryout SNBT - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/riwayat.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <div class="dashboard-body">
+                <main class="riwayat-container">
+                    <div class="riwayat-header">
+                        <h1>📝 Riwayat Tryout SNBT</h1>
+                        <p>Daftar tryout SNBT yang sudah kamu selesaikan.</p>
+                        <a href="riwayat.html" class="btn-back">← Kembali ke Riwayat</a>
+                    </div>
+
+                    <div id="snbtList" class="snbt-list">
+                        <p class="loading-text">⏳ Memuat data tryout...</p>
+                    </div>
+                </main>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/riwayat-snbt.js"></script>
+</body>
+</html>

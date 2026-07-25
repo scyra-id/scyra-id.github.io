@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Pembahasan - Scyra</title>
+    <link rel="icon" type="image/png" href="images/logo.png">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/review.css">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+
+    <main class="review-container">
+        <!-- Loading State -->
+        <div id="reviewLoading" class="review-loading">
+            <div class="spinner-sage"></div>
+            <p>Memuat pembahasan soal...</p>
+        </div>
+
+        <!-- Konten Review (Disembunyikan sampai data siap) -->
+        <div id="reviewContent" style="display: none;">
+            <header class="review-header">
+                <h1>📊 Review & Pembahasan</h1>
+                <p id="reviewPaket" class="review-subtitle">Tryout Harian</p>
+            </header>
+
+            <!-- Kartu Ringkasan Skor -->
+            <div class="summary-grid">
+                <div class="summary-card score">
+                    <span class="summary-label">Skor Akhir</span>
+                    <span class="summary-value" id="sumSkor">0</span>
+                </div>
+                <div class="summary-card correct">
+                    <span class="summary-label">Benar</span>
+                    <span class="summary-value" id="sumBenar">0</span>
+                </div>
+                <div class="summary-card wrong">
+                    <span class="summary-label">Salah</span>
+                    <span class="summary-value" id="sumSalah">0</span>
+                </div>
+                <div class="summary-card empty">
+                    <span class="summary-label">Tidak Dijawab</span>
+                    <span class="summary-value" id="sumKosong">0</span>
+                </div>
+            </div>
+
+            <!-- Daftar Soal & Pembahasan -->
+            <section class="questions-list" id="questionsList">
+                <!-- Di-generate oleh JS -->
+            </section>
+
+            <div class="review-actions">
+                <a href="dashboard.html" class="btn-primary-lg">Kembali ke Dashboard</a>
+            </div>
+        </div>
+    </main>
+
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/review.js"></script>
+</body>
+</html>

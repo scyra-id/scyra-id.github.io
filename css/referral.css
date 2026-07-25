@@ -1,0 +1,472 @@
+/**
+ * =============================================
+ * REFERRAL PAGE STYLES
+ * =============================================
+ */
+
+/* Container */
+.referral-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+/* Header */
+.referral-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.referral-header h1 {
+    font-size: 2rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.referral-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Grid Layout */
+.referral-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+}
+
+/* Card */
+.referral-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-color);
+}
+
+.card-header {
+    margin-bottom: 1.5rem;
+}
+
+/* IG Instructions */
+.ig-instructions {
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--brand-primary);
+}
+
+.ig-instructions h4 {
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.ig-instructions ol {
+    color: var(--text-secondary);
+    margin-left: 1.5rem;
+    line-height: 1.8;
+}
+
+.ig-instructions ol li {
+    margin-bottom: 0.5rem;
+}
+
+.ig-instructions strong {
+    color: var(--brand-primary);
+}
+
+/* IG Status */
+.ig-status {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--bg-secondary);
+    border-radius: 12px;
+    border: 2px solid var(--brand-primary);
+    margin-bottom: 1.5rem;
+}
+
+.ig-status .status-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.ig-status .status-content {
+    flex: 1;
+}
+
+.ig-status .status-content strong {
+    display: block;
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.ig-status .status-content p {
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.card-header h2 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.card-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Notices */
+.eligibility-notice,
+.already-used-notice {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    align-items: flex-start;
+}
+
+.eligibility-notice {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.already-used-notice {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.notice-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.notice-content strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: var(--text-primary);
+}
+
+.notice-content p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* Form */
+.referral-form,
+.otp-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.form-group label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    padding: 0.875rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    font-size: 1rem;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.1);
+}
+
+.form-group input::placeholder {
+    color: var(--text-muted);
+}
+
+.form-group small {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* OTP Info */
+.otp-info {
+    background: rgba(33, 150, 243, 0.1);
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.otp-info p {
+    margin: 0 0 0.5rem 0;
+    color: var(--text-primary);
+}
+
+.otp-note {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+/* OTP Actions */
+.otp-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* Buttons */
+.btn-primary {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    padding: 1rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-secondary {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: var(--bg-hover);
+}
+
+.btn-text {
+    background: transparent;
+    color: var(--text-secondary);
+    border: none;
+    padding: 0.875rem;
+    font-size: 0.95rem;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.btn-text:hover {
+    color: var(--text-primary);
+}
+
+/* My Referral Code */
+.my-referral-code {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.code-display {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--bg-secondary);
+    padding: 1rem;
+    border-radius: 10px;
+    border: 2px dashed var(--border-color);
+}
+
+.code-display span {
+    flex: 1;
+    font-size: 1.25rem;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: var(--brand-primary);
+    letter-spacing: 0.1rem;
+}
+
+.btn-copy {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-copy:hover {
+    background: var(--bg-hover);
+}
+
+.btn-share {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 0.875rem 1.5rem;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-share:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+}
+
+/* Referral Info */
+.referral-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+}
+
+.info-icon {
+    font-size: 1.5rem;
+}
+
+.info-item strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.info-item p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Referral Terms */
+.referral-terms {
+    background: var(--bg-secondary);
+    padding: 1.25rem;
+    border-radius: 10px;
+}
+
+.referral-terms h4 {
+    margin: 0 0 0.75rem 0;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.referral-terms ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.referral-terms li {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 0.25rem;
+}
+
+/* Success State */
+.referral-success {
+    text-align: center;
+    padding: 2rem 1rem;
+}
+
+.success-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.referral-success h3 {
+    color: var(--success);
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.referral-success p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .referral-container {
+        padding: 1rem;
+    }
+    
+    .referral-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .referral-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .referral-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .code-display span {
+        font-size: 1rem;
+    }
+}
+
+/* Dark Mode */
+[data-theme="dark"] .referral-card {
+    background: var(--bg-card-dark);
+    border-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .form-group input {
+    background: var(--bg-input-dark);
+    border-color: var(--border-color-dark);
+    color: var(--text-primary-dark);
+}
+
+[data-theme="dark"] .code-display {
+    background: var(--bg-secondary-dark);
+    border-color: var(--border-color-dark);
+}
+
+[data-theme="dark"] .info-item {
+    background: var(--bg-secondary-dark);
+}
+
+[data-theme="dark"] .referral-terms {
+    background: var(--bg-secondary-dark);
+}

@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Persiapan Tryout - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tryout.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+    
+    <script>
+        const savedTheme = localStorage.getItem('scyra_theme') || localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark', 'dark-mode', 'dark-theme');
+            window.addEventListener('DOMContentLoaded', () => document.body.classList.add('dark', 'dark-mode', 'dark-theme'));
+        }
+    </script>
+
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            
+            <div class="dashboard-body" style="max-width: 900px; margin: 0 auto; width: 100%;">
+                
+                <div class="prep-header">
+                    <h1 id="toTitle">Tryout SNBT</h1>
+                    <div class="rules-box">
+                        <h3>⚠️ Peraturan & Sistem Keamanan Tryout</h3>
+                        <ul style="margin-left: 1.5rem; color: var(--text-secondary); margin-top: 0.5rem; line-height: 1.6;">
+                            <li>Waktu total pengerjaan adalah <strong>195 Menit (3 Jam 15 Menit)</strong>. Waktu akan terus berjalan sejak Anda menekan tombol mulai pada subtes pertama.</li>
+                            <li>Sistem menggunakan <strong>pengacakan soal dinamis</strong>. Jangan memuat ulang (refresh) halaman saat berada di dalam ruang ujian.</li>
+                            <li>Tindakan keluar dari tab browser dapat memicu sistem keamanan untuk mengunci paksa ujian Anda.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="global-timer-box">
+                    <p style="color: var(--text-secondary); font-weight: 600; text-transform: uppercase; letter-spacing: 2px;">Waktu Global Tryout</p>
+                    <div class="global-timer" id="globalTimerDisplay">03:15:00</div>
+                    <p style="color: var(--error); font-size: 0.85rem; margin-top: 0.5rem;">*Timer akan berjalan setelah subtes pertama dimulai</p>
+                </div>
+
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Daftar Subtes (Acak)</h3>
+                <div class="subtest-list" id="subtestContainer">
+                    <p>⏳ Menyiapkan subtes...</p>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/detail-tryout.js"></script>
+    <script src="js/session.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,310 @@
+.billing-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.billing-header {
+    margin-bottom: 2rem;
+}
+
+.billing-header h1 {
+    color: var(--brand-primary);
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.billing-header p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.billing-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+.payment-card, .summary-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px var(--shadow-color);
+}
+
+.payment-card h2, .summary-card h2 {
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+}
+
+.qris-container {
+    text-align: center;
+}
+
+.qris-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.qris-logo {
+    width: 120px;
+    height: auto;
+}
+
+.qris-header span {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.qris-code {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    border: 2px solid var(--border-color);
+}
+
+.qris-code img {
+    width: 250px;
+    height: 250px;
+}
+
+.payment-timer {
+    background: rgba(229, 115, 115, 0.1);
+    border: 2px solid var(--error);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.timer-label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+}
+
+.timer-value {
+    display: block;
+    color: var(--error);
+    font-size: 1.8rem;
+    font-weight: 800;
+    font-family: 'Courier New', monospace;
+}
+
+.payment-info {
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.payment-info p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.total-amount {
+    color: var(--brand-primary) !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    margin-top: 0.3rem !important;
+}
+
+.order-details {
+    margin-bottom: 1.5rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+.order-item span {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.order-item strong {
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.order-item.total {
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 0.5rem;
+}
+
+.order-item.total strong {
+    color: var(--brand-primary);
+    font-size: 1.3rem;
+}
+
+.order-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 1rem 0;
+}
+
+.coupon-section {
+    margin-bottom: 1.5rem;
+}
+
+.coupon-section label {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.coupon-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.coupon-input-group input {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.coupon-input-group input:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+}
+
+.btn-apply-coupon {
+    padding: 0.7rem 1.2rem;
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-apply-coupon:hover {
+    background: var(--brand-primary);
+    color: white;
+    border-color: var(--brand-primary);
+}
+
+.coupon-message {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    min-height: 1.2rem;
+}
+
+.coupon-message.success {
+    color: var(--success);
+}
+
+.coupon-message.error {
+    color: var(--error);
+}
+
+.terms-section {
+    margin-bottom: 1.5rem;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--brand-primary);
+}
+
+.checkbox-container a {
+    color: var(--brand-primary);
+    text-decoration: underline;
+}
+
+.btn-confirm-payment {
+    width: 100%;
+    padding: 1rem;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 12px rgba(135, 168, 120, 0.3);
+}
+
+.btn-confirm-payment:hover:not(:disabled) {
+    background: var(--brand-primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(135, 168, 120, 0.4);
+}
+
+.btn-confirm-payment:disabled {
+    background: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .billing-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .billing-container {
+        padding: 1rem;
+    }
+    
+    .billing-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .payment-card, .summary-card {
+        padding: 1.5rem;
+    }
+    
+    .qris-code img {
+        width: 200px;
+        height: 200px;
+    }
+    
+    .total-amount {
+        font-size: 1.3rem !important;
+    }
+}
