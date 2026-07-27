@@ -73,10 +73,13 @@ async function loadKategori() {
     // Render ke HTML
     tableBody.innerHTML = data.map(k => `
         <tr>
-            <td style="font-size: 1.8rem; text-align: center;">${k.icon || '📚'}</td>
-            <td style="font-weight: 600; color: var(--text-primary);">${k.nama_mapel}</td>
+            <td style="font-size: 1.8rem; text-align: center; ${k.is_hidden ? 'opacity:0.3; filter:grayscale(1);' : ''}">${k.icon || '📚'}</td>
+            <td style="font-weight: 600; color: var(--text-primary);">
+                ${k.nama_mapel}
+                ${k.is_hidden ? '<span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.5rem;">(tersembunyi)</span>' : ''}
+            </td>
             <td>
-                <span class="badge badge-publik" style="text-transform: uppercase;">${k.jenjang || 'UTBK'}</span>
+                <span class="badge badge-publik" style="text-transform: uppercase; ${k.is_hidden ? 'opacity:0.5;' : ''}">${k.jenjang || 'UTBK'}</span>
             </td>
             <td>
                 <button onclick="editKategori('${k.id}')" style="background:none; border:none; cursor:pointer; color:var(--brand-primary); margin-right:15px; font-weight:600;">✏️ Edit</button>
@@ -94,10 +97,20 @@ async function simpanKategori() {
     btnSubmit.disabled = true;
 
     const id = document.getElementById('kategoriId').value;
+    const namaMapel = document.getElementById('nama_mapel').value;
+    const slug = namaMapel
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
     const payload = {
         icon: document.getElementById('icon').value,
-        nama_mapel: document.getElementById('nama_mapel').value,
-        jenjang: document.getElementById('jenjang').value
+        nama_mapel: namaMapel,
+        slug: slug,
+        jenjang: document.getElementById('jenjang').value,
+        jenis_tes: document.getElementById('jenis_tes').value,
+        is_hidden: document.getElementById('is_hidden').checked
     };
 
     let result;
@@ -128,6 +141,8 @@ window.editKategori = async (id) => {
         document.getElementById('icon').value = data.icon;
         document.getElementById('nama_mapel').value = data.nama_mapel;
         document.getElementById('jenjang').value = data.jenjang || 'utbk';
+        document.getElementById('jenis_tes').value = data.jenis_tes || 'TPS';
+        document.getElementById('is_hidden').checked = data.is_hidden === true;
         
         document.getElementById('modalTitle').textContent = 'Edit Mapel';
         modal.classList.add('active');

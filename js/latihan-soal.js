@@ -22,21 +22,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             state.userId = user.id;
 
-            // CEK APAKAH UDAH PERNAH DIKERJAIN SEBELUMNYA?
-            const historyKey = `latihan_history_${state.userId}_${state.materiId}`;
-            const savedHistory = localStorage.getItem(historyKey);
+            const { data: info } = await window.db.from('materi').select('kategori_id').eq('id', state.materiId).single();
+            if (info) state.kategoriId = info.kategori_id;
 
-            if (savedHistory) {
-                // TAMPILKAN HASILNYA LANGSUNG (Memory 5 soal yang pernah dia kerjain)
-                state.jawabanHistory = JSON.parse(savedHistory);
-                
-                // Ambil Kategori ID untuk fitur Next Bab
-                const { data: info } = await window.db.from('materi').select('kategori_id').eq('id', state.materiId).single();
-                if(info) state.kategoriId = info.kategori_id;
-                
+            let savedHistory = null;
+            if (window.ProgressSystem) {
+                savedHistory = await window.ProgressSystem.getLatihanHistory(state.userId, state.materiId);
+            }
+            if (!savedHistory) {
+                try {
+                    const raw = localStorage.getItem(`latihan_history_${state.userId}_${state.materiId}`);
+                    if (raw) savedHistory = JSON.parse(raw);
+                } catch (_) {}
+            }
+
+            if (savedHistory && Array.isArray(savedHistory) && savedHistory.length) {
+                state.jawabanHistory = savedHistory;
                 renderLayarHasil();
             } else {
-                // MULAI DARI AWAL
                 fetchSoal();
             }
         }
@@ -61,9 +64,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (err) { console.error(err); }
     }
 
-    function renderSoalActive(index) {
+    async function renderSoalActive(index) {
         if (index >= state.listSoal.length) {
-            localStorage.setItem(`latihan_history_${state.userId}_${state.materiId}`, JSON.stringify(state.jawabanHistory));
+            try {
+                localStorage.setItem(`latihan_history_${state.userId}_${state.materiId}`, JSON.stringify(state.jawabanHistory));
+            } catch (_) {}
+            if (window.ProgressSystem) {
+                await window.ProgressSystem.saveLatihanComplete(
+                    state.userId,
+                    state.materiId,
+                    state.kategoriId,
+                    state.jawabanHistory
+                );
+            }
             renderLayarHasil();
             return;
         }

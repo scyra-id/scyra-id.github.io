@@ -291,6 +291,17 @@ async function finishExam(isDisqualified = false) {
 
         if (insertError) throw insertError;
 
+        if (window.ProgressSystem && user?.id) {
+            try {
+                await window.ProgressSystem.logActivity(user.id, 'tryout_complete', insertedData?.id, {
+                    skor,
+                    total_soal: questions.length,
+                    jumlah_benar: isDisqualified ? 0 : correct,
+                    kategori_id: currentKategoriId,
+                });
+            } catch (_) {}
+        }
+
         if (isDisqualified) {
             await showScyraAlert("Anda didiskualifikasi.\nSkor Anda: 0", "🚫 Ujian Berakhir", "🚫");
             window.location.href = 'tryout.html';

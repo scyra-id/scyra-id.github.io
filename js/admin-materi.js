@@ -30,13 +30,17 @@ async function initPage() {
 
 async function loadKategori() {
     const { data, error } = await window.db.from('kategori').select('*').order('nama_mapel');
-    if (error) return console.error(error);
-    kategoriList = data;
+    if (error) {
+        console.error('Gagal memuat kategori:', error);
+        kategoriList = [];
+        return;
+    }
+    kategoriList = data || [];
     
     const select = document.getElementById('kategori');
-    if(select) {
+    if (select) {
         select.innerHTML = '';
-        data.forEach(k => select.innerHTML += `<option value="${k.id}">${k.nama_mapel}</option>`);
+        kategoriList.forEach(k => select.innerHTML += `<option value="${k.id}">${k.nama_mapel}</option>`);
     }
 }
 
@@ -392,7 +396,11 @@ function setupAutoModal() {
                 const barisAwal = allLines.slice(0, 10);
                 const slugTerdeteksi = detectKategori(teksLengkap, barisAwal);
                 const kategoriTerdeteksi = kategoriList.find(k => k.slug === slugTerdeteksi);
-                const kategori_id = kategoriTerdeteksi ? kategoriTerdeteksi.id : kategoriList[0].id;
+                const fallbackKategori = kategoriList.find(k => !k.is_hidden) || kategoriList[0];
+                if (!fallbackKategori) {
+                    throw new Error('Belum ada kategori tersedia. Tambahkan kategori terlebih dahulu di Kelola Mapel.');
+                }
+                const kategori_id = (kategoriTerdeteksi || fallbackKategori).id;
                 let konten_html = parsePdfToRawHTML(allLines.slice(1));
                 const slug = judul.toLowerCase().replace(/ /g, '-').replace(/[^\w-]/g, '') + '-' + Date.now() + '-' + i; 
                 
@@ -408,10 +416,11 @@ function setupAutoModal() {
                 const { data: { user } } = await window.db.auth.getUser();
                 
                 // 🚨 MASUKKAN nomor_bab KE DATABASE
-                await window.db.from('materi').insert({
+                const { error: insertError } = await window.db.from('materi').insert({
                     judul, slug, kategori_id, status: 'publik', konten_html, created_by: user.id,
                     nomor_bab 
                 });
+                if (insertError) throw insertError;
                 successCount++;
             } catch (err) {
                 console.error(`Gagal memproses ${file.name}:`, err);

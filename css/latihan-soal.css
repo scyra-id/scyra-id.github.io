@@ -211,3 +211,20 @@
     transition: font-size 0.2s ease;
 }
 .huruf-opsi { font-size: calc(1.1rem * var(--zoom-level)) !important; }
+/* KHUSUS SURVEY ISIAN */
+.survey-input-large {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1.1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: inherit;
+    margin-bottom: 1rem;
+}
+.survey-input-large:focus {
+    outline: none;
+    border-color: var(--brand-primary);
+}
+

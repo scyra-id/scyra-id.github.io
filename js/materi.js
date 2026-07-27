@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // B. Ambil Kategori
-            const resKategori = await window.db.from('kategori').select('*').order('nama_mapel');
+            const resKategori = await window.db.from('kategori').select('*').neq('is_hidden', true).order('nama_mapel');
             if (resKategori.data) dbKategori = resKategori.data;
 
             // 🚨 C. AMBIL MATERI + nomor_bab (PENTING!)

@@ -3,6 +3,42 @@
   padding: 0;  
   box-sizing: border-box;  
 }
+
+/* =====================================================
+   SCYRA CUSTOM SCROLLBAR — Global (Chromium + Firefox)
+   ===================================================== */
+
+/* Firefox */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(135, 168, 120, 0.35) transparent;
+}
+
+/* Chromium / Safari */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(135, 168, 120, 0.35);
+    border-radius: 999px;
+    transition: background 0.2s;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 143, 92, 0.6);
+}
+/* Hapus tombol panah atas/bawah/kiri/kanan */
+::-webkit-scrollbar-button {
+    display: none;
+    width: 0;
+    height: 0;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
 /* ================= CSS VARIABLES (SAGE & GOLD THEME) ================= */
 :root {
     /* LIGHT MODE (Cream & Sage) */
@@ -50,6 +86,20 @@ body.dark-mode {
     --shadow-color: rgba(0, 0, 0, 0.5); 
     --footer-bg: #000000;       
     --footer-text: #B8B8B8;
+}
+
+/* Override scrollbar Firefox (dark mode) */
+body.dark-mode * {
+    scrollbar-color: rgba(163, 196, 145, 0.35) transparent;
+}
+/* Override scrollbar Chrome/Safari (dark mode) */
+body.dark-mode::-webkit-scrollbar-thumb,
+body.dark-mode *::-webkit-scrollbar-thumb {
+    background: rgba(163, 196, 145, 0.35);
+}
+body.dark-mode::-webkit-scrollbar-thumb:hover,
+body.dark-mode *::-webkit-scrollbar-thumb:hover {
+    background: rgba(135, 168, 120, 0.6);
 }
 
 body {
@@ -527,6 +577,105 @@ body.dark-mode .icon-moon { display: inline-block; }
 /* Kartu Email & Password otomatis turun ke baris kedua */
 .security-card {
     border-left: 5px solid var(--brand-accent);
+}
+
+.danger-zone {
+    grid-column: 1 / -1;
+    border-left: 5px solid var(--error);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+.danger-zone .card-header {
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+.btn-delete-account {
+    flex-shrink: 0;
+    background: transparent;
+    color: var(--error);
+    border: 1.5px solid var(--error);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-delete-account:hover { background: rgba(229, 115, 115, 0.12); }
+.btn-delete-account:disabled { opacity: 0.65; cursor: not-allowed; }
+@media (max-width: 640px) {
+    .danger-zone { align-items: stretch; flex-direction: column; }
+}
+
+.delete-account-modal[hidden] { display: none; }
+.delete-account-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+}
+.delete-account-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(15, 15, 15, 0.65);
+    backdrop-filter: blur(5px);
+}
+.delete-account-modal__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 480px);
+    padding: 2rem;
+    border: 1px solid rgba(229, 115, 115, 0.45);
+    border-radius: 18px;
+    background: var(--bg-secondary);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+.delete-account-modal__icon { font-size: 2rem; margin-bottom: 0.75rem; }
+.delete-account-modal__dialog h2 { color: var(--error); margin-bottom: 0.65rem; }
+.delete-account-modal__dialog > p { color: var(--text-secondary); margin-bottom: 1.25rem; }
+.delete-account-modal__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.9rem;
+    border: 0;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 1.75rem;
+    cursor: pointer;
+}
+.delete-account-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+.btn-delete-cancel,
+.btn-delete-confirm {
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+}
+.btn-delete-cancel {
+    color: var(--text-primary);
+    background: transparent;
+    border: 1px solid var(--border-color);
+}
+.btn-delete-confirm {
+    color: white;
+    background: var(--error);
+    border: 1px solid var(--error);
+}
+.btn-delete-confirm:disabled { opacity: 0.5; cursor: not-allowed; }
+@media (max-width: 480px) {
+    .delete-account-modal__dialog { padding: 1.5rem; }
+    .delete-account-modal__actions { flex-direction: column-reverse; }
+    .btn-delete-cancel, .btn-delete-confirm { width: 100%; }
 }
 
 /* =========================================================

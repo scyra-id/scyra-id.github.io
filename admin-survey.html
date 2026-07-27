@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Survey - Scyra Admin</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-soal.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <div class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <div class="dashboard-body">
+                <main class="admin-container">
+                    <div class="admin-header">
+                        <h1>📊 Kelola Survey</h1>
+                        <p>Upload PDF pertanyaan survey, review hasil, dan kirim reward ke partisipan.</p>
+                        <a href="admin.html" class="btn-back-admin">← Kembali ke Dashboard</a>
+                    </div>
+
+                    <!-- UPLOAD PDF -->
+                    <div class="upload-card">
+                        <h2 style="color:var(--text-primary); margin-bottom:0.5rem;">📄 Upload Pertanyaan Survey (PDF)</h2>
+                        <p style="color:var(--text-secondary); margin-bottom:1.5rem; font-size:0.95rem;">
+                            Tidak perlu pilih mapel/materi. Langsung upload PDF — AI akan mendeteksi soal PG, isian, dan PG kompleks.
+                        </p>
+                        <div style="background:rgba(135,168,120,0.08); padding:1rem; border-radius:8px; border-left:4px solid var(--brand-primary); margin-bottom:1.5rem; font-size:0.9rem; color:var(--text-primary);">
+                            <strong>Format PDF (tanpa kunci jawaban):</strong><br>
+                            • <code>1. Pertanyaan...</code> + opsi <code>A.</code>…<code>Z.</code> → Pilihan Ganda (1 jawaban)<br>
+                            • <code>1. Nama kamu? [ISIAN]</code> atau <code>___</code> → Isian<br>
+                            • PG Kompleks (multi-select): tulis penanda <code>[PGK]</code> / <code>[MULTI]</code> di pertanyaan,<br>
+                            &nbsp;&nbsp;atau frasa <em>“boleh pilih lebih dari satu”</em>, atau baris <code>Tipe: multi</code><br>
+                            • Tulis <code>======</code> pada satu baris penuh untuk memulai <strong>halaman survey berikutnya</strong><br>
+                            • Survey <strong>tidak memakai kunci/pembahasan</strong> — baris itu diabaikan jika ada
+                        </div>
+                        <form id="surveyUploadForm">
+                            <div class="form-group">
+                                <label for="pdfSurveyFile">Pilih File PDF Survey</label>
+                                <input type="file" id="pdfSurveyFile" accept="application/pdf" multiple required>
+                            </div>
+                            <label style="display:flex;align-items:center;gap:0.5rem;margin:1rem 0;cursor:pointer;color:var(--text-secondary);">
+                                <input type="checkbox" id="replaceExisting" style="width:18px;height:18px;">
+                                Ganti semua pertanyaan lama (hapus soal survey aktif sebelumnya)
+                            </label>
+                            <button type="submit" class="btn-admin btn-gold" id="btnScanSurvey">⚡ Scan PDF Survey</button>
+                        </form>
+                        <div id="scanResults" class="scan-results" style="display:none;">
+                            <h3>🤖 Hasil Deteksi AI</h3>
+                            <div id="resultsList"></div>
+                            <button id="btnConfirmSave" class="btn-admin" style="margin-top:1rem;background:var(--success);">✅ Simpan ke Database Survey</button>
+                        </div>
+                    </div>
+
+                    <!-- DAFTAR PERTANYAAN -->
+                    <div class="upload-card" style="margin-top:2rem;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem;">
+                            <div>
+                                <h2 style="color:var(--text-primary);margin:0 0 0.3rem;">Daftar Pertanyaan Aktif</h2>
+                                <p style="color:var(--text-secondary);margin:0;font-size:0.9rem;">Soal yang tampil di halaman survey user</p>
+                            </div>
+                            <div style="background:var(--bg-tertiary);padding:0.5rem 1rem;border-radius:8px;border:1px solid var(--border-color);">
+                                <strong id="totalSurveyQ" style="color:var(--brand-primary);">0</strong>
+                                <span style="color:var(--text-secondary);font-size:0.85rem;"> pertanyaan</span>
+                            </div>
+                        </div>
+                        <div id="loadingSurvey" style="padding:2rem;text-align:center;">
+                            <div class="spinner-sage" style="margin:0 auto 1rem;"></div>
+                            <p>Memuat data...</p>
+                        </div>
+                        <div id="listPertanyaanContainer" style="display:none;flex-direction:column;gap:1rem;"></div>
+                    </div>
+
+                    <!-- DETAIL JAWABAN -->
+                    <div id="hasilDetailContainer" class="upload-card" style="margin-top:2rem;display:none;">
+                        <h3 id="hasilDetailTitle">Jawaban</h3>
+                        <p id="hasilDetailStats" style="margin-bottom:1rem;color:var(--text-secondary);"></p>
+                        <div id="hasilDetailList" style="display:flex;flex-direction:column;gap:0.75rem;max-height:400px;overflow-y:auto;padding-right:1rem;"></div>
+                        <button id="btnSendRewardToSession" class="btn-admin" style="display:none;width:100%;margin-top:1.5rem;">🎉 Kirim Reward & Buat Akun Silver</button>
+                    </div>
+
+                    <!-- KIRIM MASSAL -->
+                    <div id="sendAllContainer" class="upload-card" style="margin-top:2rem;display:none;">
+                        <h3>Kirim Massal ke Semua yang Belum Dikirim</h3>
+                        <p id="pendingCountText" style="color:var(--text-secondary);margin-bottom:1rem;">Menghitung...</p>
+                        <button id="btnSendAllRewards" class="btn-action">📨 Kirim Semua Reward</button>
+                        <div id="sendAllProgress" style="margin-top:1rem;display:none;"></div>
+                    </div>
+
+                    <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-survey.js"></script>
+</body>
+</html>

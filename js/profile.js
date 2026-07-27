@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         setupAvatarUpload(user);
         setupEmailForm(user);
         setupPasswordForm(user);
+        setupAccountDeletion(user);
         generateCaptcha('email');
         generateCaptcha('pass');
     };
@@ -175,6 +176,80 @@ function setupAvatarUpload(user) {
             btnUpload.disabled = false; 
             btnUpload.textContent = origText;
             avatarInput.value = '';
+        }
+    });
+}
+
+function setupAccountDeletion(user) {
+    const button = document.getElementById('btnDeleteAccount');
+    const modal = document.getElementById('deleteAccountModal');
+    const passwordInput = document.getElementById('deleteAccountPassword');
+    const confirmationInput = document.getElementById('deleteAccountConfirmation');
+    const confirmButton = document.getElementById('btnConfirmDeleteAccount');
+    const errorEl = document.getElementById('deleteAccountError');
+    if (!button || !modal || !passwordInput || !confirmationInput || !confirmButton) return;
+
+    const closeModal = () => {
+        modal.hidden = true;
+        modal.setAttribute('aria-hidden', 'true');
+        passwordInput.value = '';
+        confirmationInput.value = '';
+        confirmButton.disabled = true;
+        if (errorEl) errorEl.classList.remove('active');
+        button.focus();
+    };
+
+    const validate = () => {
+        confirmButton.disabled = !passwordInput.value || confirmationInput.value.trim() !== 'HAPUS AKUN';
+    };
+
+    button.addEventListener('click', () => {
+        modal.hidden = false;
+        modal.setAttribute('aria-hidden', 'false');
+        passwordInput.focus();
+    });
+    passwordInput.addEventListener('input', validate);
+    confirmationInput.addEventListener('input', validate);
+    modal.querySelectorAll('[data-close-delete-modal]').forEach((node) => node.addEventListener('click', closeModal));
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && !modal.hidden) closeModal();
+    });
+
+    confirmButton.addEventListener('click', async () => {
+        const originalText = confirmButton.textContent;
+        confirmButton.disabled = true;
+        confirmButton.textContent = 'Menghapus akun...';
+        if (errorEl) errorEl.classList.remove('active');
+
+        try {
+            const { data, error } = await window.db.functions.invoke('delete-account', {
+                body: { password: passwordInput.value, confirmation: 'HAPUS AKUN' }
+            });
+
+            let payload = data;
+            if (error) {
+                try {
+                    if (error.context) payload = await error.context.json();
+                } catch (_) {}
+                throw new Error(payload?.error || error.message || 'Gagal menghapus akun.');
+            }
+            if (!payload?.success) throw new Error(payload?.error || 'Gagal menghapus akun.');
+
+            await window.db.auth.signOut();
+            localStorage.removeItem('scyra_has_registered');
+            localStorage.removeItem('scyra_saved_email');
+            sessionStorage.clear();
+            closeModal();
+            await showScyraAlert('Akun dan data terkait telah dihapus secara permanen.', 'Akun Dihapus', '✅');
+            window.location.href = 'index.html';
+        } catch (err) {
+            console.error('delete account:', err);
+            if (errorEl) {
+                errorEl.textContent = err.message || 'Gagal menghapus akun. Coba lagi nanti.';
+                errorEl.classList.add('active');
+            }
+            confirmButton.textContent = originalText;
+            validate();
         }
     });
 }

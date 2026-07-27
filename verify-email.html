@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Email - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+</head>
+<body>
+    <div id="header-placeholder"></div>
+    <main class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header" id="verificationState" aria-live="polite">
+                <h2>Memverifikasi emailmu…</h2>
+                <p>Mohon tunggu sebentar.</p>
+            </div>
+            <p class="auth-footer-text"><a href="login.html">Kembali ke halaman masuk</a></p>
+        </div>
+    </main>
+    <div id="footer-placeholder"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/verify-email.js"></script>
+</body>
+</html>

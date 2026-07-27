@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/latihan-soal.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body class="dashboard-page">
+
+    <div class="dashboard-layout">
+        <div class="main-content" style="margin: 0 auto; width: 100%; max-width: 800px; display: flex; flex-direction: column;">
+            
+            <header class="site-header" style="position: static; padding: 1rem 2rem; border-bottom: 1px solid var(--border-color);">
+                <a href="index.html" class="logo">
+                    <img src="images/logo.svg" alt="Scyra" class="logo-img">
+                    <h2>Scyra</h2>
+                </a>
+            </header>
+
+            <div class="dashboard-body" style="padding-top: 1rem;">
+                
+                <div class="latihan-container">
+                    
+                    <div class="latihan-header">
+                        <span class="badge" id="surveyBadge">⏳ Memuat Survey...</span>
+                        <a href="index.html" class="btn-outline btn-keluar">🛑 Kembali</a>
+                    </div>
+
+                    <div class="latihan-content" id="surveyContent">
+                        <!-- Area teks soal -->
+                        <div class="soal-container" id="soalContainer">
+                            <div class="teks-soal" id="soalText">Mencari data survey...</div>
+                        </div>
+
+                        <!-- Opsi jawaban -->
+                        <div class="opsi-container" id="opsiContainer"></div>
+
+                        <!-- Lanjut -->
+                        <button id="btnLanjutSoal" class="btn-lanjut" style="display: none; margin-top: 1.5rem;">Soal Selanjutnya →</button>
+                    </div>
+
+                </div>
+
+                <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/survey.js"></script>
+</body>
+</html>

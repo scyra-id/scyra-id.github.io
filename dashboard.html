@@ -37,6 +37,10 @@
                         <div>
                             <h1>Halo, <span id="dashUserName">Pejuang PTN</span>! 👋</h1>
                             <p>Siap melanjutkan perjalanan menembus PTN impianmu hari ini?</p>
+                            <div class="dash-live-row">
+                                <span id="dashLiveStatus" class="dash-live" data-state="syncing"><span class="live-dot"></span>Menghubungkan…</span>
+                                <span id="dashLastUpdated" class="dash-updated"></span>
+                            </div>
                         </div>
                         <a href="tryout.html" class="btn-primary-lg">🚀 Mulai Tryout Harian</a>
                     </div>
@@ -46,28 +50,28 @@
                         <div class="dash-card stat-card">
                             <div class="stat-icon" style="background: rgba(135, 168, 120, 0.15); color: var(--brand-primary);">📚</div>
                             <div class="stat-info">
-                                <h3>12</h3>
+                                <h3 id="statMateri">0</h3>
                                 <p>Materi Dibaca</p>
                             </div>
                         </div>
                         <div class="dash-card stat-card">
                             <div class="stat-icon" style="background: rgba(212, 175, 55, 0.15); color: var(--brand-accent);">📝</div>
                             <div class="stat-info">
-                                <h3>145</h3>
+                                <h3 id="statSoal">0</h3>
                                 <p>Soal Dijawab</p>
                             </div>
                         </div>
                         <div class="dash-card stat-card">
                             <div class="stat-icon" style="background: rgba(107, 143, 92, 0.15); color: var(--success);">🏆</div>
                             <div class="stat-info">
-                                <h3>680</h3>
+                                <h3 id="statSkor">0</h3>
                                 <p>Rata-rata Skor</p>
                             </div>
                         </div>
                         <div class="dash-card stat-card">
                             <div class="stat-icon" style="background: rgba(229, 115, 115, 0.15); color: var(--error);">🔥</div>
                             <div class="stat-info">
-                                <h3>5 Hari</h3>
+                                <h3 id="statStreak">0 Hari</h3>
                                 <p>Streak Belajar</p>
                             </div>
                         </div>
@@ -76,22 +80,10 @@
                     <!-- Continue Learning -->
                     <div class="continue-section">
                         <h2>Lanjutkan Belajar 📖</h2>
-                        <div class="continue-grid">
-                            <div class="dash-card course-card">
-                                <span class="course-badge">Penalaran Umum</span>
-                                <h3>Silogisme & Modus Ponens</h3>
-                                <p>Pelajari cara menarik kesimpulan logis dari dua premis atau lebih.</p>
-                                <div class="progress-bar"><div class="progress-fill" style="width: 65%;"></div></div>
-                                <div class="progress-text">65% Selesai</div>
-                                <a href="detail-materi.html" class="btn-continue">Lanjut Baca →</a>
-                            </div>
-                            <div class="dash-card course-card">
-                                <span class="course-badge">Literasi B. Inggris</span>
-                                <h3>Reading Comprehension: Main Idea</h3>
-                                <p>Tips cepat menemukan gagasan utama dalam teks bahasa Inggris.</p>
-                                <div class="progress-bar"><div class="progress-fill" style="width: 20%;"></div></div>
-                                <div class="progress-text">20% Selesai</div>
-                                <a href="detail-materi.html" class="btn-continue">Lanjut Baca →</a>
+                        <div id="continueGrid" class="continue-grid">
+                            <!-- Dynamic course cards will be rendered here by dashboard.js -->
+                            <div id="continueLoading" style="grid-column: 1/-1; text-align:center; padding: 2rem; color: var(--text-secondary);">
+                                Memuat data belajar... ⏳
                             </div>
                         </div>
                     </div>
@@ -108,6 +100,7 @@
     <script src="js/supabase-client.js"></script>
     <script src="js/supabase-client2.js"></script>
     <script src="js/credit.js"></script>
+    <script src="js/progress.js"></script>
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>
     <script src="js/dashboard-layout.js"></script>

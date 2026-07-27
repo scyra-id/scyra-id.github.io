@@ -25,6 +25,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     if (registerForm) registerForm.addEventListener('submit', handleRegister);
 
+    const resendButton = document.getElementById('btnResendVerification');
+    if (resendButton) resendButton.addEventListener('click', handleResendVerification);
+
     const loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
 });
@@ -77,17 +80,20 @@ async function handleRegister(e) {
             const { data, error } = await window.db.auth.signUp({
                 email: email,
                 password: password,
-                options: { data: { full_name: name } }
+                options: {
+                    data: { full_name: name },
+                    emailRedirectTo: new URL('verify-email.html', window.location.href).href
+                }
             });
             if (error) {
                 await showScyraAlert('Gagal mendaftar: ' + error.message, '⚠️ Error', '⚠️');
             } else {
-                // Simpan status registrasi ke cache
-                if (typeof setUserRegistered === 'function') {
-                    setUserRegistered(email);
-                }
-                await showScyraAlert('Registrasi berhasil! Silakan login dengan akun Anda.', '🎉 Sukses Daftar', '🎉');
-                window.location.href = 'login.html';
+                showVerificationNotice(email);
+                const isExistingUnverifiedUser = data.user?.identities?.length === 0;
+                const message = isExistingUnverifiedUser
+                    ? 'Email ini sudah terdaftar tetapi belum diverifikasi. Link verifikasi baru telah dikirim. Periksa inbox atau folder spam.'
+                    : 'Pendaftaran berhasil, tetapi akunmu belum aktif. Kami telah mengirim link verifikasi ke emailmu. Klik link tersebut sebelum masuk ke Scyra.';
+                await showScyraAlert(message, '📧 Verifikasi Email Diperlukan', '📧');
             }
         } catch (err) {
             await showScyraAlert('Terjadi kesalahan sistem: ' + err.message, '⚠️ Error', '⚠️');
@@ -95,6 +101,46 @@ async function handleRegister(e) {
     }
     btn.textContent = originalText;
     btn.disabled = false;
+}
+
+function showVerificationNotice(email) {
+    const form = document.getElementById('registerForm');
+    const notice = document.getElementById('verificationNotice');
+    const emailNode = document.getElementById('verificationEmail');
+    if (emailNode) emailNode.textContent = email;
+    if (form) form.hidden = true;
+    if (notice) notice.hidden = false;
+    sessionStorage.setItem('scyra_pending_verification_email', email);
+}
+
+async function handleResendVerification(e) {
+    const button = e.currentTarget;
+    const email = sessionStorage.getItem('scyra_pending_verification_email');
+    if (!email) {
+        await showScyraAlert('Masukkan email dan daftar kembali untuk mengirim link verifikasi.', '⚠️ Email Tidak Ditemukan', '⚠️');
+        return;
+    }
+
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Mengirim...';
+
+    try {
+        const { error } = await window.db.auth.resend({
+            type: 'signup',
+            email,
+            options: {
+                emailRedirectTo: new URL('verify-email.html', window.location.href).href
+            }
+        });
+        if (error) throw error;
+        await showScyraAlert('Link verifikasi baru sudah dikirim. Periksa inbox atau folder spam emailmu.', '📧 Link Terkirim', '📧');
+    } catch (err) {
+        await showScyraAlert('Gagal mengirim ulang link: ' + err.message, '⚠️ Error', '⚠️');
+    } finally {
+        button.textContent = originalText;
+        button.disabled = false;
+    }
 }
 
 async function handleLogin(e) {
@@ -116,7 +162,13 @@ async function handleLogin(e) {
             password: password
         });
         if (error) {
-            showError('passwordError', 'Email atau password salah!');
+            const message = error.message || '';
+            if (/email not confirmed/i.test(message)) {
+                sessionStorage.setItem('scyra_pending_verification_email', email);
+                showError('passwordError', 'Email belum diverifikasi. Periksa inbox atau daftar ulang untuk mengirim link baru.');
+            } else {
+                showError('passwordError', 'Email atau password salah!');
+            }
         } else {
             // Simpan status registrasi ke cache - langsung set tanpa fungsi
             localStorage.setItem('scyra_has_registered', 'true');

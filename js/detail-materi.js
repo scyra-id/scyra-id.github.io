@@ -7,9 +7,91 @@ document.addEventListener('DOMContentLoaded', async () => {
     const CREDIT_ICON = `<img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;">`;
 
     // =======================================================
+    // SINGLE-FLOW MATERIAL RENDERER
+    // Semua elemen PDF (teks, tabel, gambar, simulasi) dirender vertikal
+    // dalam urutan aslinya tanpa pembagian kolom kiri/kanan.
+    // =======================================================
+    function renderSingleFlow(rawHtml) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(rawHtml || '', 'text/html');
+        let result = '';
+        let tableRows = [];
+
+        const flushTable = () => {
+            if (!tableRows.length) return;
+            const rows = tableRows
+                .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+                .join('');
+            result += `<div class="scyra-table-wrapper"><table class="scyra-table"><tbody>${rows}</tbody></table></div>`;
+            tableRows = [];
+        };
+
+        const renderShortcodes = (html) => {
+            let output = html;
+            output = output.replace(/\[GAMBAR:\s*(.*?)\]/gi, (_, url) =>
+                `<img src="${url.trim()}" class="scyra-image" alt="Gambar materi">`
+            );
+            output = output.replace(/\[SIMULASI:\s*(.*?)\]/gi, (_, url) => {
+                const simUrl = url.trim();
+                return `<div class="simulasi-container scyra-sim-container" data-simurl="${simUrl}">
+                    <div class="simulasi-header"><span>🎮 Simulasi Interaktif</span><a href="${simUrl}" target="_blank" rel="noopener" style="color:white;text-decoration:none;font-size:0.9rem;">Buka Link Asli ↗</a></div>
+                    <div class="sim-loading" style="padding:2rem;text-align:center;"><div class="spinner-sage" style="margin:0 auto 1rem;"></div><p style="color:var(--text-secondary);">Memuat simulasi...</p></div>
+                    <iframe style="width:100%;height:500px;border:none;background:#fff;display:none;"></iframe>
+                </div>`;
+            });
+            return output;
+        };
+
+        Array.from(doc.body.children).forEach((element) => {
+            const tag = element.tagName;
+            const text = element.textContent.trim();
+            const html = element.innerHTML.trim();
+            if (!text && !html) return;
+
+            const isPipeRow = text.includes('|') && /^\|?.*\|.*\|?$/.test(text);
+            const isCsvRow = text.includes('","') && text.includes('"');
+            if (isPipeRow || isCsvRow) {
+                const cells = isCsvRow
+                    ? text.split('","').map((cell) => cell.replace(/"/g, '').trim())
+                    : text.split('|').map((cell) => cell.trim()).filter(Boolean);
+                if (cells.length > 1) {
+                    tableRows.push(cells);
+                    return;
+                }
+            }
+
+            flushTable();
+            const lower = text.toLowerCase();
+            const rendered = renderShortcodes(html);
+
+            if (lower.startsWith('pembahasan')) {
+                const content = rendered.replace(/^pembahasan[^:]*:?\s*/i, '');
+                result += `<details class="scyra-pembahasan"><summary>💡 Pembahasan</summary><div class="pembahasan-isi">${content || '<p>Pembahasan tersedia.</p>'}</div></details>`;
+            } else if (lower.includes('trap alert') || lower.includes('jebakan maut')) {
+                result += `<div class="scyra-trap"><strong>🚨 TRAP ALERT</strong>${rendered}</div>`;
+            } else if (lower.includes('fyi:') || lower.includes('for your information')) {
+                result += `<div class="scyra-fyi"><strong>ℹ️ FYI</strong>${rendered}</div>`;
+            } else if (tag.match(/^H[1-6]$/)) {
+                result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
+            } else if (tag === 'UL' || tag === 'OL') {
+                result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
+            } else {
+                result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
+            }
+        });
+
+        flushTable();
+        return result.replace(/<tbody>\s*<tr>(.*?)<\/tr>/gi, (_, firstRow) =>
+            `<thead><tr>${firstRow.replace(/<td/g, '<th').replace(/<\/td>/g, '</th>')}</tr></thead><tbody>`
+        );
+    }
+
+    // =======================================================
     // 🚨 SCYRA MAGIC ENGINE (TRAP ALERT ANTI-BOCOR & KELUAR PEMBAHASAN)
     // =======================================================
     function applyScyraMagic(rawHtml) {
+        return renderSingleFlow(rawHtml);
+
         const parser = new DOMParser();
         const doc = parser.parseFromString(rawHtml, 'text/html');
         let finalHtml = '';
@@ -541,12 +623,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loadingEl = document.getElementById('detailLoading');
         const contentEl = document.getElementById('detailContent');
         const errorEl = document.getElementById('detailError');
-        const { data: { user } } = await window.db.auth.getUser();
-        if (!user) {
+        const { data: { user }, error: authError } = await window.db.auth.getUser();
+        if (authError || !user) {
             await showScyraAlert('Kamu harus login terlebih dahulu.', '⛔ Akses Ditolak', '🔒');
             window.location.href = 'login.html';
             return;
         }
+        
+        // Fetch user role safely (fallback to direct DB query if window.userRole not set yet)
+        let userRole = window.userRole;
+        if (!userRole) {
+            const { data: profile } = await window.db.from('profiles').select('role').eq('id', user.id).single();
+            userRole = profile?.role || 'user';
+        }
+        
         const urlParams = new URLSearchParams(window.location.search);
         const materiId = urlParams.get('id');
         if (!materiId) {
@@ -568,9 +658,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         
         // 🚨 SATPAM RBAC: CEK AKSES BAB DENGAN CREDIT SYSTEM
-        const isUserFree = (window.userRole === 'user' || !window.userRole);
+        const isUserFree = (userRole === 'user' || !userRole);
         // 🚨 Silver, Gold, dan Admin = auto-unlock semua materi tanpa credit
-        const isPremium = window.userRole === 'gold' || window.userRole === 'admin' || window.userRole === 'silver';
+        const isPremium = userRole === 'gold' || userRole === 'admin' || userRole === 'silver';
         const babNum = materi.nomor_bab || 1;
         const kategoriId = materi.kategori_id;
         
@@ -587,7 +677,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     kategoriId,
                     isSubtestUnlocked,
                     needsCredit,
-                    userRole: window.userRole,
+                    userRole,
                     babNum,
                     dbPaymentReady: !!window.dbPayment,
                     dbReady: !!window.db
@@ -697,16 +787,79 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         });
         
-        // ================= STATUS LATIHAN =================
+        // ================= PROGRESS + STATUS LATIHAN =================
+        if (window.ProgressSystem && user?.id) {
+            try {
+                const prog = await window.ProgressSystem.getMateriProgress(user.id, materi.id);
+                if (!prog) {
+                    await window.ProgressSystem.markMateriRead(user.id, materi.id, materi.kategori_id);
+                }
+                setupReadingProgress(user.id, materi.id, materi.kategori_id, prog?.ui_state?.scroll || 0);
+            } catch (_) {}
+        }
+
         const btnDrill = document.getElementById('btnGoToDrill');
-        const historyKey = `latihan_history_${user.id}_${materi.id}`; 
-        const isDone = localStorage.getItem(historyKey);
+        let isDone = false;
+        if (window.ProgressSystem && user?.id) {
+            const prog = await window.ProgressSystem.getMateriProgress(user.id, materi.id);
+            isDone = prog && prog.status === 'completed';
+        }
+        if (!isDone) {
+            const historyKey = `latihan_history_${user.id}_${materi.id}`;
+            isDone = !!localStorage.getItem(historyKey);
+        }
         if (isDone) {
             btnDrill.innerHTML = '👁️ Lihat Hasil Latihan';
             btnDrill.classList.add('selesai');
         }
         btnDrill.onclick = () => { window.location.href = `latihan-soal.html?materi=${materi.id}`; };
     };
+
+    function setupReadingProgress(userId, materiId, kategoriId, initialScroll) {
+        const scrollContainer = document.querySelector('.dashboard-body');
+        const article = document.getElementById('detailContent');
+        if (!scrollContainer || !article || !window.ProgressSystem) return;
+
+        // Autoscroll jika ada history dan user baru saja mendarat di halaman (bukan merefresh paksa)
+        if (initialScroll > 0 && !window.location.hash.includes('noscroll')) {
+            setTimeout(() => {
+                scrollContainer.scrollTo({
+                    top: initialScroll,
+                    behavior: 'smooth'
+                });
+            }, 600); // Tunggu sampai DOM & gambar selesai di-render
+        }
+
+        let lastSavedPercent = -1;
+        let saveTimer = null;
+
+        const calculatePercent = () => {
+            const contentTop = article.offsetTop;
+            const contentHeight = article.offsetHeight;
+            const visibleBottom = scrollContainer.scrollTop + scrollContainer.clientHeight;
+            if (contentHeight <= 0) return 0;
+            return Math.max(0, Math.min(100, Math.round(((visibleBottom - contentTop) / contentHeight) * 100)));
+        };
+
+        const saveProgress = () => {
+            const percent = calculatePercent();
+            const scrollPos = Math.round(scrollContainer.scrollTop);
+            if (percent <= lastSavedPercent && saveTimer !== 'force') return;
+            lastSavedPercent = percent;
+            window.ProgressSystem.saveReadingProgress(userId, materiId, kategoriId, percent, scrollPos).catch(() => {});
+        };
+
+        const onScroll = () => {
+            if (saveTimer && saveTimer !== 'force') clearTimeout(saveTimer);
+            saveTimer = setTimeout(saveProgress, 500);
+        };
+
+        scrollContainer.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('beforeunload', () => {
+            saveTimer = 'force';
+            saveProgress();
+        }, { once: true });
+    }
 
     // 🔓 FUNGSI UNLOCK SUBTEST DARI DETAIL-MATERI (GLOBAL)
     window.unlockSubtestFromDetail = async (subtestId, creditCost) => {

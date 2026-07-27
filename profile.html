@@ -24,7 +24,7 @@
             <!-- Overlay untuk mobile sidebar -->
             <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-<main class="profile-page-container">
+<section class="dashboard-body profile-page-container">
     <!-- 🎯 GRID WRAPPER: Menyatukan 3 kartu agar sejajar -->
     <div class="profile-grid">
         
@@ -122,10 +122,41 @@
             </form>
         </div>
 
-    </div>
-</main>
+        <section class="profile-card danger-zone" aria-labelledby="deleteAccountTitle">
+            <div class="card-header">
+                <h3 id="deleteAccountTitle">Hapus Akun</h3>
+                <p class="card-desc">Tindakan ini permanen. Data profil, progress belajar, riwayat, dan kredit akun akan dihapus.</p>
+            </div>
+            <button type="button" id="btnDeleteAccount" class="btn-delete-account">Hapus Akun Saya</button>
+        </section>
 
-    <div id="footer-placeholder"></div>
+    </div>
+</section>
+        </main>
+    </div>
+
+    <div id="deleteAccountModal" class="delete-account-modal" hidden aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="deleteAccountModalTitle">
+        <div class="delete-account-modal__backdrop" data-close-delete-modal></div>
+        <section class="delete-account-modal__dialog">
+            <button type="button" class="delete-account-modal__close" data-close-delete-modal aria-label="Tutup">×</button>
+            <div class="delete-account-modal__icon">⚠️</div>
+            <h2 id="deleteAccountModalTitle">Hapus akun secara permanen?</h2>
+            <p>Semua data profil, progress belajar, riwayat, transaksi, dan kredit akan dihapus. Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="form-group">
+                <label for="deleteAccountPassword">Password Saat Ini</label>
+                <input type="password" id="deleteAccountPassword" autocomplete="current-password" placeholder="Masukkan password saat ini">
+            </div>
+            <div class="form-group">
+                <label for="deleteAccountConfirmation">Ketik <strong>HAPUS AKUN</strong> untuk mengonfirmasi</label>
+                <input type="text" id="deleteAccountConfirmation" autocomplete="off" placeholder="HAPUS AKUN">
+            </div>
+            <p id="deleteAccountError" class="error-message" aria-live="polite"></p>
+            <div class="delete-account-modal__actions">
+                <button type="button" class="btn-delete-cancel" data-close-delete-modal>Batal</button>
+                <button type="button" id="btnConfirmDeleteAccount" class="btn-delete-confirm" disabled>Hapus Permanen</button>
+            </div>
+        </section>
+    </div>
 
     <!-- Library & Script -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

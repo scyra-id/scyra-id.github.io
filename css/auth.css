@@ -108,6 +108,32 @@
 .error-message.active { display: block; }
 .form-group input.error { border-color: #ef4444; }
 
+.verification-notice {
+    text-align: center;
+    padding: 0.5rem 0 0;
+}
+.verification-notice h3 {
+    color: var(--brand-primary);
+    margin-bottom: 0.75rem;
+}
+.verification-notice p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+}
+.btn-outline {
+    width: 100%;
+    background: transparent;
+    color: var(--brand-primary);
+    border: 1.5px solid var(--brand-primary);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+.btn-outline:hover { background: rgba(135, 168, 120, 0.1); }
+.btn-outline:disabled { opacity: 0.65; cursor: not-allowed; }
+
 /* ================= PROFILE PAGE STYLING ================= */
 .profile-card {
     max-width: 550px; /* Sedikit lebih lebar dari login */
