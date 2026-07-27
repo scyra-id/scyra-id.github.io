@@ -148,34 +148,32 @@ font-size: 1.15rem;
 }
 .peta-card-half p { margin: 0; line-height: 1.5; color: var(--text-primary); }
 @media (max-width: 768px) { .peta-card-bawah { grid-template-columns: 1fr; } }
-/* 2. SPLIT SCREEN LAYOUT (GRID SYSTEM) */
+/* 2. SINGLE-FLOW LAYOUT
+   Semua UI Magic Engine dipertahankan, tetapi disusun vertikal dalam satu kolom. */
 .split-layout {
-    display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
     margin: 2.5rem 0;
-    align-items: start;
-    /* Desktop: Core & Algo di kiri, Media di kanan (span 2 baris) */
-    grid-template-areas:
-        "core media"
-        "algo media";
 }
 
-.split-core { grid-area: core; display: flex; flex-direction: column; gap: 0.8rem; }
-.split-algo { grid-area: algo; display: flex; flex-direction: column; gap: 0.8rem; }
-.split-right { grid-area: media; display: flex; flex-direction: column; gap: 1.5rem; position: sticky; top: 2rem; }
-
-/* Layout Mobile: Susun ke bawah sesuai urutan Core -> Media -> Algo */
-@media (max-width: 900px) {
-    .split-layout {
-        grid-template-columns: 1fr;
-        grid-template-areas:
-            "core"
-            "media"
-            "algo";
-    }
-    .split-right { position: static; } /* Hilangkan sticky di HP */
+.split-core,
+.split-algo,
+.split-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    width: 100%;
 }
+
+.split-right {
+    position: static;
+}
+
+/* Urutan tampilan: teks utama → media → algoritma */
+.split-core { order: 1; }
+.split-right { order: 2; }
+.split-algo { order: 3; }
 /* 3. GAMBAR, TABEL & MEDIA (KOLOM KANAN) */
 .scyra-image {
 width: 100%;

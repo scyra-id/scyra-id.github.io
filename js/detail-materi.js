@@ -90,8 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🚨 SCYRA MAGIC ENGINE (TRAP ALERT ANTI-BOCOR & KELUAR PEMBAHASAN)
     // =======================================================
     function applyScyraMagic(rawHtml) {
-        return renderSingleFlow(rawHtml);
-
         const parser = new DOMParser();
         const doc = parser.parseFromString(rawHtml, 'text/html');
         let finalHtml = '';
