@@ -6,6 +6,7 @@
     <title>Belajar UTBK - Home</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/landing.css">
+    <link rel="stylesheet" href="css/mascot-greeting.css">
     <link rel="stylesheet" href="css/path-of-light.css">
     <link rel="icon" href="images/logo.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="images/logo.svg">
@@ -31,30 +32,41 @@
                     </p>
                     <div class="hero-cta">
                         <a href="#" class="btn-primary-lg" id="btn-mulai-belajar" onclick="handleMulaiBelajar(event)">Mulai Belajar Gratis</a>
-                        <a href="survey.html" class="btn-secondary-lg">Bantu Kami via Survey ↓</a>
                     </div>
                 </div>
-                <div class="hero-trust">
-                    <div class="avatars-stack">
-                        <div class="mini-avatar" style="background: #ef4444;">A</div>
-                        <div class="mini-avatar" style="background: #f59e0b;">B</div>
-                        <div class="mini-avatar" style="background: #10b981;">C</div>
+                <div class="mascot-greeting" id="mascotGreeting" aria-live="polite">
+                    <button type="button" class="mascot-greeting__mascot" id="mascotGreetingButton" aria-label="Ganti sapaan maskot">
+                        <div class="mascot-greeting__beam" aria-hidden="true"></div>
+                        <img id="mascotGreetingImage" src="images/maskot.webp" alt="Maskot Scyra sedang menyapa" width="96" height="96">
+                    </button>
+                    <div class="mascot-greeting__bubble">
+                        <span class="mascot-greeting__name" id="mascotGreetingMood">Kyra menyapa</span>
+                        <p id="mascotGreetingText">Hai, Pejuang PTN! Gimana kabarmu hari ini?</p>
+                        <button type="button" id="mascotGreetingNext" class="mascot-greeting__next" aria-label="Sapaan lain">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                        </button>
                     </div>
-                    <span>bergabung dengan <strong>1,000+</strong> pejuang PTN lainnya</span>
                 </div>
             </div>
-            <div class="hero-visual">
-                <!-- Placeholder untuk ilustrasi/mockup nanti -->
-                <div class="mockup-card">
-                    <div class="mockup-header">
-                        <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
-                    </div>
-                    <div class="mockup-body">
-                        <div class="mockup-question">
-                            <p class="q-label" id="mockupMapel">Memuat soal...</p>
-                            <p class="q-text" id="mockupTeks">Mohon tunggu sebentar...</p>
-                            <div class="q-options" id="mockupOptions"></div>
-                            <div class="mockup-feedback" id="mockupFeedback" style="display:none;"></div>
+        </section>
+
+        <section class="mini-quiz-section" aria-label="Mini Quiz Scyra">
+            <div class="container">
+                <div class="hero-visual">
+                    <div class="mockup-card">
+                        <div class="mockup-header">
+                            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
+                        </div>
+                        <div class="mockup-body">
+                            <div class="mockup-question">
+                                <p class="q-label" id="mockupMapel">Memuat soal...</p>
+                                <p class="q-text" id="mockupTeks">Mohon tunggu sebentar...</p>
+                                <div class="q-options" id="mockupOptions"></div>
+                                <div class="mockup-feedback" id="mockupFeedback" style="display:none;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -930,6 +942,7 @@
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>
     <script src="js/landing.js"></script>
+    <script src="js/mascot-greeting.js"></script>
     <script src="js/path-of-light.js"></script>
 </body>
 </html>

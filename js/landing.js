@@ -107,6 +107,7 @@ async function checkAuthAndRoute() {
             setTimeout(() => loadingScreen.remove(), 500); // Hapus dari memori
         }
         initMiniQuiz();
+        if (typeof initMascotGreeting === 'function') initMascotGreeting();
     }
 }
 
@@ -116,30 +117,61 @@ async function checkAuthAndRoute() {
 function handleMulaiBelajar(event) {
     event.preventDefault();
 
-    // Cek 1: cache manual yang kita set saat register/login
-    const hasRegisteredBefore = localStorage.getItem('scyra_has_registered');
-
-    // Cek 2: Supabase menyimpan token auth di localStorage secara otomatis
-    // Key formatnya: sb-[project-ref]-auth-token
-    const supabaseAuthToken = localStorage.getItem('sb-qqouccbtjywanmgktdty-auth-token');
-
-    // Cek 3: Scan semua key localStorage untuk token Supabase (jaga-jaga kalau key berubah)
-    let hasSupabaseData = false;
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('sb-') && key.includes('auth'))) {
-            hasSupabaseData = true;
-            break;
-        }
-    }
-
-    if (hasRegisteredBefore || supabaseAuthToken || hasSupabaseData) {
-        // User sudah pernah login/registrasi di browser ini → ke login.html
-        window.location.href = 'login.html';
-    } else {
-        // User baru, tidak ada jejak akun → ke register.html
-        window.location.href = 'register.html';
-    }
+    // Cek apakah survey aktif
+    window.db.from('survey_settings')
+        .select('setting_value')
+        .eq('setting_key', 'survey_active')
+        .single()
+        .then(({ data }) => {
+            const surveyActive = data && data.setting_value === true;
+            
+            if (surveyActive) {
+                // Cek apakah user sudah isi survey
+                const hasSurveyDone = localStorage.getItem('scyra_survey_done');
+                if (!hasSurveyDone) {
+                    // Belum isi survey → arahkan ke survey
+                    window.location.href = 'survey.html';
+                    return;
+                }
+            }
+            
+            // Survey nonaktif ATAU sudah isi survey → fungsi normal
+            const hasRegisteredBefore = localStorage.getItem('scyra_has_registered');
+            const supabaseAuthToken = localStorage.getItem('sb-qqouccbtjywanmgktdty-auth-token');
+            let hasSupabaseData = false;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-') && key.includes('auth')) {
+                    hasSupabaseData = true;
+                    break;
+                }
+            }
+            
+            if (hasRegisteredBefore || supabaseAuthToken || hasSupabaseData) {
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = 'register.html';
+            }
+        })
+        .catch(() => {
+            // Fallback: fungsi normal
+            const hasRegisteredBefore = localStorage.getItem('scyra_has_registered');
+            const supabaseAuthToken = localStorage.getItem('sb-qqouccbtjywanmgktdty-auth-token');
+            let hasSupabaseData = false;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('sb-') && key.includes('auth')) {
+                    hasSupabaseData = true;
+                    break;
+                }
+            }
+            
+            if (hasRegisteredBefore || supabaseAuthToken || hasSupabaseData) {
+                window.location.href = 'login.html';
+            } else {
+                window.location.href = 'register.html';
+            }
+        });
 }
 
 // ==========================================
@@ -174,5 +206,6 @@ setTimeout(() => {
         loadingScreen.classList.add('hidden');
         setTimeout(() => loadingScreen.remove(), 500);
         initMiniQuiz();
+        if (typeof initMascotGreeting === 'function') initMascotGreeting();
     }
 }, 3000);

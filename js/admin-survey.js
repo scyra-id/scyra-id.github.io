@@ -2,6 +2,7 @@ let parsedSurveyQuestions = [];
 let allQuestions = [];
 let allResponses = [];
 let lastClickedSessionId = null;
+let surveyActive = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     const checkAdmin = async () => {
@@ -26,6 +27,8 @@ async function initPage() {
     }
     setupUploadForm();
     setupRewardButtons();
+    await loadSurveySetting();
+    setupSurveyToggle();
     await loadSurveyData();
 }
 
@@ -54,6 +57,76 @@ function setupUploadForm() {
         }
     };
     document.getElementById('btnConfirmSave').onclick = saveSurveyQuestions;
+}
+
+async function loadSurveySetting() {
+    try {
+        const { data } = await window.db
+            .from('survey_settings')
+            .select('setting_value')
+            .eq('setting_key', 'survey_active')
+            .single();
+        surveyActive = data ? data.setting_value : false;
+    } catch (err) {
+        surveyActive = false;
+    }
+    updateSurveyToggleUI();
+}
+
+function setupSurveyToggle() {
+    const toggle = document.getElementById('surveyToggle');
+    if (!toggle) return;
+    const label = document.getElementById('surveyToggleLabel');
+    const track = document.getElementById('surveyToggleTrack');
+    const thumb = document.getElementById('surveyToggleThumb');
+    const statusText = document.getElementById('surveyStatusText');
+    
+    function updateStatus() {
+        if (surveyActive) {
+            label.textContent = 'Aktif';
+            statusText.textContent = 'Survey aktif. Tombol "Mulai Belajar Gratis" akan mengarah ke halaman survey.';
+            toggle.checked = true;
+            track.style.background = 'var(--brand-primary)';
+            thumb.style.transform = 'translateX(26px)';
+        } else {
+            label.textContent = 'Nonaktif';
+            statusText.textContent = 'Survey tidak aktif. Tombol "Mulai Belajar Gratis" kembali ke fungsi normal.';
+            toggle.checked = false;
+            track.style.background = 'var(--border-color)';
+            thumb.style.transform = 'translateX(3px)';
+        }
+    }
+    
+    toggle.onchange = async (e) => {
+        surveyActive = e.target.checked;
+        try {
+            const { error } = await window.db
+                .from('survey_settings')
+                .update({ setting_value: surveyActive, updated_at: new Date().toISOString() })
+                .eq('setting_key', 'survey_active');
+            if (error) throw error;
+            updateStatus();
+            await showScyraAlert(surveyActive ? '✅ Survey diaktifkan!' : '✅ Survey dinonaktifkan!', '🚀 Success', '✅');
+        } catch (err) {
+            surveyActive = !surveyActive;
+            updateStatus();
+            await showScyraAlert('❌ Gagal: ' + err.message, '⚠️ Error', '⚠️');
+        }
+    };
+    updateStatus();
+}
+
+function updateSurveyToggleUI() {
+    if (!document.getElementById('surveyToggle')) return;
+    const label = document.getElementById('surveyToggleLabel');
+    const statusText = document.getElementById('surveyStatusText');
+    if (surveyActive) {
+        label.textContent = 'Aktif';
+        statusText.textContent = 'Survey aktif. Tombol "Mulai Belajar Gratis" akan mengarah ke halaman survey.';
+    } else {
+        label.textContent = 'Nonaktif';
+        statusText.textContent = 'Survey tidak aktif. Tombol "Mulai Belajar Gratis" kembali ke fungsi normal.';
+    }
 }
 
 async function extractTextFromPDF(file) {

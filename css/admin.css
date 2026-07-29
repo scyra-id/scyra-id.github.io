@@ -131,3 +131,15 @@ html, body.dashboard-page {
     display: block !important; /* Jaga-jaga kalau materi.css ngubah jadi flex yang salah sumbu */
     padding-bottom: 5rem !important; /* Biar konten paling bawah gak ketutup layar */
 }
+
+/* SURVEY TOGGLE SWITCH */
+#surveyToggle:checked + #surveyToggleTrack {
+    background: var(--brand-primary);
+}
+#surveyToggle:checked ~ #surveyToggleThumb {
+    transform: translateX(26px);
+}
+#surveyToggle:disabled + #surveyToggleTrack {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -53,6 +53,17 @@ async function checkAuthState() {
         const { data: profile } = await window.db.from('profiles').select('*').eq('id', user.id).single();
 
         if (profile) {
+            // Cek kadaluarsa Silver Trial
+            if (profile.role === 'silver' && profile.silver_expires_at) {
+                const now = new Date();
+                const expiry = new Date(profile.silver_expires_at);
+                if (now > expiry) {
+                    profile.role = 'user'; // Downgrade lokal
+                    // Background sync ke DB
+                    window.db.from('profiles').update({ role: 'user', silver_expires_at: null }).eq('id', user.id).then();
+                }
+            }
+
             window.userRole = profile.role; 
             
             const finalAvatarUrl = profile.avatar_url ? profile.avatar_url : GENERIC_AVATAR;

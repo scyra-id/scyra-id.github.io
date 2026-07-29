@@ -195,10 +195,20 @@ background: var(--bg-secondary);
 .scyra-table th {
 background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
 color: white; padding: 1.2rem 1.5rem; text-align: left; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.5px;
+border-right: 2px solid rgba(255,255,255,0.3);
 }
-.scyra-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); vertical-align: top; line-height: 1.5; }
+.scyra-table th:last-child { border-right: none; }
+.scyra-table td { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border-color); border-right: 1.5px solid var(--border-color); color: var(--text-primary); vertical-align: top; line-height: 1.5; }
+.scyra-table td:last-child { border-right: none; }
 .scyra-table tr:last-child td { border-bottom: none; }
 .scyra-table tr:hover { background: rgba(135, 168, 120, 0.05); }
+/* Kolom genap punya background tipis biar kontras antar kolom makin jelas */
+.scyra-table td:nth-child(even), .scyra-table th:nth-child(even) {
+background: rgba(135, 168, 120, 0.04);
+}
+.scyra-table th:nth-child(even) {
+background: linear-gradient(135deg, rgba(135,168,120,0.85), rgba(107,143,92,0.85));
+}
 /* 🚨 TABEL LEBAR (FULL WIDTH DI BAWAH CORE / ALGO) */
 .scyra-table-wrapper.scyra-table-wide {
     margin: 2.5rem 0;
@@ -296,6 +306,8 @@ box-shadow: 0 0 0 4px var(--bg-primary);
 }
 .step-content strong { color: var(--brand-primary); display: block; margin-bottom: 0.3rem; }
 .step-content p { margin: 0; font-size: 1rem; color: var(--text-primary); line-height: 1.5; }
+.algo-step .algo-continue { margin: 0.8rem 0 0; padding: 0.6rem 0 0; border-top: 1px dashed rgba(135, 168, 120, 0.3); }
+.algo-step .algo-continue:last-child { margin-bottom: 0; }
 .scyra-pembahasan { background: var(--bg-secondary); border: 2px dashed var(--border-color); border-radius: 12px; margin: 2rem 0; overflow: hidden; }
 .scyra-pembahasan summary { background: rgba(212, 175, 55, 0.1); padding: 1rem 1.5rem; font-weight: 700; color: var(--brand-primary-dark); cursor: pointer; display: flex; justify-content: space-between; list-style: none; }
 .scyra-pembahasan summary::-webkit-details-marker { display: none; }
@@ -524,6 +536,11 @@ box-shadow: 0 0 0 4px var(--bg-primary);
     }
     .step-content p { 
         font-size: 0.9rem; 
+    }
+    .algo-step .algo-continue {
+        margin: 0.6rem 0 0;
+        padding: 0.5rem 0 0;
+        font-size: 0.9rem;
     }
     
     /* 💬 PEMBAHASAN - Dropdown lebih compact */

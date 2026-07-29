@@ -172,6 +172,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const closeAlgo = () => {
             if (inAlgo && algoHtml) {
+                // Merge semua <p class="algo-continue"> ke dalam step-content langkah sebelumnya
+                const wrapper = document.createElement('div');
+                wrapper.innerHTML = algoHtml;
+                
+                // Cari semua elemen algo-continue
+                const continuations = wrapper.querySelectorAll('.algo-continue');
+                continuations.forEach(cont => {
+                    // Cari algo-step terdekat sebelumnya
+                    let prev = cont.previousElementSibling;
+                    while (prev && !prev.classList.contains('algo-step')) {
+                        prev = prev.previousElementSibling;
+                    }
+                    if (prev) {
+                        const stepContent = prev.querySelector('.step-content');
+                        if (stepContent) {
+                            stepContent.appendChild(cont);
+                        }
+                    }
+                });
+                
+                algoHtml = wrapper.innerHTML;
+                
                 let html = `
                 <div class="scyra-algo-container">
                     <div class="scyra-algo">
@@ -191,19 +213,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             closeActiveBlock();
             closeAlgo();
             renderPeta();
-            closePembahasan(); 
             if (pendingTableRow !== '') {
-                if (!inSplit) inSplit = true;
-                splitRight += `<p>${pendingTableRow}</p>`;
+                if (isPembahasanOpen) finalHtml += `<p>${pendingTableRow}</p>`;
+                else {
+                    if (!inSplit) inSplit = true;
+                    splitRight += `<p>${pendingTableRow}</p>`;
+                }
                 pendingTableRow = '';
             }
 
-            // 🚨 PENANGANAN TABEL KETIKA SPLIT HARUS DITUTUP
+            // Tabel mengikuti konteks aktif, termasuk di dalam pembahasan
             let wideTablePending = '';
             if (inTable) {
                 tableHtml += '</tbody></table></div>';
-                if (tableCols > 3) {
-                    // Jika kolom lebih dari 3, simpan sementara untuk ditaruh di bawah split
+                if (isPembahasanOpen) {
+                    finalHtml += tableHtml;
+                } else if (tableCols > 3) {
                     wideTablePending = tableHtml;
                 } else {
                     if (!inSplit) inSplit = true;
@@ -213,6 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tableHtml = '';
                 tableCols = 0;
             }
+            closePembahasan(); 
             
             if (inSplit) {
                 finalHtml += `
@@ -236,17 +262,31 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const flushTable = () => {
             if (inTable) {
-                if (tableCols > 3) {
-                    // Paksa tutup split agar tabel melebar ke bawah
-                    closeSplit(); 
+                tableHtml += '</tbody></table></div>';
+                if (isPembahasanOpen) {
+                    finalHtml += tableHtml;
+                } else if (tableCols > 3) {
+                    if (inSplit) {
+                        finalHtml += `
+                        <div class="split-layout">
+                            <div class="split-core">${splitCore}</div>
+                            <div class="split-right">${splitRight}</div>
+                            <div class="split-algo">${splitAlgo}</div>
+                        </div>`;
+                        splitCore = '';
+                        splitAlgo = '';
+                        splitRight = '';
+                        inSplit = false;
+                        currentSection = 'core';
+                    }
+                    finalHtml += tableHtml;
                 } else {
-                    tableHtml += '</tbody></table></div>';
                     if (!inSplit) inSplit = true;
                     splitRight += tableHtml;
-                    inTable = false;
-                    tableHtml = '';
-                    tableCols = 0;
                 }
+                inTable = false;
+                tableHtml = '';
+                tableCols = 0;
             }
         };
         
@@ -402,23 +442,36 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
             
-            // 6. DETEKSI ALGORITMA DARI LIST
+            // 6. DETEKSI ALGORITMA DARI LIST (UL/OL)
+            // <ul>/<ol> dari Quill = teks lanjutan, BUKAN langkah baru
+            // Append ke algo-step terakhir yang sudah ada
             if (tag === 'OL' || tag === 'UL') {
                 let listItems = Array.from(el.querySelectorAll('li'));
-                listItems.forEach((li, index) => {
-                    let num = tag === 'OL' ? (index + 1) : '•';
-                    algoHtml += `
-                        <div class="algo-step">
-                            <span class="step-num">${num}</span>
-                            <div class="step-content"><p>${li.innerHTML}</p></div>
-                        </div>`;
-                });
+                let continuationTexts = listItems.map(li => li.innerHTML.trim()).filter(Boolean);
+                if (continuationTexts.length > 0) {
+                    let contHtml = continuationTexts.map(t => `<p class="algo-continue">${t}</p>`).join('');
+                    if (algoHtml) {
+                        // Append ke step terakhir
+                        algoHtml += contHtml;
+                    } else {
+                        // Fallback: tampilkan biasa jika belum ada step
+                        if (inSplit) {
+                            if (currentSection === 'algo') splitAlgo += contHtml;
+                            else splitCore += contHtml;
+                        } else {
+                            finalHtml += contHtml;
+                        }
+                    }
+                }
                 inAlgo = true;
                 return;
             }
             
-            // 7. INFOGRAFIS, TRAP, FYI, ALGORITMA BIASA
-            let isAlgoMatch = lower.match(/^(?:•|-|\*)?\s*(langkah|step|trik|cara)\s*\d+/i) || lower.match(/^(?:•|-|\*)?\s*\d+[\.\)]\s/i);
+            // 7. DETEKSI LANGKAH BARU: HANYA "LANGKAH X:" ATAU ANGKA DI AWAL
+            // Bullet biasa (•, o) TANPA keyword langkah = teks lanjutan, masuk kotak sebelumnya
+            let isKeywordStep = lower.match(/^(?:•|o|-|\*)?\s*(langkah|step|trik|cara)\s*\d+/i);
+            let isNumberedStep = lower.match(/^\s*\d+[\.\)]\s/) && !lower.match(/^(?:•|o|-|\*)\s+\d+/);
+            let isNewStep = isKeywordStep || isNumberedStep;
             
             // 🚨 DETEKSI TRAP ALERT 🚨
             if (lower.includes('trap alert') || lower.includes('jebakan maut')) {
@@ -441,23 +494,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (clean) blockHtml = `<p>${clean}</p>`;
                 return;
             } 
-            else if (isAlgoMatch && !tag.match(/^H[1-6]$/)) {
+            else if (isNewStep && !tag.match(/^H[1-6]$/)) {
                 closeActiveBlock();
+                // Tentukan nomor langkah
                 let numMatch = text.match(/\d+/);
                 let num = numMatch ? numMatch[0] : '•';
+                // Bersihkan teks dari keyword dan bullet
                 let clean = inner;
-                if (lower.match(/(langkah|step|trik|cara)\s*\d+/i)) {
+                if (isKeywordStep) {
                     clean = inner.replace(/.*?(langkah|step|trik|cara)\s*\d+[:\-\.\)]?\s*/i, '');
                 } else {
-                    clean = inner.replace(/.*?\d+[\.\)]\s*/i, '');
+                    clean = inner.replace(/^\s*\d+[\.\)]\s*/, '').trim();
                 }
-                clean = clean.replace(/^[•\-\*]\s*/, '').replace(/^<[^>]*>/, '').trim();
-                algoHtml += `
-                    <div class="algo-step">
-                        <span class="step-num">${num}</span>
-                        <div class="step-content"><p>${clean}</p></div>
-                    </div>`;
-                inAlgo = true;
+                clean = clean.replace(/^[•\-\*o]\s*/, '').replace(/^<[^>]*>/, '').trim();
+                if (clean) {
+                    algoHtml += `
+                        <div class="algo-step">
+                            <span class="step-num">${num}</span>
+                            <div class="step-content"><p>${clean}</p></div>
+                        </div>`;
+                    inAlgo = true;
+                }
                 return;
             } 
             else if (lower.startsWith('pembahasan') && !inSplit) { 
@@ -515,8 +572,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                     blockHtml += rawEl;
                     return;
                 }
+                if (isPembahasanOpen) {
+                    finalHtml += rawEl;
+                    return;
+                }
                 if (inAlgo && text.length > 0) {
-                     algoHtml += `<div class="step-content" style="margin-left: 3rem; margin-bottom: 1rem;"><p>${inner}</p></div>`;
+                     algoHtml += `<p class="algo-continue">${inner}</p>`;
                      return;
                 }
                 closeActiveBlock();
