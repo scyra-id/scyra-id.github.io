@@ -180,11 +180,13 @@ function initSidebarLogic() {
     const navTryout = document.getElementById('nav-tryout');
     const navRiwayat = document.getElementById('nav-riwayat');
     const navPaket = document.getElementById('nav-paket');
+    const navTentang = document.getElementById('nav-tentang');
     const navKontak = document.getElementById('nav-kontak');
 
-    [navDashboard, navMateri, navTryout, navRiwayat, navPaket, navKontak].forEach(el => { if(el) el.classList.remove('active'); });
+    [navDashboard, navMateri, navTryout, navRiwayat, navPaket, navTentang, navKontak].forEach(el => { if(el) el.classList.remove('active'); });
 
     if(path.includes('paketbelajar')) navPaket?.classList.add('active');
+    else if(path.includes('tentang')) navTentang?.classList.add('active');
     else if(path.includes('kontak')) navKontak?.classList.add('active');
     else if(path.includes('dashboard')) navDashboard?.classList.add('active');
     else if(path.includes('materi')) navMateri?.classList.add('active');

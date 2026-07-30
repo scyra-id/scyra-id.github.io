@@ -50,25 +50,10 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </section>
-
-        <section class="mini-quiz-section" aria-label="Mini Quiz Scyra">
-            <div class="container">
-                <div class="hero-visual">
-                    <div class="mockup-card">
-                        <div class="mockup-header">
-                            <div class="dot red"></div><div class="dot yellow"></div><div class="dot green"></div>
-                        </div>
-                        <div class="mockup-body">
-                            <div class="mockup-question">
-                                <p class="q-label" id="mockupMapel">Memuat soal...</p>
-                                <p class="q-text" id="mockupTeks">Mohon tunggu sebentar...</p>
-                                <div class="q-options" id="mockupOptions"></div>
-                                <div class="mockup-feedback" id="mockupFeedback" style="display:none;"></div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="hero-journey-cue" aria-label="Pengantar perjalanan">
+                    <span>KYRA</span>
+                    <p>“Sebelum kita melangkah lebih jauh… ada sesuatu yang ingin kusampaikan kepadamu.”</p>
+                    <a href="#path-of-light-section">Gulir perlahan untuk melanjutkan <b>↓</b></a>
                 </div>
             </div>
         </section>
@@ -95,11 +80,23 @@
             </div>
         </div>
 
-        <!-- ========== LEVEL 0: TRANSITION ZONE (seamless entryway) ========== -->
+        <!-- ========== LEVEL 0: DEEP TALK & FOREST TRANSITION ========== -->
         <div class="pol-level pol-level-0" data-kyra-pos="hidden">
             <div class="pol-entry-fog fog-a" aria-hidden="true"></div>
             <div class="pol-entry-fog fog-b" aria-hidden="true"></div>
+            <div class="pol-deep-talk">
+                <span class="pol-story-kicker">Setiap perjalanan dimulai dari sebuah pertanyaan</span>
+                <h2>“Setelah ini, aku ingin pergi ke mana?”</h2>
+                <p>Ada masa ketika kita mulai memikirkan masa depan: tentang ingin menjadi apa, kampus yang ingin dituju, dan kehidupan yang ingin dibangun nanti.</p>
+                <div class="pol-growth-cards">
+                    <article><strong>Mungkin kamu masih kelas 10.</strong><span>Perjalanannya terasa panjang, dan belum tahu arah itu tidak apa-apa.</span></article>
+                    <article><strong>Mungkin kamu sudah kelas 11.</strong><span>Pilihan jurusan dan kampus mulai terasa dekat, meski kamu belum sepenuhnya yakin.</span></article>
+                    <article><strong>Atau kamu sudah kelas 12.</strong><span>Waktu terasa cepat, sementara kamu masih mencari langkah yang tepat.</span></article>
+                </div>
+                <p class="pol-deep-closing">Di mana pun kamu berada, kamu tidak terlambat untuk bertumbuh. Masa depan dibentuk dari satu materi yang kamu pahami, satu soal yang kamu selesaikan, dan satu kesalahan yang tidak lagi kamu ulangi.</p>
+            </div>
             <p class="pol-entry-caption">Memasuki hutan berkabut…</p>
+            <p class="pol-entry-bridge">Di depanmu, perjalanan telah menunggu. Jalannya belum sepenuhnya terlihat, tetapi kabut bukan berarti tidak ada jalan.</p>
             <div class="pol-entry-veil" aria-hidden="true"></div>
         </div>
 
@@ -114,17 +111,34 @@
                 <div class="pol-dialogue">
                     <span class="pol-dialogue-name">KYRA</span>
                     <p class="pol-typewriter"><span id="pol-typewriter-text"></span><span class="pol-caret" aria-hidden="true"></span></p>
-                    <p class="pol-dialogue-hint">▼ Gulir untuk menerima misi</p>
+                    <p class="pol-dialogue-hint">▼ Gulir perlahan untuk melanjutkan</p>
                 </div>
             </div>
         </div>
 
-         <!-- ========== LEVEL 2: HALLWAY OF ILLUSIONS (5 myths vs facts) - 2D CINEMATIC ========== -->
-         <div class="pol-level pol-level-2" data-kyra-pos="corner" data-kyra-line="Lima bayangan ini sudah lama menghalangi banyak pejuang. Mari kita bongkar kebohongannya.">
+        <div class="pol-level pol-level-utbk" data-kyra-pos="corner" data-kyra-line="Tenang. Kamu tidak tersesat. Kamu hanya belum memiliki peta untuk melihat jalan di depanmu.">
+            <div class="pol-level-head pol-reveal">
+                <span class="pol-story-kicker">Kabut mulai terbelah</span>
+                <h2 class="pol-h2">Sebuah Gerbang Bernama UTBK</h2>
+                <p class="pol-lead">Suatu hari nanti, kamu mungkin duduk di sebuah ruangan dengan layar komputer, soal-soal yang perlu diselesaikan, dan waktu yang terus berjalan.</p>
+            </div>
+            <div class="pol-utbk-gate pol-reveal" style="--d:3">
+                <div class="pol-utbk-gate-glow" aria-hidden="true"></div>
+                <div class="pol-utbk-numbers">
+                    <article><strong>195</strong><span>MENIT</span></article>
+                    <article><strong>160</strong><span>SOAL</span></article>
+                    <article><strong>7</strong><span>SUBTES</span></article>
+                </div>
+                <p>Tiga jam lima belas menit dalam satu hari, yang bisa dipersiapkan selama berbulan-bulan. UTBK bukan sekadar hafalan—kamu akan membaca, memahami informasi, menemukan pola, menggunakan logika, mengolah angka, dan mengambil keputusan saat waktu berjalan.</p>
+            </div>
+        </div>
+
+          <!-- ========== LEVEL 2: HALLWAY OF ILLUSIONS (5 myths vs facts) - 2D CINEMATIC ========== -->
+          <div class="pol-level pol-level-2" data-kyra-pos="corner" data-kyra-line="Sebelum melanjutkan, ada beberapa suara yang harus kamu berhenti percayai. Jangan biarkan ketakutan membuatmu menyerah sebelum mencoba.">
              <div class="pol-level-2-container">
                  <div class="pol-level-head pol-reveal">
                      <h2 class="pol-h2">Lorong Ilusi</h2>
-                     <p class="pol-lead">Lima bayangan menakutkan menghalangi jalan. Dekati mereka — biarkan <strong>cahaya Kyra</strong> membongkar kebohongannya satu per satu.</p>
+                      <p class="pol-lead">Banyak pejuang berhenti bukan karena tidak mampu, tetapi karena terlalu lama percaya pada ketakutannya sendiri. Dekati setiap bayangan dan biarkan <strong>cahaya Kyra</strong> membongkar kebohongannya.</p>
                  </div>
 
                  <!-- 2D Theme Morph Backdrop -->
@@ -138,7 +152,7 @@
                   <!-- Illusion 1: The Exhausted Wraith -->
                   <div class="pol-illusion pol-reveal" style="--d:2">
                       <div class="pol-myth-frame">
-                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Belajar efektif itu harus begadang tanpa henti.&rdquo;</div>
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Aku harus belajar setiap saat.&rdquo;</div>
                       </div>
                       <div class="pol-illusion-stage">
                           <div class="pol-spook pol-wraith" aria-hidden="true">
@@ -149,7 +163,7 @@
                           </div>
                           <div class="pol-fact-card">
                               <strong>FAKTA</strong>
-                              <p>Otak butuh jeda. Belajar teratur (Spaced Repetition) jauh lebih efektif.</p>
+                              <p>Belajar lebih lama tidak selalu lebih baik. Perkembangan besar datang dari belajar yang terarah, serius, dan konsisten.</p>
                           </div>
                       </div>
                   </div>
@@ -157,7 +171,7 @@
                   <!-- Illusion 2: The Wall of Division -->
                   <div class="pol-illusion pol-reveal" style="--d:3">
                       <div class="pol-myth-frame">
-                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Anak IPA dan IPS cuma punya peluang di jalurnya masing-masing.&rdquo;</div>
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Tanpa bimbel, aku tidak akan lolos.&rdquo;</div>
                       </div>
                       <div class="pol-illusion-stage">
                           <svg class="pol-spook pol-wall" viewBox="0 0 220 180" aria-hidden="true">
@@ -175,7 +189,7 @@
                           </svg>
                           <div class="pol-fact-card">
                               <strong>FAKTA</strong>
-                              <p>Tes TPS dan Literasi berlaku universal. Siapapun yang menguasai logika dasar punya peluang yang sama.</p>
+                              <p>Bimbel bisa membantu, tetapi bukan satu-satunya jalan. Sumber yang tepat, arah jelas, dan kemauan memperbaiki diri tetap bisa membawamu maju.</p>
                           </div>
                       </div>
                   </div>
@@ -183,7 +197,7 @@
                   <!-- Illusion 3: The Deceitful Scales -->
                   <div class="pol-illusion pol-reveal" style="--d:4">
                       <div class="pol-myth-frame">
-                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Semua soal nilainya sama — kerjakan yang mudah saja.&rdquo;</div>
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Aku sudah terlambat memulai.&rdquo;</div>
                       </div>
                       <div class="pol-illusion-stage">
                           <svg class="pol-spook pol-scales scales-glow" viewBox="0 0 220 190" aria-hidden="true">
@@ -201,7 +215,7 @@
                           </svg>
                           <div class="pol-fact-card">
                               <strong>FAKTA</strong>
-                              <p>Sistem IRT memberikan poin lebih tinggi pada soal yang sulit dan banyak dijawab salah.</p>
+                              <p>Satu bulan yang digunakan sungguh-sungguh lebih berarti daripada berbulan-bulan belajar tanpa arah.</p>
                           </div>
                       </div>
                   </div>
@@ -209,7 +223,7 @@
                   <!-- Illusion 4: The Overloaded Scholar -->
                   <div class="pol-illusion pol-reveal" style="--d:5">
                       <div class="pol-myth-frame">
-                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Kuantitatif = hafalkan semua rumus yang ada.&rdquo;</div>
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Nilai tryout-ku terlalu rendah.&rdquo;</div>
                       </div>
                       <div class="pol-illusion-stage">
                           <div class="pol-spook pol-scholar" aria-hidden="true">
@@ -225,7 +239,7 @@
                           </div>
                           <div class="pol-fact-card">
                               <strong>FAKTA</strong>
-                              <p>Penalaran Kuantitatif menguji caramu memecahkan masalah dengan logika angka, bukan hafalan buta.</p>
+                              <p>Nilai tryout bukan penentu masa depanmu. Angka itu menunjukkan bagian yang perlu dipahami dan diperbaiki.</p>
                           </div>
                       </div>
                   </div>
@@ -233,7 +247,7 @@
                   <!-- Illusion 5: The Mirror of Despair -->
                   <div class="pol-illusion pol-reveal" style="--d:6">
                       <div class="pol-myth-frame">
-                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Skor tryout awal rendah berarti sudah pasti gagal.&rdquo;</div>
+                          <div class="pol-myth-caption"><strong>MITOS</strong>&ldquo;Aku harus menguasai semua subtes.&rdquo;</div>
                       </div>
                       <div class="pol-illusion-stage">
                           <div class="pol-spook pol-mirror" aria-hidden="true">
@@ -243,7 +257,7 @@
                           </div>
                           <div class="pol-fact-card">
                               <strong>FAKTA</strong>
-                              <p>Tryout awal hanyalah peta kelemahanmu. Evaluasi dan progres adalah kunci kelulusan.</p>
+                              <p>Tidak ada yang langsung hebat dalam semuanya. Kenali kekuatanmu, perbaiki kelemahanmu, lalu bertumbuh sedikit demi sedikit.</p>
                           </div>
                       </div>
                   </div>
@@ -251,10 +265,11 @@
          </div>
 
         <!-- ========== LEVEL 3: FOREST OF WISDOM (7 subtest pillars) ========== -->
-        <div class="pol-level pol-level-3" data-kyra-pos="corner" data-kyra-line="Pilar-pilar ini menyimpan segel tujuh subtes UTBK. Sentuh untuk membacanya.">
+        <div class="pol-level pol-level-3" data-kyra-pos="corner" data-kyra-line="Di balik gerbang ini ada tujuh jalan. Kamu tidak perlu menaklukkan semuanya hari ini—cukup kenali jalannya terlebih dahulu.">
             <div class="pol-level-head pol-reveal">
+                <span class="pol-story-kicker">Tujuh jalan UTBK</span>
                 <h2 class="pol-h2">Hutan Kebijaksanaan</h2>
-                <p class="pol-lead">Tujuh pilar kuno menjaga jalan ini — tujuh subtes UTBK SNBT. <strong>Sentuh sebuah pilar</strong> untuk membaca segel yang tersimpan di dalamnya.</p>
+                <p class="pol-lead">Wilayah ini menyimpan <strong>Tes Potensi Skolastik</strong> dan <strong>Tes Literasi</strong>. Sentuh setiap pilar untuk mengenali tantangan yang akan kamu hadapi.</p>
             </div>
 
             <div class="pol-pillar-path">
@@ -299,7 +314,7 @@
                     <div class="pol-pillar-label">Penalaran Umum</div>
                     <div class="pol-tooltip" role="tooltip">
                         <h4>Penalaran Umum (PU)</h4>
-                        <p>Ujian nalar dan logika.</p>
+                        <p>Penalaran induktif, deduktif, dan kuantitatif untuk menemukan pola serta hubungan informasi.</p>
                         <span class="pol-tooltip-meta">30 Soal • 30 Menit</span>
                     </div>
                 </div>
@@ -316,7 +331,7 @@
                     <div class="pol-pillar-label">Pengetahuan &amp; Pemahaman Umum</div>
                     <div class="pol-tooltip" role="tooltip">
                         <h4>Pengetahuan &amp; Pemahaman Umum (PPU)</h4>
-                        <p>Makna kata dan informasi umum.</p>
+                        <p>Menganalisis kata, kalimat, informasi umum, dan bacaan sesuai konteks.</p>
                         <span class="pol-tooltip-meta">20 Soal • 15 Menit</span>
                     </div>
                 </div>
@@ -333,7 +348,7 @@
                     <div class="pol-pillar-label">Kemampuan Memahami Bacaan &amp; Menulis</div>
                     <div class="pol-tooltip" role="tooltip">
                         <h4>Kemampuan Memahami Bacaan dan Menulis (KMBM)</h4>
-                        <p>Seni membedah tata bahasa.</p>
+                        <p>Memahami isi bacaan, menata kalimat, dan memperbaiki penyampaian ide.</p>
                         <span class="pol-tooltip-meta">20 Soal • 25 Menit</span>
                     </div>
                 </div>
@@ -409,10 +424,11 @@
         </div>
 
         <!-- ========== LEVEL 4: THE GUARDIAN SPIRITS (6 question species) ========== -->
-        <div class="pol-level pol-level-4" data-kyra-pos="corner" data-kyra-line="Roh-roh ini menjaga rahasia jenis-jenis soal. Ketuk untuk melihat bestiary-nya.">
+        <div class="pol-level pol-level-4" data-kyra-pos="corner" data-kyra-line="Soal sering terasa sulit bukan karena kamu tidak mampu, melainkan karena kamu belum mengenali cara soal itu bertanya. Kenali polanya.">
             <div class="pol-level-head pol-reveal">
+                <span class="pol-story-kicker">Setelah lorong ilusi</span>
                 <h2 class="pol-h2">Roh Penjaga</h2>
-                <p class="pol-lead">Enam roh cahaya melayang menghadang jalan. Masing-masing menjaga rahasia <strong>jenis soal UTBK</strong>. Sentuh mereka untuk membuka bestiary-nya.</p>
+                <p class="pol-lead">Kini kamu telah mengenali medan. Enam roh cahaya membawa pola soal yang perlu kamu kenali agar strategi belajarmu semakin terarah. <strong>Sentuh mereka</strong> untuk membuka bestiary-nya.</p>
             </div>
 
             <div class="pol-wisp-grid">
@@ -479,10 +495,11 @@
         </div>
 
         <!-- ========== LEVEL 5: THE ARMORY (feature inventory) ========== -->
-        <div class="pol-level pol-level-5" data-kyra-pos="corner" data-kyra-line="Altar senjata ini menyimpan sembilan artefak kuat untuk perjalananmu.">
+        <div class="pol-level pol-level-5" data-kyra-pos="corner" data-kyra-line="Kamu sudah mengenali medan dan pola tantangannya. Sekarang, temukan perlengkapan yang membantumu belajar lebih terarah.">
             <div class="pol-level-head pol-reveal">
+                <span class="pol-story-kicker">Perlengkapan perjalanan</span>
                 <h2 class="pol-h2">Gudang Senjata</h2>
-                <p class="pol-lead">Kyra berhenti di sebuah altar batu bercahaya dan membuka inventory-nya. <strong>Sembilan artefak</strong> ini akan menjadi senjatamu menghadapi UTBK.</p>
+                <p class="pol-lead">Peralatan ini bukan untuk menggantikan perjuanganmu, tetapi agar setiap latihan memiliki arah dan tujuan yang jelas. <strong>Senjata terkuat tetap kemauanmu untuk terus memperbaiki diri.</strong></p>
             </div>
 
             <div class="pol-altar pol-reveal" style="--d:1" aria-hidden="true"></div>
@@ -794,15 +811,16 @@
             </div>
 
             <p class="pol-armory-footer pol-reveal" style="--d:10">
-                Belajar lebih fokus, konsisten, dan menyenangkan dalam satu platform UTBK.
+                Peralatan terbaik tidak dapat berjuang menggantikanmu. Namun, dengan perlengkapan yang tepat, kamu tidak perlu lagi belajar tanpa mengetahui arah.
             </p>
         </div>
 
         <!-- ========== LEVEL 6: THE BRIDGE & CAMPFIRE ========== -->
-        <div class="pol-level pol-level-6" data-kyra-pos="corner" data-kyra-line="Seberangi jembatan ini, lalu mari beristirahat sebentar. Jangan lupa menjaga bahan bakarmu.">
+        <div class="pol-level pol-level-6" data-kyra-pos="corner" data-kyra-line="Tidak apa-apa berhenti sejenak. Perjalanan ini tentang menjaga langkahmu hingga akhir, bukan memaksa diri paling keras.">
             <div class="pol-level-head pol-reveal">
+                <span class="pol-story-kicker">Jaga langkahmu</span>
                 <h2 class="pol-h2">Jembatan &amp; Api Unggun</h2>
-                <p class="pol-lead">Seberangi jembatan tua ini, lalu beristirahatlah di api unggun. Kyra pun <strong>melayang turun untuk beristirahat</strong> bersamamu.</p>
+                <p class="pol-lead">Perjalanan panjang tidak selalu ditempuh dengan berlari. Berhenti sejenak bukan berarti menyerah, melainkan memastikan dirimu masih cukup kuat untuk melanjutkan.</p>
             </div>
 
             <div class="pol-bridge-zone pol-reveal" style="--d:1">
@@ -861,12 +879,12 @@
                 
                 <!-- Floating holographic wisdom cards -->
                 <div class="pol-holo-card pol-holo-1" style="--b:0s">
-                    <strong>⚡ Awas Burnout!</strong>
-                    Lakukan Real Rest (tidur, jalan kaki di luar), bukan Fake Rest (scroll medsos).
+                    <strong>⚡ Jangan Terjebak Satu Soal</strong>
+                    Tandai lalu lanjutkan ketika sebuah soal menghabiskan terlalu banyak waktu.
                 </div>
                 <div class="pol-holo-card pol-holo-2" style="--b:.4s">
-                    <strong>🔋 Bahan Bakar Otak</strong>
-                    Isi bahan bakar otakmu dengan protein dan air!
+                    <strong>🌙 Istirahat yang Sebenarnya</strong>
+                    Tidur cukup, berjalan sebentar, atau menjauh dari layar membantu pikiran kembali jernih.
                 </div>
                 
                 <!-- Ambient glowing fireflies drifting through the clearing -->
@@ -894,31 +912,42 @@
             </div>
         </div>
 
-        <!-- ========== LEVEL 7: CLIFF PEAK (destiny scroll & dynamic store) ========== -->
-        <div class="pol-level pol-level-7" data-kyra-pos="corner" data-kyra-line="Ini dia... puncak takdir. Tuliskan harapanmu, dan aku akan mengubahnya menjadi bintang.">
+        <!-- ========== LEVEL 7: CLIFF PEAK (name & hope → destiny scroll & dynamic store) ========== -->
+        <div class="pol-level pol-level-7" data-kyra-pos="corner" data-kyra-line="Kamu sudah berjalan cukup jauh. Sebelum menuju akhir, aku ingin tahu alasan yang membuatmu terus melangkah.">
             <div class="pol-peak-fog" aria-hidden="true"></div>
 
             <div class="pol-level-head pol-reveal">
-                <h2 class="pol-h2">Puncak Tebing Takdir</h2>
-                <p class="pol-lead">Kau telah tiba di ujung perjalanan. Tuliskan harapanmu pada <strong>Gulungan Takdir</strong>, lalu terbangkan ia menjadi bintang.</p>
+                <span class="pol-story-kicker">Sebelum perjalanan ini dilanjutkan</span>
+                <h2 class="pol-h2">Nama dan Impian</h2>
+                <p class="pol-lead">Setiap orang datang ke sini dengan alasan yang berbeda. Tuliskan namamu dan impian yang ingin kamu perjuangkan.</p>
             </div>
 
-            <!-- State 1: ancient parchment form -->
             <div class="pol-parchment pol-reveal" id="pol-parchment" style="--d:1">
-                <h2>Gulungan Takdir</h2>
-                <p class="pol-parchment-sub">Satu harapan, satu bintang baru di langit.</p>
+                <h2>Surat Harapanmu</h2>
+                <p class="pol-parchment-sub">Jaga alasan yang membuatmu memulai.</p>
                 <form id="pol-hope-form">
-                    <input class="pol-field" type="text" name="hopeName" placeholder="Namamu" maxlength="40" required>
-                    <textarea class="pol-field" name="hopeText" placeholder="Harapan terbesarmu (contoh: tembus Kedokteran UI)" maxlength="140"></textarea>
-                    <button type="submit" class="pol-btn-hope">Terbangkan Harapan ✦</button>
+                    <input class="pol-field" type="text" name="hopeName" placeholder="Nama kamu" maxlength="40" required>
+                    <textarea class="pol-field" name="hopeText" placeholder="Contoh: Aku ingin diterima di kampus impianku." maxlength="140"></textarea>
+                    <button type="submit" class="pol-btn-hope">Simpan Harapanku ✦</button>
                 </form>
             </div>
 
-            <!-- State 3: grand portal gate + dynamically fetched store -->
+            <!-- After hope saved: greeting + surat harapan + pricing -->
             <div class="pol-destiny" id="pol-destiny" hidden>
-                <div class="pol-portal-gate" aria-hidden="true"></div>
-                <h2 class="pol-h2">Gerbang Takdir Terbuka</h2>
+            <div class="pol-destiny-surat">
+                <div class="pol-surat-header">✦ Untuk</div>
                 <p class="pol-destiny-greeting" id="pol-destiny-greeting"></p>
+                <div class="pol-surat-footer">— Dari dirimu hari ini, untuk dirimu di masa depan.</div>
+                <button id="pol-download-surat" class="pol-btn-download" type="button">
+                    <span class="pol-btn-icon">↓</span>
+                    <span>Simpan Surat Harapan</span>
+                </button>
+            </div>
+                <div class="pol-destiny-after">
+                    <p>Jangan biarkan harapanmu berhenti sebagai tulisan. Ubahlah menjadi latihan, keberanian, dan langkah nyata.</p>
+                </div>
+                <h2 class="pol-h2" style="margin-top:2.5rem">Setiap Perjalanan Memiliki Jalannya Sendiri</h2>
+                <p class="pol-destiny-greeting" style="margin-bottom:2rem">Pilih yang kamu butuhkan hari ini. Mulai dari yang kamu mampu, lalu bertumbuh ketika kamu siap.</p>
 
                 <!-- Diisi secara dinamis dari paketbelajar.html via fetch() + DOMParser -->
                 <div class="pol-store-inventory" id="pol-store-inventory"></div>
@@ -936,8 +965,12 @@
     <!-- Footer akan dimuat di sini secara otomatis -->
     <div id="footer-placeholder"></div>
 
+    <!-- Pinned floating navigation — always accessible -->
+    <button id="pol-journey-return" style="display:none" onclick="if (window.pathOfLightLoaded) { document.getElementById('path-of-light-section').scrollIntoView({behavior:'smooth'}); }">▲ Lanjutkan Perjalanan</button>
+
     <!-- Memuat script utama -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>

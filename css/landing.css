@@ -111,6 +111,47 @@ body.dark-mode .badge-new {
     color: var(--brand-primary);
 }
 
+/* Journey cue beneath hero */
+.hero-journey-cue {
+    margin: 2rem 0 0;
+    padding: 0.9rem 1.2rem;
+    border-radius: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
+}
+.hero-journey-cue span {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+    color: var(--brand-primary);
+}
+.hero-journey-cue p {
+    margin: 0.5rem 0 0.7rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+.hero-journey-cue a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--brand-primary);
+    font-weight: 700;
+    text-decoration: none;
+    font-size: 0.9rem;
+    animation: hero-cue-bounce 2s ease-in-out infinite;
+}
+.hero-journey-cue a b {
+    font-size: 1.2rem;
+}
+@keyframes hero-cue-bounce {
+    0%, 100% { transform: translateY(0); opacity: 0.7; }
+    50% { transform: translateY(6px); opacity: 1; }
+}
+
 .hero-trust {
     display: flex;
     align-items: center;
@@ -138,103 +179,6 @@ body.dark-mode .badge-new {
 }
 .mini-avatar:first-child { margin-left: 0; }
 
-/* ================= HERO VISUAL (MOCKUP) - FLAT DESIGN ================= */
-.mini-quiz-section {
-    padding: 0 0 5rem;
-    background: var(--bg-primary);
-}
-.mini-quiz-section .hero-visual {
-    width: min(100%, 720px);
-    margin: 0 auto;
-}
-.hero-visual {
-    position: relative;
-}
-
-.mockup-card {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.15);
-    border: 1px solid var(--border-color);
-    overflow: hidden;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.mockup-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 25px 50px -12px rgba(107, 143, 92, 0.2);
-}
-
-.mockup-header {
-    background: var(--bg-primary);
-    padding: 1rem;
-    display: flex;
-    gap: 8px;
-    border-bottom: 1px solid var(--border-color);
-}
-.dot { width: 12px; height: 12px; border-radius: 50%; }
-.dot.red { background: #ef4444; }
-.dot.yellow { background: #f59e0b; }
-.dot.green { background: #10b981; }
-
-.mockup-body { padding: 2rem; }
-
-.q-label {
-    color: var(--brand-primary);
-    font-weight: 700;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
-
-.q-text {
-    font-size: 1.1rem;
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    line-height: 1.5;
-}
-
-.q-options {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-    margin-bottom: 2rem;
-}
-
-.option {
-    padding: 0.8rem 1rem;
-    border: 2px solid var(--border-color);
-    border-radius: 10px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: all 0.2s;
-    cursor: pointer;
-}
-
-.option.active {
-    border-color: var(--brand-primary);
-    background: rgba(135, 168, 120, 0.08);
-    color: var(--brand-primary-dark);
-}
-body.dark-mode .option.active {
-    background: rgba(163, 196, 145, 0.1);
-    color: var(--brand-primary-light);
-}
-
-.mockup-btn {
-    width: 100%;
-    background: var(--brand-primary);
-    color: white;
-    border: none;
-    padding: 1rem;
-    border-radius: 10px;
-    font-weight: 600;
-    font-size: 1rem;
-    cursor: default;
-}
-
 /* ================= STATS BAR ================= */
 .stats-bar {
     background: var(--bg-secondary);
@@ -261,54 +205,6 @@ body.dark-mode .option.active {
     color: var(--text-secondary);
     font-weight: 500;
     font-size: 0.95rem;
-}
-
-/* State Opsi Jawaban */
-.option:hover:not(.disabled) {
-    border-color: var(--brand-primary);
-    transform: translateX(5px);
-}
-
-.option.correct {
-    border-color: var(--success) !important;
-    background: rgba(107, 143, 92, 0.1);
-    color: var(--success);
-    font-weight: bold;
-}
-
-.option.wrong {
-    border-color: var(--error) !important;
-    background: rgba(229, 115, 115, 0.1);
-    color: var(--error);
-}
-
-.option.disabled {
-    pointer-events: none;
-    opacity: 0.5;
-}
-.option.correct.disabled {
-    opacity: 1;
-}
-
-/* Animasi Kotak Pembahasan */
-.mockup-feedback {
-    margin-top: 1.5rem;
-    padding: 1rem;
-    border-radius: 10px;
-    background: var(--bg-primary);
-    border-left: 4px solid var(--brand-primary);
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.mockup-feedback.correct-fb { border-left-color: var(--success); }
-.mockup-feedback.wrong-fb { border-left-color: var(--error); }
-.mockup-feedback strong { color: var(--text-primary); }
-
-@keyframes slideUpFade {
-    from { opacity: 0; transform: translateY(15px); }
-    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ================= SMART ROUTING LOADER ================= */
@@ -362,11 +258,6 @@ body.dark-mode .option.active {
     .hero-subtitle { margin-left: auto; margin-right: auto; }
     .hero-cta { justify-content: center; flex-wrap: wrap; }
     .hero-trust { justify-content: center; }
-
-    .mockup-card {
-        max-width: 500px;
-        margin: 0 auto;
-    }
 
     .stats-container {
         grid-template-columns: repeat(2, 1fr);

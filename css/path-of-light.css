@@ -25,7 +25,7 @@
     --pol-danger: #ff5d6c;
 
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     /* The blend into the page above is baked into the background
        itself: the first stops match the site's own --bg-primary,
        so no overlay seam or harsh line can ever appear. */
@@ -351,6 +351,7 @@ body.dark-mode .path-of-light-section {
     align-items: center;
     justify-content: center;
     padding: 16vh 1.5rem;
+    overflow: visible;
 }
 
 .pol-h2 {
@@ -398,6 +399,296 @@ body.dark-mode .path-of-light-section {
 .pol-level-0 {
     min-height: 115vh;
     z-index: 11;
+}
+
+/* Deep Talk inside transition zone */
+.pol-deep-talk {
+    position: relative;
+    z-index: 7;
+    max-width: 760px;
+    margin: 5vh auto;
+    padding: 1.8rem 1rem;
+    text-align: center;
+    pointer-events: none;
+}
+.pol-story-kicker {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    border: 1px solid rgba(232, 169, 61, 0.35);
+    border-radius: 999px;
+    color: var(--pol-gold);
+}
+.pol-deep-talk h2 {
+    margin: 1.2rem 0 0.8rem;
+    font-family: Georgia, serif;
+    font-size: clamp(1.7rem, 4.2vw, 3rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    color: var(--pol-ink);
+}
+.pol-deep-talk > p {
+    margin: 0 auto 2rem;
+    max-width: 640px;
+    color: var(--pol-ink-dim);
+    font-size: 1.08rem;
+    line-height: 1.7;
+}
+.pol-growth-cards {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    margin: 0 auto 2rem;
+    max-width: 760px;
+}
+.pol-growth-cards article {
+    padding: 1.1rem;
+    border-radius: 14px;
+    background: rgba(13, 19, 40, 0.75);
+    border: 1px solid rgba(154, 166, 196, 0.2);
+    text-align: left;
+    pointer-events: auto;
+    transition: border-color 0.3s, background 0.3s;
+}
+.pol-growth-cards article strong {
+    display: block;
+    margin-bottom: 0.35rem;
+    color: var(--pol-gold);
+    font-size: 0.9rem;
+}
+.pol-growth-cards article span {
+    color: var(--pol-ink-dim);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+.pol-deep-closing {
+    margin: 0 auto;
+    max-width: 660px;
+    color: var(--pol-ink-dim);
+    font-size: 0.92rem;
+    line-height: 1.7;
+    font-style: italic;
+}
+.pol-entry-bridge {
+    position: relative;
+    z-index: 7;
+    max-width: 560px;
+    margin: 5vh auto 2vh;
+    text-align: center;
+    font-size: 1rem;
+    color: var(--pol-ink-dim);
+    line-height: 1.6;
+}
+
+/* UTBK Gate — new level between Level 1 and Level 2 */
+.pol-level-utbk {
+    min-height: 100vh;
+}
+.pol-utbk-gate {
+    position: relative;
+    z-index: 12;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+    border-radius: 24px;
+    border: 1px solid rgba(154, 166, 196, 0.25);
+    background: rgba(8, 12, 30, 0.7);
+    backdrop-filter: blur(8px);
+    text-align: center;
+}
+.pol-utbk-gate-glow {
+    position: absolute;
+    inset: -20%;
+    background: radial-gradient(ellipse at 50% 0%, rgba(143, 216, 255, 0.2), transparent 70%);
+    pointer-events: none;
+}
+.pol-utbk-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin: 2rem 0 2.5rem;
+}
+.pol-utbk-numbers article {
+    text-align: center;
+}
+.pol-utbk-numbers strong {
+    display: block;
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: -0.04em;
+    background: linear-gradient(135deg, var(--pol-gold), var(--pol-fire));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.pol-utbk-numbers span {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--pol-ink-dim);
+    margin-top: 0.2rem;
+}
+.pol-utbk-gate > p {
+    max-width: 640px;
+    margin: 0 auto;
+    color: var(--pol-ink-dim);
+    line-height: 1.75;
+}
+.pol-utbk-gate p:first-of-type {
+    margin-top: 1.5rem;
+}
+
+/* Surat Harapan — after hope form */
+.pol-destiny-surat {
+    max-width: 600px;
+    margin: 0 auto 2.5rem;
+    padding: 2rem 2rem 2.5rem;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 217, 122, 0.35);
+    background: linear-gradient(160deg, rgba(255, 247, 224, 0.06) 0%, rgba(255, 217, 122, 0.08) 100%);
+    position: relative;
+    text-align: center;
+}
+.pol-destiny-surat .pol-surat-header {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--pol-gold);
+    margin-bottom: 0.8rem;
+}
+.pol-destiny-surat .pol-surat-footer {
+    margin-top: 1.2rem;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--pol-ink-dim);
+}
+
+.pol-destiny-greeting p:first-of-type {
+    margin-bottom: 0.5rem;
+    color: var(--pol-ink-dim);
+    font-size: 0.95rem;
+}
+
+.pol-destiny-greeting p:nth-of-type(2) {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--pol-gold);
+    margin: 0.5rem 0 0.8rem;
+    text-shadow: 0 0 20px rgba(255, 217, 122, 0.3);
+    line-height: 1.4;
+}
+
+.pol-destiny-greeting p:last-of-type {
+    margin: 0.8rem 0 0;
+    color: var(--pol-ink);
+    font-size: 0.95rem;
+    line-height: 1.7;
+}
+.pol-destiny-after {
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    font-size: 0.95rem;
+    color: var(--pol-ink-dim);
+    line-height: 1.7;
+    text-align: center;
+}
+
+/* Download surat button */
+.pol-btn-download {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: 1.5rem;
+    padding: 0.75rem 1.5rem;
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: #2a1c05;
+    background: linear-gradient(180deg, #ffd97a 0%, #e8a93d 100%);
+    border: 1px solid #b8860b;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(180, 130, 40, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pol-btn-download:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 32px rgba(180, 130, 40, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.pol-btn-download:active {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(180, 130, 40, 0.45);
+}
+
+.pol-btn-download .pol-btn-icon {
+    font-size: 1.2rem;
+    animation: polDownloadBounce 1.8s ease-in-out infinite;
+}
+
+@keyframes polDownloadBounce {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
+}
+
+/* Canvas download overlay */
+.pol-download-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 990;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(4, 6, 14, 0.85);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.pol-download-overlay.active {
+    opacity: 1;
+}
+
+.pol-download-overlay p {
+    color: var(--pol-gold);
+    font-size: 1.1rem;
+    font-weight: 700;
+    animation: polDownloadPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes polDownloadPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+
+/* Floating return button only after journey starts */
+#pol-journey-return {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 999;
+    padding: 0.65rem 1.1rem;
+    font: inherit;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--pol-gold);
+    background: rgba(8, 12, 30, 0.88);
+    border: 1px solid rgba(255, 217, 122, 0.4);
+    border-radius: 999px;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: transform 0.2s, opacity 0.2s;
+    opacity: 0.75;
+}
+#pol-journey-return:hover {
+    transform: translateY(-2px);
+    opacity: 1;
 }
 
 /* Solid veil that crossfades away — no gradient band, no line */
@@ -1062,6 +1353,7 @@ body.dark-mode .path-of-light-section {
     flex-direction: column;
     gap: 5rem;
     width: min(860px, 94vw);
+    overflow: visible;
 }
 
 /* Magical winding trail SVG connecting the pillars */
@@ -1240,7 +1532,7 @@ body.dark-mode .path-of-light-section {
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     text-align: center;
-    z-index: 70;
+    z-index: 9999;
     opacity: 0;
     pointer-events: none;
     transform: translateX(-50%) translateY(10px) scale(.92);
@@ -1371,7 +1663,7 @@ body.dark-mode .path-of-light-section {
     box-shadow: 0 18px 44px rgba(0, 0, 0, .65), 0 0 32px hsl(var(--h) 85% 60% / .18);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    z-index: 80;
+    z-index: 9999;
     text-align: left;
     opacity: 0;
     pointer-events: none;
@@ -1808,7 +2100,6 @@ body.dark-mode .path-of-light-section {
     display: flex;
     align-items: flex-end;
     justify-content: center;
-    overflow: hidden;
     border-radius: 26px;
     border: 1px solid rgba(150, 165, 200, .12);
     /* Ground fades in from nothing — no harsh horizon line */
@@ -2064,11 +2355,10 @@ body.dark-mode .path-of-light-section {
     font-size: .88rem;
     line-height: 1.65;
     color: #cfeaff;
-    overflow: hidden;
     animation: polHoloBob 1.6s ease-in-out infinite;
     animation-delay: var(--b, 0s);
     will-change: transform, opacity;
-    z-index: 12;
+    z-index: 9999;
 }
 
 .pol-holo-card::before {
@@ -2572,6 +2862,9 @@ html.pol-no-scroll body {
     .pol-wisp-card { width: min(280px, 86vw); }
     .pol-dialogue { padding: 1.7rem 1.2rem 1.3rem; }
     .pol-parchment { padding: 2.2rem 1.4rem 1.8rem; }
+    .pol-growth-cards { grid-template-columns: 1fr; }
+    .pol-utbk-numbers { gap: 1.5rem; flex-wrap: wrap; }
+    .pol-utbk-numbers strong { font-size: 2rem; }
     .pol-camp-zone { min-height: 540px; }
     .pol-holo-card { font-size: .8rem; }
     .pol-holo-1 { top: 2%; }
@@ -2597,4 +2890,612 @@ html.pol-no-scroll body {
     .pol-fog, .pol-entry-fog { display: none; }
     .pol-entry-veil { opacity: 0; }
     .pol-spook { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+/* ============================================================
+   ✨ ELEVATED VISUAL DESIGN — Professional UI Polish ✨
+   These enhancements layer on top of existing styles to create
+   a world-class, immersive visual experience.
+   ============================================================ */
+
+/* --- Level 0 Deep Talk — Atmospheric Gradient & Glass Cards --- */
+.pol-level-0 {
+    background:
+        radial-gradient(ellipse 120% 60% at 50% 20%, rgba(19, 29, 64, 0.6) 0%, transparent 70%),
+        linear-gradient(180deg, var(--bg-primary) 0%, #1a1f3a 40%, #0d1226 70%, #04060e 100%);
+}
+
+.pol-deep-talk {
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255, 217, 122, 0.04) 0%, transparent 70%);
+    border-radius: 24px;
+    padding: 2.5rem 1.5rem;
+    backdrop-filter: blur(4px);
+}
+
+.pol-deep-talk h2 {
+    background: linear-gradient(135deg, #ffd97a 0%, #e8a93d 50%, #ff9a3d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 60px rgba(255, 217, 122, 0.3);
+    position: relative;
+}
+
+.pol-deep-talk h2::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pol-gold), transparent);
+    border-radius: 2px;
+}
+
+.pol-growth-cards article {
+    background: linear-gradient(160deg, rgba(13, 19, 40, 0.9) 0%, rgba(26, 35, 70, 0.85) 100%);
+    border: 1px solid rgba(154, 166, 196, 0.25);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.pol-growth-cards article::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pol-gold), transparent);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.pol-growth-cards article:hover {
+    border-color: rgba(255, 217, 122, 0.4);
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(255, 217, 122, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.pol-growth-cards article:hover::before {
+    opacity: 1;
+}
+
+.pol-growth-cards article strong {
+    background: linear-gradient(135deg, #ffd97a 0%, #e8a93d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.pol-deep-closing {
+    padding: 1rem 1.5rem;
+    border-radius: 12px;
+    background: linear-gradient(90deg, transparent, rgba(255, 217, 122, 0.05), transparent);
+    border-top: 1px solid rgba(255, 217, 122, 0.15);
+    border-bottom: 1px solid rgba(255, 217, 122, 0.15);
+}
+
+/* --- Level UTBK — Dramatic Gate & Animated Numbers --- */
+.pol-level-utbk {
+    background:
+        radial-gradient(ellipse 100% 50% at 50% 30%, rgba(19, 29, 64, 0.7) 0%, transparent 65%),
+        linear-gradient(180deg, transparent 0%, rgba(10, 15, 34, 0.8) 50%, transparent 100%);
+}
+
+.pol-utbk-gate {
+    background:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(143, 216, 255, 0.15) 0%, transparent 70%),
+        linear-gradient(180deg, rgba(8, 12, 30, 0.85) 0%, rgba(13, 19, 40, 0.75) 100%);
+    border: 1px solid rgba(154, 166, 196, 0.3);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(143, 216, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.pol-utbk-gate::before {
+    content: '';
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 80px;
+    background:
+        radial-gradient(ellipse at center, rgba(255, 217, 122, 0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(8px);
+    opacity: 0.7;
+}
+
+.pol-utbk-numbers article {
+    padding: 1.5rem 2rem;
+    border-radius: 16px;
+    background: linear-gradient(160deg, rgba(13, 19, 40, 0.9) 0%, rgba(26, 35, 70, 0.8) 100%);
+    border: 1px solid rgba(154, 166, 196, 0.2);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.pol-utbk-numbers article::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 217, 122, 0.08) 0%, transparent 70%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.pol-utbk-numbers article:hover {
+    border-color: rgba(255, 217, 122, 0.4);
+    transform: translateY(-6px) scale(1.02);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(255, 217, 122, 0.12);
+}
+
+.pol-utbk-numbers article:hover::after {
+    opacity: 1;
+}
+
+.pol-utbk-numbers strong {
+    background: linear-gradient(135deg, #ffd97a 0%, #ff9a3d 50%, #ffd97a 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 80px rgba(255, 217, 122, 0.4);
+    animation: utbkNumberPulse 3s ease-in-out infinite;
+}
+
+@keyframes utbkNumberPulse {
+    0%, 100% { filter: brightness(1); }
+    50% { filter: brightness(1.2); }
+}
+
+/* --- Level 1 — Enhanced RPG Dialogue --- */
+.pol-dialogue {
+    background: linear-gradient(180deg, rgba(8, 12, 30, 0.94) 0%, rgba(13, 19, 40, 0.9) 100%);
+    border: 2px solid rgba(255, 217, 122, 0.5);
+    box-shadow:
+        0 0 0 6px rgba(8, 12, 30, 0.6),
+        0 0 60px rgba(255, 200, 90, 0.18),
+        0 20px 60px rgba(0, 0, 0, 0.6),
+        inset 0 0 60px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.pol-dialogue::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 20%;
+    right: 20%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255, 217, 122, 0.6), transparent);
+}
+
+.pol-dialogue-name {
+    background: linear-gradient(180deg, #ffd97a 0%, #e8a93d 100%);
+    box-shadow:
+        0 6px 20px rgba(232, 169, 61, 0.6),
+        0 0 30px rgba(255, 217, 122, 0.3);
+    letter-spacing: 0.25em;
+    padding: 0.4rem 1.3rem;
+    border-radius: 10px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Level 2 — Refined Illusion Cards --- */
+.pol-myth-caption {
+    background: linear-gradient(160deg, rgba(46, 10, 24, 0.9) 0%, rgba(30, 15, 30, 0.85) 100%);
+    border: 1px solid rgba(255, 93, 108, 0.5);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 40px rgba(255, 93, 108, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    padding: 0.8rem 1.6rem;
+    border-radius: 14px;
+}
+
+.pol-myth-caption strong {
+    background: linear-gradient(135deg, #ff5d6c 0%, #c62f42 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 93, 108, 0.5);
+}
+
+.pol-fact-card {
+    background: linear-gradient(160deg, rgba(8, 22, 18, 0.94) 0%, rgba(15, 35, 30, 0.9) 100%);
+    border: 1px solid rgba(127, 231, 196, 0.6);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(127, 231, 196, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 60px rgba(127, 231, 196, 0.05);
+}
+
+.pol-fact-card strong {
+    background: linear-gradient(135deg, #7fe7c4 0%, #5cc9a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 24px rgba(127, 231, 196, 0.6);
+}
+
+/* --- Level 3 — Enhanced Pillars --- */
+.pol-pillar-body {
+    background: linear-gradient(90deg, #0a0f22 0%, #1a2444 22%, #2c3d6e 50%, #1a2444 78%, #080d1c 100%);
+    border: 1px solid rgba(150, 165, 200, 0.3);
+    box-shadow:
+        inset -14px 0 28px rgba(0,0,0,.65),
+        inset 10px 0 22px rgba(190,205,235,.08),
+        0 18px 40px rgba(0,0,0,.65),
+        0 0 40px rgba(127, 231, 196, 0.15);
+}
+
+.pol-pillar.lit .pol-pillar-body,
+.pol-pillar:hover .pol-pillar-body,
+.pol-pillar:focus-visible .pol-pillar-body {
+    border-color: rgba(127, 231, 196, 0.7);
+    box-shadow:
+        inset -14px 0 28px rgba(0,0,0,.65),
+        inset 10px 0 22px rgba(190,205,235,.08),
+        0 18px 40px rgba(0,0,0,.65),
+        0 0 60px rgba(127, 231, 196, 0.35),
+        inset 0 0 40px rgba(127, 231, 196, 0.08);
+}
+
+.pol-tooltip {
+    background: linear-gradient(180deg, rgba(10, 16, 36, 0.98) 0%, rgba(13, 19, 40, 0.95) 100%);
+    border: 1px solid rgba(127, 231, 196, 0.6);
+    box-shadow:
+        0 20px 50px rgba(0, 0, 0, 0.7),
+        0 0 50px rgba(127, 231, 196, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px);
+}
+
+.pol-tooltip h4 {
+    background: linear-gradient(135deg, #7fe7c4 0%, #5cc9a8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(127, 231, 196, 0.5);
+}
+
+/* --- Level 4 — Enhanced Wisps --- */
+.pol-wisp-orb {
+    background: radial-gradient(circle at 34% 30%,
+        rgba(255, 255, 255, 0.98) 0%,
+        hsl(var(--h) 90% 72%) 25%,
+        hsl(var(--h) 85% 55% / 0.7) 50%,
+        hsl(var(--h) 80% 40% / 0.2) 75%,
+        transparent 82%);
+    box-shadow:
+        0 0 32px hsl(var(--h) 90% 65% / 0.9),
+        0 0 80px hsl(var(--h) 90% 60% / 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.pol-wisp:hover .pol-wisp-orb,
+.pol-wisp:focus-visible .pol-wisp-orb {
+    transform: scale(1.25);
+    box-shadow:
+        0 0 48px hsl(var(--h) 90% 65% / 1),
+        0 0 100px hsl(var(--h) 90% 60% / 0.7),
+        inset 0 0 30px rgba(255, 255, 255, 0.4);
+}
+
+.pol-wisp-card {
+    background: linear-gradient(180deg, rgba(10, 16, 36, 0.98) 0%, rgba(13, 19, 40, 0.95) 100%);
+    border: 1px solid hsl(var(--h) 80% 65% / 0.7);
+    box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.75),
+        0 0 50px hsl(var(--h) 85% 60% / 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.pol-wisp-card h4 {
+    background: linear-gradient(135deg, hsl(var(--h) 85% 72%) 0%, hsl(var(--h) 75% 62%) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px hsl(var(--h) 85% 60% / 0.5);
+}
+
+/* --- Level 5 — Enhanced Artifacts --- */
+.pol-artifact {
+    background: linear-gradient(160deg, rgba(13, 19, 40, 0.85) 0%, rgba(20, 28, 55, 0.8) 100%);
+    border: 1.5px solid rgba(255, 217, 122, 0.3);
+    box-shadow:
+        0 8px 40px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05),
+        inset 0 0 40px rgba(255, 200, 90, 0.03);
+}
+
+.pol-artifact::before,
+.pol-artifact::after {
+    content: '';
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    pointer-events: none;
+    transition: all 0.4s ease;
+}
+
+.pol-artifact::before {
+    top: 8px;
+    left: 8px;
+    border-top: 2px solid rgba(255, 217, 122, 0.4);
+    border-left: 2px solid rgba(255, 217, 122, 0.4);
+    border-radius: 2px 0 0 0;
+}
+
+.pol-artifact::after {
+    bottom: 8px;
+    right: 8px;
+    border-bottom: 2px solid rgba(255, 217, 122, 0.4);
+    border-right: 2px solid rgba(255, 217, 122, 0.4);
+    border-radius: 0 0 2px 0;
+}
+
+.pol-artifact:hover {
+    transform: translateY(-8px);
+    border-color: rgba(255, 217, 122, 0.65);
+    box-shadow:
+        0 28px 70px rgba(0, 0, 0, 0.6),
+        0 0 60px rgba(255, 200, 90, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 60px rgba(255, 200, 90, 0.08);
+}
+
+.pol-artifact:hover::before,
+.pol-artifact:hover::after {
+    width: 32px;
+    height: 32px;
+    border-color: rgba(255, 217, 122, 0.7);
+}
+
+.pol-artifact h3 {
+    background: linear-gradient(135deg, #ffd97a 0%, #e8a93d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(255, 217, 122, 0.4);
+}
+
+.pol-altar {
+    background: linear-gradient(180deg, #4a5a8e 0%, #1c2338 100%);
+    border: 1px solid rgba(255, 217, 122, 0.5);
+    box-shadow:
+        0 0 60px rgba(255, 200, 90, 0.3),
+        inset 0 4px 16px rgba(255, 220, 150, 0.25),
+        inset 0 -4px 12px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Level 6 — Enhanced Campfire & Holograms --- */
+.pol-camp-zone {
+    background: linear-gradient(180deg,
+        rgba(10, 15, 34, 0) 0%,
+        rgba(9, 14, 30, 0.7) 42%,
+        rgba(6, 10, 22, 1) 100%);
+    border: 1px solid rgba(150, 165, 200, 0.2);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.pol-holo-card {
+    background: linear-gradient(160deg, rgba(80, 200, 255, 0.08) 0%, rgba(80, 200, 255, 0.04) 100%);
+    border: 1px solid rgba(143, 216, 255, 0.6);
+    box-shadow:
+        0 0 50px rgba(143, 216, 255, 0.2),
+        inset 0 0 40px rgba(143, 216, 255, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+}
+
+.pol-holo-card strong {
+    background: linear-gradient(135deg, #8fd8ff 0%, #6bc4e8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(143, 216, 255, 0.6);
+}
+
+.pol-sign-board {
+    background: linear-gradient(170deg, #5a4828 0%, #3a2818 100%);
+    border: 2px solid #7a6238;
+    box-shadow:
+        0 16px 40px rgba(0, 0, 0, 0.7),
+        0 0 40px rgba(255, 200, 90, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 0 24px rgba(0, 0, 0, 0.5);
+}
+
+/* --- Level 7 — Enhanced Parchment & Surat Harapan --- */
+.pol-parchment {
+    background:
+        radial-gradient(120% 90% at 50% 0%, rgba(90, 70, 35, 0.4) 0%, transparent 55%),
+        linear-gradient(180deg, #f0e6c8 0%, #e0d4b0 55%, #d4c49c 100%);
+    border: 1px solid #b8a878;
+    box-shadow:
+        0 0 0 8px rgba(240, 225, 180, 0.15),
+        0 0 80px rgba(255, 220, 140, 0.35),
+        0 40px 80px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.pol-parchment::before,
+.pol-parchment::after {
+    background: linear-gradient(180deg, #9a7a48, #6a4a28);
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.pol-btn-hope {
+    background: linear-gradient(180deg, #ffd97a 0%, #e8a93d 100%);
+    border: 1px solid #c89620;
+    box-shadow:
+        0 8px 24px rgba(180, 130, 40, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pol-btn-hope:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 14px 36px rgba(180, 130, 40, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.pol-destiny-surat {
+    background: linear-gradient(160deg, rgba(255, 247, 224, 0.08) 0%, rgba(255, 217, 122, 0.12) 100%);
+    border: 1px solid rgba(255, 217, 122, 0.5);
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 0 80px rgba(255, 217, 122, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.pol-destiny-surat::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 217, 122, 0.08) 0%, transparent 70%);
+    animation: suratGlow 4s ease-in-out infinite;
+}
+
+@keyframes suratGlow {
+    0%, 100% { opacity: 0.5; transform: scale(0.95); }
+    50% { opacity: 1; transform: scale(1.05); }
+}
+
+.pol-destiny-surat .pol-surat-header {
+    background: linear-gradient(135deg, #ffd97a 0%, #e8a93d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 217, 122, 0.4);
+}
+
+.pol-destiny-surat .pol-surat-footer {
+    color: rgba(154, 166, 196, 0.9);
+    font-style: italic;
+}
+
+/* --- Global Micro-Interactions & Polish --- */
+.pol-story-kicker {
+    background: linear-gradient(90deg, transparent, rgba(255, 217, 122, 0.08), transparent);
+    border: 1px solid rgba(232, 169, 61, 0.4);
+    padding: 0.4rem 0.9rem;
+    box-shadow: 0 0 20px rgba(255, 217, 122, 0.1);
+    position: relative;
+}
+
+.pol-story-kicker::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: -8px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--pol-gold);
+    box-shadow: 0 0 8px rgba(255, 217, 122, 0.8);
+}
+
+.pol-h2 {
+    background: linear-gradient(135deg, #e8ecf7 0%, #c0c8e0 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 40px rgba(255, 217, 122, 0.3);
+    position: relative;
+}
+
+.pol-h2::after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--pol-gold), transparent);
+    border-radius: 2px;
+}
+
+.pol-lead {
+    color: rgba(154, 166, 196, 0.95);
+}
+
+.pol-lead strong {
+    background: linear-gradient(135deg, #ffd97a 0%, #e8a93d 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 217, 122, 0.4);
+}
+
+/* --- Enhanced Reveal Animation --- */
+.pol-reveal {
+    opacity: 0;
+    transform: translateY(46px) scale(0.96);
+    transition:
+        opacity 1s cubic-bezier(.22,1,.36,1),
+        transform 1s cubic-bezier(.22,1,.36,1);
+    transition-delay: calc(var(--d, 0) * 160ms);
+    will-change: opacity, transform;
+}
+
+.pol-reveal.pol-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* --- Floating Return Button --- */
+#pol-journey-return {
+    background: linear-gradient(180deg, rgba(8, 12, 30, 0.95) 0%, rgba(13, 19, 40, 0.9) 100%);
+    border: 1px solid rgba(255, 217, 122, 0.5);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(255, 217, 122, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#pol-journey-return:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 217, 122, 0.8);
+    box-shadow:
+        0 16px 48px rgba(0, 0, 0, 0.7),
+        0 0 60px rgba(255, 217, 122, 0.25);
 }

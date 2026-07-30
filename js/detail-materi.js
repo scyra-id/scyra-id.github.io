@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const tag = element.tagName;
             const text = element.textContent.trim();
             const html = element.innerHTML.trim();
-            if (!text && !html) return;
+            if (!text && !html && tag !== 'IMG') return;
 
             const isPipeRow = text.includes('|') && /^\|?.*\|.*\|?$/.test(text);
             const isCsvRow = text.includes('","') && text.includes('"');
@@ -73,6 +73,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 result += `<div class="scyra-fyi"><strong>ℹ️ FYI</strong>${rendered}</div>`;
             } else if (tag.match(/^H[1-6]$/)) {
                 result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
+            } else if (tag === 'IMG') {
+                result += element.outerHTML;
             } else if (tag === 'UL' || tag === 'OL') {
                 result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
             } else {
@@ -114,6 +116,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         let inTable = false;
         let tableCols = 0;
         let tableHtml = '';
+
+        const appendToCurrentSection = (html) => {
+            if (inSplit) {
+                if (currentSection === 'algo') splitAlgo += html;
+                else splitCore += html;
+            } else {
+                finalHtml += html;
+            }
+        };
         
         const closePembahasan = () => {
             if (isPembahasanOpen) {
@@ -215,24 +226,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderPeta();
             if (pendingTableRow !== '') {
                 if (isPembahasanOpen) finalHtml += `<p>${pendingTableRow}</p>`;
-                else {
-                    if (!inSplit) inSplit = true;
-                    splitRight += `<p>${pendingTableRow}</p>`;
-                }
+                else appendToCurrentSection(`<p>${pendingTableRow}</p>`);
                 pendingTableRow = '';
             }
 
             // Tabel mengikuti konteks aktif, termasuk di dalam pembahasan
-            let wideTablePending = '';
             if (inTable) {
                 tableHtml += '</tbody></table></div>';
                 if (isPembahasanOpen) {
                     finalHtml += tableHtml;
-                } else if (tableCols > 3) {
-                    wideTablePending = tableHtml;
                 } else {
-                    if (!inSplit) inSplit = true;
-                    splitRight += tableHtml;
+                    appendToCurrentSection(tableHtml);
                 }
                 inTable = false;
                 tableHtml = '';
@@ -254,10 +258,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 currentSection = 'core';
             }
 
-            // Letakkan tabel yang lebih dari 3 kolom di luar dari split layout agar melebar
-            if (wideTablePending) {
-                finalHtml += wideTablePending;
-            }
         };
 
         const flushTable = () => {
@@ -265,24 +265,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 tableHtml += '</tbody></table></div>';
                 if (isPembahasanOpen) {
                     finalHtml += tableHtml;
-                } else if (tableCols > 3) {
-                    if (inSplit) {
-                        finalHtml += `
-                        <div class="split-layout">
-                            <div class="split-core">${splitCore}</div>
-                            <div class="split-right">${splitRight}</div>
-                            <div class="split-algo">${splitAlgo}</div>
-                        </div>`;
-                        splitCore = '';
-                        splitAlgo = '';
-                        splitRight = '';
-                        inSplit = false;
-                        currentSection = 'core';
-                    }
-                    finalHtml += tableHtml;
                 } else {
-                    if (!inSplit) inSplit = true;
-                    splitRight += tableHtml;
+                    appendToCurrentSection(tableHtml);
                 }
                 inTable = false;
                 tableHtml = '';
@@ -307,8 +291,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let isTrigger = tag.match(/^H[1-6]$/) || inner.includes('[GAMBAR:') || inner.includes('[SIMULASI:') || lower.match(/^(?:•|-|\*)?\s*(langkah|step|trik|cara|trap alert|jebakan maut|fyi|for your information)/i);
                 if (isTrigger) {
                     flushTable();
-                    if (!inSplit) inSplit = true;
-                    splitRight += `<p>${pendingTableRow}</p>`;
+                    appendToCurrentSection(`<p>${pendingTableRow}</p>`);
                     pendingTableRow = '';
                 }
             }
@@ -340,8 +323,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (inner.includes('[GAMBAR:')) {
                 let imgMatch = inner.match(/\[GAMBAR:\s*(.*?)\]/i);
                 if (imgMatch) {
-                    if (!inSplit) inSplit = true;
-                    splitRight += `<img src="${imgMatch[1]}" class="scyra-image">`;
+                    appendToCurrentSection(`<img src="${imgMatch[1]}" class="scyra-image">`);
                     inner = inner.replace(/\[GAMBAR:\s*.*?\]/gi, '');
                     text = text.replace(/\[GAMBAR:\s*.*?\]/gi, '').trim();
                     if (!inner.trim()) return; 
@@ -353,7 +335,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (inner.includes('[SIMULASI:')) {
                 let simMatch = inner.match(/\[SIMULASI:\s*(.*?)\]/i);
                 if (simMatch) {
-                    if (!inSplit) inSplit = true;
                     let simUrl = simMatch[1].trim();
                     let simHtml = `
                     <div class="simulasi-container scyra-sim-container" data-simurl="${simUrl}">
@@ -367,7 +348,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         </div>
                         <iframe style="width: 100%; height: 500px; border: none; background: #fff; display: none;"></iframe>
                     </div>`;
-                    splitRight += simHtml;
+                    appendToCurrentSection(simHtml);
                     inner = inner.replace(/\[SIMULASI:\s*.*?\]/gi, '');
                     text = text.replace(/\[SIMULASI:\s*.*?\]/gi, '').trim();
                     if (!inner.trim()) return; 
@@ -789,7 +770,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detailJudul').textContent = materi.judul;
         document.getElementById('detailTanggal').textContent = `📅 Dipublikasikan pada ${tgl}`;
         
-        // Eksekusi Magic Engine
         document.getElementById('detailBody').innerHTML = applyScyraMagic(materi.konten_html);
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';

@@ -181,12 +181,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             const { error } = await window.db.from('survey_responses').insert(payloads);
             if (error) throw error;
             localStorage.setItem('scyra_survey_done', 'true');
+
+            // Determine and assign badge
+            let badgeHtml = '';
+            const { data: { user } } = await window.db.auth.getUser();
+            if (user && window.BadgeSystem) {
+                const questions = state.pages.flat();
+                const assignedBadge = window.BadgeSystem.determineBadge(state.jawaban, questions);
+                if (assignedBadge) {
+                    await window.BadgeSystem.assignBadgeToUser(user.id, assignedBadge, getSessionId());
+                    badgeHtml = `
+                        <div style="margin:2rem auto;padding:2rem;background:linear-gradient(135deg,rgba(135,168,120,0.15),rgba(212,175,55,0.1));border:2px solid var(--brand-primary);border-radius:16px;max-width:400px;">
+                            <div style="font-size:3rem;margin-bottom:0.5rem;">${assignedBadge.icon}</div>
+                            <h3 style="color:var(--brand-primary);margin-bottom:0.5rem;">Badge: ${assignedBadge.name}</h3>
+                            <p style="color:var(--text-secondary);font-size:0.95rem;margin:0;">${assignedBadge.description}</p>
+                        </div>`;
+                }
+            }
+
             badge.textContent = '✅ Selesai';
             surveyContainer.innerHTML = `
                 <div style="text-align:center;padding:3rem 1rem;">
                     <div style="font-size:4rem;margin-bottom:1rem;">🎉</div>
                     <h2 style="color:var(--text-primary);margin-bottom:1rem;">Terima Kasih!</h2>
-                    <p style="color:var(--text-secondary);margin-bottom:2rem;">Tanggapanmu telah tersimpan. Akses trial gratis akan dikirim ke emailmu setelah kami meninjau survey.</p>
+                    <p style="color:var(--text-secondary);margin-bottom:1rem;">Tanggapanmu telah tersimpan. Akses trial gratis akan dikirim ke emailmu setelah kami meninjau survey.</p>
+                    ${badgeHtml}
                     <a href="index.html" class="btn-primary-lg">Kembali ke Beranda</a>
                 </div>`;
         } catch (err) {

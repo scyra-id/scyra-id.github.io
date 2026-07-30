@@ -18,6 +18,11 @@
                 <h2>Buat Akun Baru 🚀</h2>
                 <p>Daftar untuk mulai persiapan UTBK-mu</p>
             </div>
+
+            <div id="registrationPausedNotice" class="registration-paused-notice" hidden role="status">
+                <h3>Segera Hadir! ✨</h3>
+                <p>Kami sedang mematangkan platform ini sebelum siap dirilis penuh. Fitur pendaftaran akan ditangguhkan sementara hingga periode survei selesai. Terima kasih telah menjadi bagian dari perjalanan awal kami!</p>
+            </div>
             
             <form id="registerForm" class="auth-form">
                 <div class="form-group">
@@ -48,7 +53,7 @@
                     <span class="error-message" id="confirmError"></span>
                 </div>
                 
-                <button type="submit" class="btn-submit">Daftar</button>
+                <button type="submit" class="btn-submit" disabled>Daftar</button>
                 
                 <p class="auth-footer-text">
                     Sudah punya akun? <a href="login.html">Masuk di sini</a>
@@ -57,7 +62,7 @@
             <div id="verificationNotice" class="verification-notice" hidden aria-live="polite">
                 <h3>Periksa emailmu</h3>
                 <p>Kami telah mengirim link verifikasi ke <strong id="verificationEmail"></strong>. Klik link tersebut sebelum masuk ke Scyra.</p>
-                <button type="button" id="btnResendVerification" class="btn-outline">Kirim Ulang Link Verifikasi</button>
+                <button type="button" id="btnResendVerification" class="btn-outline" disabled>Kirim Ulang Link Verifikasi</button>
                 <p class="auth-footer-text">Sudah terverifikasi? <a href="login.html">Masuk di sini</a></p>
             </div>
         </div>

@@ -8,7 +8,7 @@
     'use strict';
 
     const REDUCED_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const TYPEWRITER_TEXT = 'Halo! Aku Kyra. Perjalanan menuju kampus impian memang dipenuhi kabut tebal. Maukah kamu ikut denganku menyusuri Path of Light?';
+    const TYPEWRITER_TEXT = 'Hai, Pejuang PTN! Aku sudah menyiapkan sebuah perjalanan untukmu. Siap menemukan seberapa jauh kemampuanmu bisa bertumbuh?';
     const KYRA_POSITIONS = ['hidden', 'center', 'corner', 'gone'];
     const MYTH_DELAY_MS = 650;      // delay before a silhouette materializes
     const FACT_RATIO = 0.62;        // scroll depth that triggers the fact card
@@ -667,18 +667,77 @@
 
     function revealDestiny(peak, destiny, greeting, name, hope) {
         if (greeting) {
+            const header = destiny.querySelector('.pol-surat-header');
+            if (header) {
+                header.textContent = '✦ Untuk ' + name;
+            }
+
             greeting.innerHTML = '';
-            const strong = document.createElement('strong');
-            strong.textContent = name;
-            greeting.append(
-                'Harapan' + (hope ? ' "' + hope + '"' : '') + ' milik ',
-                strong,
-                ' telah menjadi bintang baru di langit. Kabut terakhir telah tersibak — Gerbang Takdir kini terbuka untukmu.'
-            );
+            const para = document.createElement('p');
+            para.style.margin = '0 0 0.5rem';
+            para.textContent = 'Hari ini, kamu menuliskan sebuah impian:';
+            greeting.append(para);
+
+            const hopeLine = hope ? ' "' + hope + '"' : '';
+            const hopeP = document.createElement('p');
+            hopeP.style.cssText = 'font-size: 1.3rem; font-weight: 700; color: var(--pol-gold); margin: 0.5rem 0 0.8rem;';
+            hopeP.textContent = hopeLine;
+            greeting.append(hopeP);
+
+            const closeP = document.createElement('p');
+            closeP.style.margin = '0.5rem 0 0';
+            closeP.textContent = 'Semoga suatu hari nanti, kamu melihat kembali tulisan ini dengan senyum penuh rasa syukur. Teruslah belajar, berdoa, dan bertumbuh sedikit demi sedikit.';
+            greeting.append(closeP);
         }
 
         peak.classList.add('destiny-revealed');
         destiny.hidden = false;
+
+        const downloadBtn = document.getElementById('pol-download-surat');
+        const suratEl = destiny.querySelector('.pol-destiny-surat');
+        if (downloadBtn && suratEl) {
+            downloadBtn.addEventListener('click', () => {
+                downloadSurat(suratEl, name);
+            });
+        }
+    }
+
+    function downloadSurat(suratEl, name) {
+        const overlay = document.createElement('div');
+        overlay.className = 'pol-download-overlay';
+        overlay.innerHTML = '<p>Menyiapkan suratmu... ✦</p>';
+        document.body.appendChild(overlay);
+        requestAnimationFrame(() => overlay.classList.add('active'));
+
+        const tempWrapper = document.createElement('div');
+        tempWrapper.style.cssText = 'position:fixed; left:-9999px; top:0; width:600px;';
+        document.body.appendChild(tempWrapper);
+
+        const clone = suratEl.cloneNode(true);
+        const downloadBtnClone = clone.querySelector('#pol-download-surat');
+        if (downloadBtnClone) downloadBtnClone.remove();
+        tempWrapper.appendChild(clone);
+
+        html2canvas(clone, {
+            backgroundColor: '#04060e',
+            scale: 2,
+            useCORS: true,
+            logging: false
+        }).then((canvas) => {
+            const fileName = (name || 'Pejuang').replace(/[^a-zA-Z0-9]/g, '_');
+            const link = document.createElement('a');
+            link.download = 'Surat_Harapan_Scyra_' + fileName + '.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+
+            tempWrapper.remove();
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.remove(), 400);
+        }).catch((err) => {
+            console.error('Download gagal:', err);
+            tempWrapper.remove();
+            overlay.remove();
+        });
     }
 
     /* ============================================================

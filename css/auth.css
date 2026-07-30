@@ -31,6 +31,25 @@
     gap: 1.25rem;
 }
 
+.registration-paused-notice {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid var(--brand-accent);
+    border-radius: 10px;
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--text-primary);
+}
+
+.registration-paused-notice h3 {
+    margin-bottom: 0.5rem;
+    color: var(--brand-primary-dark);
+}
+
+.registration-paused-notice p {
+    margin: 0;
+    line-height: 1.55;
+}
+
 .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
 
 .form-group label {

@@ -4,7 +4,8 @@ function initMascotGreeting() {
     const mood = document.getElementById('mascotGreetingMood');
     const nextButton = document.getElementById('mascotGreetingNext');
     const mascotButton = document.getElementById('mascotGreetingButton');
-    if (!image || !text || !mood) return;
+    if (!image || !text || !mood || image.dataset.greetingInitialized === 'true') return;
+    image.dataset.greetingInitialized = 'true';
 
     const greetings = [
         {
@@ -66,25 +67,26 @@ function initMascotGreeting() {
     const hour = new Date().getHours();
     let index = hour >= 22 || hour < 5 ? 5 : hour >= 5 && hour < 10 ? 0 : Math.floor(Math.random() * 5);
     let lineIndex = 0;
+    let typingTimer = null;
+    let typingToken = 0;
 
     function typeText(element, fullText, speed = 28) {
-        return new Promise((resolve) => {
-            element.textContent = '';
-            let i = 0;
-            function type() {
-                if (i < fullText.length) {
-                    element.textContent += fullText.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    resolve();
-                }
-            }
-            type();
-        });
+        typingToken += 1;
+        const token = typingToken;
+        if (typingTimer) clearTimeout(typingTimer);
+
+        element.textContent = '';
+        let i = 0;
+        function type() {
+            if (token !== typingToken) return;
+            element.textContent = fullText.slice(0, i + 1);
+            i += 1;
+            if (i < fullText.length) typingTimer = setTimeout(type, speed);
+        }
+        type();
     }
 
-    async function renderGreeting(animate = true) {
+    function renderGreeting(animate = true) {
         const greeting = greetings[index];
         if (animate) {
             image.classList.remove('mascot-greeting__image--enter');
@@ -95,7 +97,7 @@ function initMascotGreeting() {
         image.alt = greeting.alt;
         mood.textContent = greeting.mood;
         const fullText = greeting.lines[lineIndex % greeting.lines.length];
-        await typeText(text, fullText, 30);
+        typeText(text, fullText, 30);
     }
 
     image.addEventListener('error', () => {

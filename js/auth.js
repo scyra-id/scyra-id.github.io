@@ -1,3 +1,5 @@
+let isRegistrationBlocked = true;
+
 document.addEventListener('DOMContentLoaded', () => {
     if (!window.db) {
         console.error("Koneksi database (window.db) belum siap!");
@@ -23,7 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const registerForm = document.getElementById('registerForm');
-    if (registerForm) registerForm.addEventListener('submit', handleRegister);
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegister);
+        initializeRegistrationAvailability();
+    }
 
     const resendButton = document.getElementById('btnResendVerification');
     if (resendButton) resendButton.addEventListener('click', handleResendVerification);
@@ -31,6 +36,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLogin);
 });
+
+async function initializeRegistrationAvailability() {
+    const form = document.getElementById('registerForm');
+    const submitButton = form?.querySelector('.btn-submit');
+    const resendButton = document.getElementById('btnResendVerification');
+    const pausedNotice = document.getElementById('registrationPausedNotice');
+
+    try {
+        const { data, error } = await window.db
+            .from('survey_settings')
+            .select('setting_value')
+            .eq('setting_key', 'survey_active')
+            .single();
+        if (error) throw error;
+
+        isRegistrationBlocked = data?.setting_value === true;
+        if (pausedNotice) pausedNotice.hidden = !isRegistrationBlocked;
+        if (submitButton) submitButton.disabled = isRegistrationBlocked;
+        if (resendButton) resendButton.disabled = isRegistrationBlocked;
+    } catch (error) {
+        isRegistrationBlocked = true;
+        if (pausedNotice) pausedNotice.hidden = false;
+        if (submitButton) submitButton.disabled = true;
+        if (resendButton) resendButton.disabled = true;
+    }
+}
 
 function showError(elementId, message) {
     const errorEl = document.getElementById(elementId);
@@ -52,6 +83,8 @@ function clearError(elementId) {
 
 async function handleRegister(e) {
     e.preventDefault();
+    if (isRegistrationBlocked) return;
+
     const btn = e.target.querySelector('.btn-submit');
     const originalText = btn.textContent;
     btn.textContent = 'Memproses...';
@@ -114,6 +147,8 @@ function showVerificationNotice(email) {
 }
 
 async function handleResendVerification(e) {
+    if (isRegistrationBlocked) return;
+
     const button = e.currentTarget;
     const email = sessionStorage.getItem('scyra_pending_verification_email');
     if (!email) {
