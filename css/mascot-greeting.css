@@ -76,3 +76,21 @@
     .mascot-greeting__bubble { min-height: 64px; }
     .mascot-greeting__bubble::before { top: 25px; }
 }
+
+@media (max-width: 400px) {
+    .mascot-greeting {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.6rem;
+    }
+    .mascot-greeting__mascot { width: 64px; height: 64px; flex-basis: 64px; }
+    .mascot-greeting__bubble {
+        min-height: auto;
+        width: 100%;
+        padding: 0.6rem 0.8rem;
+    }
+    .mascot-greeting__bubble::before { display: none; }
+    .mascot-greeting__name { font-size: 0.65rem; }
+    .mascot-greeting__bubble p { font-size: 0.8rem; }
+    .mascot-greeting__next { font-size: 0.7rem; }
+}

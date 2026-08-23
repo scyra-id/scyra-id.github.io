@@ -176,22 +176,34 @@ font-size: 1.15rem;
 .split-algo { order: 3; }
 /* 3. GAMBAR, TABEL & MEDIA (KOLOM KANAN) */
 .scyra-image {
-width: 100%;
+max-width: 600px;
+width: auto;
+max-height: 500px;
+display: block;
+margin: 1.5rem auto;
 border-radius: 12px;
 box-shadow: 0 8px 25px rgba(0,0,0,0.1);
 border: 2px solid var(--border-color);
 background: var(--bg-secondary);
 padding: 0.5rem;
+cursor: pointer;
+transition: transform 0.2s, box-shadow 0.2s;
+}
+.scyra-image:hover {
+transform: scale(1.02);
+box-shadow: 0 12px 30px rgba(0,0,0,0.15);
 }
 .scyra-table-wrapper {
 overflow-x: auto;
 border-radius: 12px;
 box-shadow: 0 8px 25px rgba(107, 143, 92, 0.15);
 border: 1px solid var(--border-color);
-margin-bottom: 1rem;
+margin: 1rem auto;
 background: var(--bg-secondary);
+width: fit-content;
+max-width: 100%;
 }
-.scyra-table { width: 100%; border-collapse: collapse; }
+.scyra-table { width: auto; border-collapse: collapse; }
 .scyra-table th {
 background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
 color: white; padding: 1.2rem 1.5rem; text-align: left; font-weight: 700; font-size: 1.05rem; letter-spacing: 0.5px;
@@ -209,27 +221,27 @@ background: rgba(135, 168, 120, 0.04);
 .scyra-table th:nth-child(even) {
 background: linear-gradient(135deg, rgba(135,168,120,0.85), rgba(107,143,92,0.85));
 }
-/* 🚨 TABEL LEBAR (FULL WIDTH DI BAWAH CORE / ALGO) */
+/* Tabel dengan banyak kolom tetap mengikuti isi dan berada di tengah */
 .scyra-table-wrapper.scyra-table-wide {
-    margin: 2.5rem 0;
-    width: 100%;
+    margin: 2.5rem auto;
+    width: fit-content;
     max-width: 100%;
-    /* Reset posisi sticky kalau ada */
-    position: relative !important; 
+    position: relative !important;
     top: auto !important;
 }
 
-/* Pastikan tabel lebar bisa scroll horizontal di HP kalau kepanjangan */
 .scyra-table-wide .scyra-table {
-    display: block;
-    overflow-x: auto;
+    display: table;
+    width: max-content;
+    max-width: none;
+    overflow: visible;
     white-space: nowrap;
 }
 
-.scyra-table-wide .scyra-table th, 
+.scyra-table-wide .scyra-table th,
 .scyra-table-wide .scyra-table td {
     padding: 1rem 1.5rem;
-    min-width: 120px; /* Biar kolom gak terlalu gepeng di HP */
+    min-width: 0;
 }
 /* 4. BEDAH SOAL & OPSI JAWABAN */
 .scyra-soal-card {
@@ -713,4 +725,103 @@ box-shadow: 0 0 0 4px var(--bg-primary);
 .img-soal:hover {
     transform: scale(1.02);
     box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+}
+
+.image-popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    z-index: 9999;
+}
+.image-popup.hidden {
+    display: none;
+}
+.image-popup-content {
+    position: relative;
+    max-width: min(92vw, 1100px);
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+.image-popup-stage {
+    overflow: auto;
+    max-width: 100%;
+    max-height: calc(90vh - 80px);
+    border-radius: 16px;
+}
+.image-popup-stage img {
+    display: block;
+    max-width: none;
+    transform-origin: center center;
+    transition: transform 0.2s ease;
+    border-radius: 16px;
+    background: white;
+}
+.image-popup-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    backdrop-filter: blur(10px);
+}
+.image-popup-btn {
+    border: none;
+    background: white;
+    color: #111;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+.image-popup-scale {
+    color: white;
+    font-weight: 700;
+    min-width: 56px;
+    text-align: center;
+}
+.image-popup-close {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    border: none;
+    background: white;
+    color: #111;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 1.4rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+@media (max-width: 768px) {
+    .scyra-image {
+        max-width: 100%;
+        max-height: 360px;
+    }
+    .image-popup {
+        padding: 1rem;
+    }
+    .image-popup-content {
+        max-width: 100%;
+    }
+    .image-popup-controls {
+        gap: 0.5rem;
+        padding: 0.55rem 0.8rem;
+    }
+    .image-popup-btn,
+    .image-popup-close {
+        width: 38px;
+        height: 38px;
+    }
 }

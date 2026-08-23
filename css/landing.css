@@ -29,6 +29,35 @@ body.dark-mode .hero::before {
     align-items: center;
     position: relative;
     z-index: 1;
+    max-width: 100%;
+}
+
+@media (max-width: 400px) {
+    .hero {
+        padding: 3rem 0 4rem;
+    }
+    .hero-container {
+        gap: 2rem;
+    }
+    .hero-text h1 {
+        font-size: 2.2rem;
+        line-height: 1.2;
+    }
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    .hero-cta {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    .btn-primary-lg, .btn-secondary-lg {
+        width: 100%;
+        text-align: center;
+    }
+    .hero-trust {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
 }
 
 .badge-new {
@@ -263,4 +292,22 @@ body.dark-mode .badge-new {
         grid-template-columns: repeat(2, 1fr);
         gap: 3rem 1rem;
     }
+}
+
+@media (max-width: 500px) {
+    .stats-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 400px) {
+    .hero-text h1 { font-size: 1.9rem; line-height: 1.2; }
+    .hero-subtitle { font-size: 1rem; }
+    .hero-cta { flex-direction: column; gap: 0.75rem; }
+    .btn-primary-lg, .btn-secondary-lg { width: 100%; text-align: center; }
+    .hero-journey-cue { padding: 0.7rem 1rem; font-size: 0.85rem; }
+    .hero-journey-cue a { font-size: 0.85rem; }
+    .stats-container { grid-template-columns: 1fr; gap: 2rem; }
+    .stat-item h3 { font-size: 2rem; }
 }

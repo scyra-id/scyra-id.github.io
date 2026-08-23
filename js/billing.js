@@ -288,7 +288,8 @@ async function generateInvoice(user) {
             },
             body: { 
                 paket: currentPaket, 
-                amount: totals.totalBayar
+                amount: totals.totalBayar,
+                creditAmount: isCreditPurchase ? creditAmount : undefined
             }
         });
 

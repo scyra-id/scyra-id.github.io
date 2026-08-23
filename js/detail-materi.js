@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             output = output.replace(/\[SIMULASI:\s*(.*?)\]/gi, (_, url) => {
                 const simUrl = url.trim();
                 return `<div class="simulasi-container scyra-sim-container" data-simurl="${simUrl}">
-                    <div class="simulasi-header"><span>🎮 Simulasi Interaktif</span><a href="${simUrl}" target="_blank" rel="noopener" style="color:white;text-decoration:none;font-size:0.9rem;">Buka Link Asli ↗</a></div>
+                    <div class="simulasi-header"><span>🎮 Simulasi Interaktif</span><a href="simulasi-fullscreen.html?url=${encodeURIComponent(simUrl)}" style="color:white;text-decoration:none;font-size:0.9rem;">Buka Layar Penuh ↗</a></div>
                     <div class="sim-loading" style="padding:2rem;text-align:center;"><div class="spinner-sage" style="margin:0 auto 1rem;"></div><p style="color:var(--text-secondary);">Memuat simulasi...</p></div>
                     <iframe style="width:100%;height:500px;border:none;background:#fff;display:none;"></iframe>
                 </div>`;
@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="simulasi-container scyra-sim-container" data-simurl="${simUrl}">
                         <div class="simulasi-header">
                             <span>🎮 Simulasi Interaktif</span>
-                            <a href="${simUrl}" target="_blank" style="color: white; text-decoration: none; font-size: 0.9rem;">Buka Link Asli ↗</a>
+                            <a href="simulasi-fullscreen.html?url=${encodeURIComponent(simUrl)}" style="color: white; text-decoration: none; font-size: 0.9rem;">Buka Layar Penuh ↗</a>
                         </div>
                         <div class="sim-loading" style="padding: 2rem; text-align: center;">
                             <div class="spinner-sage" style="margin: 0 auto 1rem auto;"></div>
@@ -628,7 +628,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             feedbackDiv.innerHTML = isCorrect 
                 ? '<span class="feedback-icon">✅</span><strong>Benar Sekali!</strong>' 
                 : `<span class="feedback-icon">❌</span><strong>Kurang Tepat.</strong> Jawaban yang benar adalah <strong>${correctAnswer === 'A' ? 'Benar' : 'Salah'}</strong>.`;
-            soalCard.appendChild(feedbackDiv);
+            const insertTarget = soalCard.querySelector('.scyra-pembahasan, .scyra-trap');
+            if (insertTarget) {
+                soalCard.insertBefore(feedbackDiv, insertTarget);
+            } else {
+                soalCard.appendChild(feedbackDiv);
+            }
         }
     };
 
@@ -651,7 +656,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             feedbackDiv.innerHTML = userAns === keyAns 
                 ? '<span class="feedback-icon">✅</span><strong>Benar Sekali!</strong>' 
                 : `<span class="feedback-icon">❌</span><strong>Kurang Tepat.</strong> Jawaban yang benar adalah <strong>${currentCorrectAnswer}</strong>.`;
-            soalCard.appendChild(feedbackDiv);
+            const insertTarget = soalCard.querySelector('.scyra-pembahasan, .scyra-trap');
+            if (insertTarget) {
+                soalCard.insertBefore(feedbackDiv, insertTarget);
+            } else {
+                soalCard.appendChild(feedbackDiv);
+            }
         }
     };
 
@@ -773,6 +783,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detailBody').innerHTML = applyScyraMagic(materi.konten_html);
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
+
+        let imagePopup = document.getElementById('imagePopup');
+        if (!imagePopup) {
+            imagePopup = document.createElement('div');
+            imagePopup.id = 'imagePopup';
+            imagePopup.className = 'image-popup hidden';
+            imagePopup.innerHTML = `
+                <div class="image-popup-content">
+                    <button type="button" class="image-popup-close" aria-label="Tutup">×</button>
+                    <div class="image-popup-stage">
+                        <img src="" alt="Preview gambar materi">
+                    </div>
+                    <div class="image-popup-controls">
+                        <button type="button" class="image-popup-btn" data-zoom="out" aria-label="Zoom out">−</button>
+                        <span class="image-popup-scale">100%</span>
+                        <button type="button" class="image-popup-btn" data-zoom="in" aria-label="Zoom in">+</button>
+                    </div>
+                </div>`;
+            document.body.appendChild(imagePopup);
+        }
+
+        const popupImage = imagePopup.querySelector('.image-popup-stage img');
+        const popupScale = imagePopup.querySelector('.image-popup-scale');
+        const popupStage = imagePopup.querySelector('.image-popup-stage');
+        let currentZoom = 1;
+
+        const updatePopupZoom = () => {
+            popupImage.style.transform = `scale(${currentZoom})`;
+            popupScale.textContent = `${Math.round(currentZoom * 100)}%`;
+        };
+
+        const closeImagePopup = () => {
+            imagePopup.classList.add('hidden');
+            popupImage.src = '';
+            currentZoom = 1;
+            updatePopupZoom();
+            popupStage.scrollTop = 0;
+            popupStage.scrollLeft = 0;
+        };
+
+        imagePopup.querySelector('.image-popup-close').onclick = closeImagePopup;
+        imagePopup.onclick = (event) => {
+            if (event.target === imagePopup) closeImagePopup();
+        };
+        imagePopup.querySelector('[data-zoom="in"]').onclick = () => {
+            currentZoom = Math.min(currentZoom + 0.25, 4);
+            updatePopupZoom();
+        };
+        imagePopup.querySelector('[data-zoom="out"]').onclick = () => {
+            currentZoom = Math.max(currentZoom - 0.25, 0.5);
+            updatePopupZoom();
+        };
+
+        document.querySelectorAll('.scyra-image').forEach(img => {
+            img.addEventListener('click', () => {
+                popupImage.src = img.src;
+                currentZoom = 1;
+                updatePopupZoom();
+                imagePopup.classList.remove('hidden');
+            });
+        });
+
+        document.onkeydown = (event) => {
+            if (event.key === 'Escape' && !imagePopup.classList.contains('hidden')) {
+                closeImagePopup();
+            }
+        };
         
         // PROSES FETCH GEOGEBRA ASLI
         const simLinks = document.querySelectorAll('a[href*="geogebra.org/m/"]');

@@ -216,6 +216,20 @@ body.dark-mode .path-of-light-section {
 /* Levels 2-7: settled in the bottom-left corner for the journey */
 #pol-companion.kx-corner { --kx: 118px; --ky: calc(100vh - 128px); --ks: .78; }
 
+/* Level 0: mysterious silhouette — figure visible but fully darkened */
+#pol-companion.kx-anonymous .pol-kyra-img {
+    filter: brightness(0) drop-shadow(0 0 18px rgba(157, 180, 208, .35));
+}
+#pol-companion.kx-anonymous .pol-kyra-aura {
+    opacity: .25 !important;
+    filter: grayscale(1);
+}
+#pol-companion.kx-anonymous .pol-kyra-beam {
+    opacity: .12 !important;
+    filter: grayscale(1);
+}
+#pol-companion.kx-anonymous .pol-chat { border-color: rgba(154, 166, 196, .3); box-shadow: 0 12px 32px rgba(0, 0, 0, .55); }
+
 /* The departure: she floats skyward as the hope launches */
 #pol-companion.kx-gone { --kx: 50%; --ky: -18vh; --ks: .5; }
 #pol-companion.kx-gone .pol-kyra,
@@ -594,23 +608,39 @@ body.dark-mode .path-of-light-section {
     font-size: 0.95rem;
     color: var(--pol-ink-dim);
     line-height: 1.7;
+}
+
+.pol-destiny-after p:first-child {
+    margin-bottom: .7rem;
+    font-weight: 700;
+    color: var(--pol-gold);
+}
+
+.pol-destiny-after span {
+    display: block;
+    margin-top: 1rem;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: var(--pol-gold);
     text-align: center;
 }
 
 /* Download surat button */
 .pol-btn-download {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 0.6rem;
+    justify-content: center;
+    gap: 0.8rem;
+    width: 100%;
     margin-top: 1.5rem;
-    padding: 0.75rem 1.5rem;
+    padding: 1.2rem 1.5rem;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     color: #2a1c05;
     background: linear-gradient(180deg, #ffd97a 0%, #e8a93d 100%);
-    border: 1px solid #b8860b;
+    border: none;
     border-radius: 10px;
     cursor: pointer;
     box-shadow: 0 6px 20px rgba(180, 130, 40, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -630,6 +660,12 @@ body.dark-mode .path-of-light-section {
 .pol-btn-download .pol-btn-icon {
     font-size: 1.2rem;
     animation: polDownloadBounce 1.8s ease-in-out infinite;
+    display: inline-block;
+    pointer-events: none;
+}
+
+.pol-btn-download > span {
+    pointer-events: none;
 }
 
 @keyframes polDownloadBounce {
@@ -1352,16 +1388,16 @@ body.dark-mode .path-of-light-section {
     display: flex;
     flex-direction: column;
     gap: 5rem;
-    width: min(860px, 94vw);
+    width: min(1180px, 96vw);
     overflow: visible;
 }
 
 /* Magical winding trail SVG connecting the pillars */
 .pol-mystic-trail {
     position: absolute;
-    inset: -5% -10%;
-    width: 120%;
-    height: 110%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     z-index: 1;
     pointer-events: none;
     opacity: 0;
@@ -1378,20 +1414,26 @@ body.dark-mode .path-of-light-section {
     to { opacity: 1; }
 }
 
-/* Glowing background path with subtle pulse */
+/* Soft road bed with subtle pulse */
 .pol-mystic-trail .trail-bg {
     animation: polTrailPulse 4s ease-in-out infinite;
     will-change: opacity;
 }
 
-@keyframes polTrailPulse {
-    0%, 100% { opacity: .35; }
-    50%      { opacity: .5; }
+.pol-mystic-trail .trail-edge {
+    animation: polTrailPulse 4s ease-in-out infinite;
+    animation-delay: .6s;
+    will-change: opacity;
 }
 
-/* Dashed line with animated flow effect */
+@keyframes polTrailPulse {
+    0%, 100% { opacity: .32; }
+    50%      { opacity: .55; }
+}
+
+/* Dashed center line with animated flow */
 .pol-mystic-trail .trail-line {
-    animation: polTrailFlow 8s linear infinite;
+    animation: polTrailFlow 10s linear infinite;
     will-change: stroke-dashoffset;
 }
 
@@ -1422,17 +1464,22 @@ body.dark-mode .path-of-light-section {
 
 .pol-pillar {
     position: relative;
-    width: 190px;
+    width: min(280px, 28vw);
     display: flex;
     flex-direction: column;
     align-items: center;
     cursor: pointer;
     outline: none;
-    z-index: 10;
+    padding-top: 96px;
 }
 
-.pol-pillar:nth-child(odd)  { align-self: flex-start;  margin-left: 8%; }
-.pol-pillar:nth-child(even) { align-self: flex-end;    margin-right: 8%; }
+.pol-pillar:hover,
+.pol-pillar:focus-visible {
+    z-index: 100;
+}
+
+.pol-pillar:nth-child(odd)  { align-self: flex-start;  margin-left: 2%; }
+.pol-pillar:nth-child(even) { align-self: flex-end;    margin-right: 2%; }
 
 .pol-pillar-body {
     position: relative;
@@ -1605,6 +1652,11 @@ body.dark-mode .path-of-light-section {
     outline: none;
 }
 
+.pol-wisp:hover,
+.pol-wisp:focus-visible {
+    z-index: 100;
+}
+
 .pol-wisp-orb {
     width: 64px;
     height: 64px;
@@ -1707,6 +1759,154 @@ body.dark-mode .path-of-light-section {
 }
 
 .pol-wisp-example strong { color: hsl(var(--h) 85% 72%); }
+
+/* ============================================================
+   WISP DETAIL MODAL
+   ============================================================ */
+.pol-wisp-modal {
+    --pol-ink: #e8ecf7;
+    --pol-ink-dim: #9aa6c4;
+    --pol-rune: #7fe7c4;
+    --pol-danger: #ff5d6c;
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .35s ease, visibility .35s ease;
+    color: var(--pol-ink);
+}
+
+.pol-wisp-modal.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pol-wisp-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 6, 14, .82);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.pol-wisp-modal-content {
+    position: relative;
+    z-index: 2;
+    width: min(520px, 92vw);
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 2.2rem 2rem 2rem;
+    border-radius: 20px;
+    background: linear-gradient(160deg, rgba(14, 20, 44, .97) 0%, rgba(8, 12, 30, .98) 100%);
+    border: 1px solid var(--modal-color, rgba(127, 231, 196, .35));
+    box-shadow: 0 24px 80px rgba(0, 0, 0, .7), 0 0 60px rgba(127, 231, 196, .12);
+    text-align: center;
+    color: var(--pol-ink);
+    transform: translateY(30px) scale(.92);
+    transition: transform .4s cubic-bezier(.22,1,.36,1);
+}
+
+.pol-wisp-modal.open .pol-wisp-modal-content {
+    transform: translateY(0) scale(1);
+}
+
+.pol-wisp-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border: 1px solid rgba(154, 166, 196, .25);
+    border-radius: 50%;
+    background: rgba(10, 16, 36, .6);
+    color: var(--pol-ink-dim);
+    font-size: 1.3rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background .2s, color .2s, border-color .2s;
+}
+
+.pol-wisp-modal-close:hover {
+    background: rgba(255, 93, 108, .15);
+    border-color: rgba(255, 93, 108, .4);
+    color: var(--pol-danger);
+}
+
+.pol-wisp-modal-orb {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 1.2rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 34% 30%, rgba(255,255,255,.9) 0%, var(--modal-color, #7fe7c4) 40%, transparent 72%);
+    box-shadow: 0 0 30px var(--modal-color, #7fe7c4);
+    animation: polWispFloat 3s ease-in-out infinite;
+}
+
+.pol-wisp-modal-title {
+    margin: 0 0 1rem;
+    font-family: Georgia, serif;
+    font-size: 1.3rem;
+    letter-spacing: .04em;
+    color: var(--modal-color, var(--pol-rune));
+    text-shadow: 0 0 14px rgba(127, 231, 196, .4);
+}
+
+.pol-wisp-modal-desc {
+    margin: 0 0 1.4rem;
+    font-size: .95rem;
+    line-height: 1.75;
+    color: var(--pol-ink-dim);
+    text-align: left;
+}
+
+.pol-wisp-modal-example {
+    padding: 1.1rem 1.2rem;
+    border-radius: 12px;
+    background: rgba(127, 231, 196, .06);
+    border: 1px solid rgba(127, 231, 196, .2);
+    text-align: left;
+}
+
+.pol-wisp-modal-example strong {
+    display: block;
+    margin-bottom: .5rem;
+    font-size: .78rem;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--modal-color, var(--pol-rune));
+}
+
+.pol-wisp-modal-example p {
+    margin: 0;
+    font-size: .9rem;
+    line-height: 1.65;
+    color: var(--pol-ink);
+}
+
+/* Long-press hint for mobile */
+.pol-wisp-hint {
+    position: absolute;
+    bottom: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .7rem;
+    color: var(--pol-ink-dim);
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transition: opacity .3s;
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .pol-wisp-hint { opacity: .6; }
+    .pol-wisp-card { display: none; }
+}
 
 /* ============================================================
    LEVEL 5 — THE ARMORY
@@ -1870,6 +2070,47 @@ body.dark-mode .path-of-light-section {
 .pol-armory-footer:hover {
     border-color: rgba(255, 217, 122, .3);
     box-shadow: 0 0 40px rgba(255, 200, 90, .1);
+}
+
+.pol-level-4-closing {
+    max-width: 520px;
+    margin: 3rem auto 0;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--pol-ink-dim);
+    padding: 1.2rem 1.5rem;
+    border-radius: 14px;
+    background: rgba(127, 231, 196, .04);
+    border: 1px solid rgba(127, 231, 196, .18);
+    box-shadow: 0 0 32px rgba(127, 231, 196, .08);
+}
+
+.pol-level-4-closing p {
+    margin: 0 0 .8rem;
+}
+
+.pol-level-4-closing p:last-child {
+    margin-bottom: 0;
+}
+
+.pol-camp-footer {
+    max-width: 520px;
+    margin: 3rem auto 0;
+    text-align: center;
+    font-size: 1.02rem;
+    line-height: 1.85;
+    color: var(--pol-ink);
+    padding: 1.3rem 1.6rem;
+    border-radius: 14px;
+    background: linear-gradient(160deg, rgba(255, 154, 61, .06) 0%, rgba(255, 200, 90, .04) 100%);
+    border: 1px solid rgba(255, 154, 61, .2);
+    box-shadow: 0 0 34px rgba(255, 154, 61, .12), inset 0 0 24px rgba(255, 120, 40, .04);
+}
+
+.pol-camp-footer br {
+    display: block;
+    margin: .5rem 0;
 }
 
 .pol-portal {
@@ -2094,7 +2335,7 @@ body.dark-mode .path-of-light-section {
 /* --- Campfire scene: forest clearing with tent & fireflies --- */
 .pol-camp-zone {
     position: relative;
-    width: min(940px, 94vw);
+    width: min(1180px, 98vw);
     min-height: 500px;
     margin-top: 4rem;
     display: flex;
@@ -2102,6 +2343,7 @@ body.dark-mode .path-of-light-section {
     justify-content: center;
     border-radius: 26px;
     border: 1px solid rgba(150, 165, 200, .12);
+    overflow: hidden;
     /* Ground fades in from nothing — no harsh horizon line */
     background: linear-gradient(180deg,
         rgba(10, 15, 34, 0) 0%,
@@ -2112,30 +2354,30 @@ body.dark-mode .path-of-light-section {
 /* Pine silhouettes framing the clearing (masked open in the middle) */
 .pol-camp-trees {
     position: absolute;
-    left: -4%;
-    right: -4%;
+    left: 0;
+    right: 0;
     bottom: 0;
     pointer-events: none;
     background-repeat: repeat-x;
     background-position: bottom center;
-    -webkit-mask-image: radial-gradient(46% 78% at 50% 100%, transparent 38%, #000 78%);
-    mask-image: radial-gradient(46% 78% at 50% 100%, transparent 38%, #000 78%);
+    -webkit-mask-image: radial-gradient(62% 84% at 50% 100%, transparent 34%, #000 70%);
+    mask-image: radial-gradient(62% 84% at 50% 100%, transparent 34%, #000 70%);
 }
 
 .pol-camp-trees.far {
-    height: 62%;
+    height: 64%;
     opacity: .45;
     filter: blur(3px);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='480' height='240' viewBox='0 0 480 240'%3E%3Cg fill='%231a2540'%3E%3Cpath d='M40 240 L70 130 L52 130 L82 70 L64 70 L94 8 L124 70 L106 70 L136 130 L118 130 L148 240 Z'/%3E%3Cpath d='M190 240 L214 150 L198 150 L224 95 L208 95 L234 35 L260 95 L244 95 L270 150 L254 150 L278 240 Z'/%3E%3Cpath d='M330 240 L362 120 L342 120 L374 60 L354 60 L386 4 L418 60 L398 60 L430 120 L410 120 L442 240 Z'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 380px 190px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='240' viewBox='0 0 640 240'%3E%3Cg fill='%231a2540'%3E%3Cpath d='M20 240 L52 132 L34 132 L64 72 L46 72 L78 8 L110 72 L92 72 L122 132 L104 132 L136 240 Z'/%3E%3Cpath d='M150 240 L182 146 L164 146 L194 92 L176 92 L206 34 L238 92 L220 92 L250 146 L232 146 L264 240 Z'/%3E%3Cpath d='M300 240 L336 118 L316 118 L350 58 L330 58 L366 4 L402 58 L382 58 L416 118 L396 118 L432 240 Z'/%3E%3Cpath d='M470 240 L502 150 L484 150 L514 98 L496 98 L526 40 L558 98 L540 98 L570 150 L552 150 L584 240 Z'/%3E%3Cpath d='M560 240 L588 136 L572 136 L600 78 L584 78 L612 10 L640 78 L624 78 L652 136 L636 136 L664 240 Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 520px 190px;
 }
 
 .pol-camp-trees.near {
-    height: 44%;
+    height: 46%;
     opacity: .9;
     filter: blur(1px);
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='200' viewBox='0 0 520 200'%3E%3Cg fill='%23070c1a'%3E%3Cpath d='M20 200 L58 90 L36 90 L72 40 L50 40 L86 0 L122 40 L100 40 L136 90 L114 90 L150 200 Z'/%3E%3Cpath d='M210 200 L242 110 L222 110 L252 60 L232 60 L262 12 L292 60 L272 60 L302 110 L282 110 L314 200 Z'/%3E%3Cpath d='M380 200 L418 85 L395 85 L432 32 L408 32 L446 0 L484 32 L460 32 L497 85 L474 85 L510 200 Z'/%3E%3C/g%3E%3C/svg%3E");
-    background-size: 440px 170px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='700' height='210' viewBox='0 0 700 210'%3E%3Cg fill='%23070c1a'%3E%3Cpath d='M0 210 L34 94 L12 94 L50 42 L28 42 L64 0 L102 42 L80 42 L116 94 L94 94 L130 210 Z'/%3E%3Cpath d='M160 210 L194 110 L174 110 L204 60 L184 60 L214 12 L246 60 L226 60 L256 110 L236 110 L270 210 Z'/%3E%3Cpath d='M330 210 L368 84 L346 84 L382 34 L360 34 L398 0 L436 34 L414 34 L450 84 L428 84 L466 210 Z'/%3E%3Cpath d='M500 210 L534 94 L514 94 L546 46 L526 46 L560 8 L594 46 L574 46 L606 94 L586 94 L620 210 Z'/%3E%3Cpath d='M610 210 L642 106 L624 106 L654 54 L636 54 L668 14 L700 54 L682 54 L712 106 L694 106 L726 210 Z'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 640px 170px;
 }
 
 /* Soft ground mound + warm firelight pool */
@@ -2381,12 +2623,24 @@ body.dark-mode .path-of-light-section {
 
 .pol-holo-1 { left: 4%;  top: 4%; }
 .pol-holo-2 { right: 4%; top: 16%; }
+.pol-holo-3 { right: 5%; top: 52%; max-width: 320px; }
 
 @keyframes polHoloBob {
     0%, 100% { transform: translateY(0);    opacity: .88; }
     25%      { transform: translateY(-6px); opacity: 1; }
     55%      { transform: translateY(-9px); opacity: .92; }
     80%      { transform: translateY(-3px); opacity: 1; }
+}
+
+.pol-holo-3 {
+    animation-name: polHoloBobRight;
+}
+
+@keyframes polHoloBobRight {
+    0%, 100% { transform: translateY(0); opacity: .88; }
+    25% { transform: translateY(-6px); opacity: 1; }
+    55% { transform: translateY(-9px); opacity: .92; }
+    80% { transform: translateY(-3px); opacity: 1; }
 }
 
 /* ============================================================
@@ -2460,6 +2714,36 @@ body.dark-mode .path-of-light-section {
     font-size: .9rem;
     color: #6b5228;
     font-style: italic;
+}
+
+.pol-field-label {
+    display: block;
+    margin: 0 0 .4rem;
+    text-align: left;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #6b5228;
+}
+
+.pol-store-title {
+    margin: 0 auto .8rem;
+    max-width: 720px;
+    font-family: Georgia, serif;
+    font-size: clamp(1.2rem, 2.4vw, 1.6rem);
+    letter-spacing: .04em;
+    text-align: center;
+    color: var(--pol-gold);
+}
+
+.pol-store-lead {
+    margin: 0 auto 2rem;
+    max-width: 640px;
+    text-align: center;
+    color: var(--pol-ink-dim);
+    font-size: .95rem;
+    line-height: 1.7;
 }
 
 .pol-field {
@@ -2845,8 +3129,23 @@ html.pol-no-scroll body {
         gap: 4rem 1.5rem;
     }
 
+    .pol-level-3 .pol-pillar-path {
+        width: min(94vw, 100%);
+        padding: 0 1rem;
+    }
+
+    .pol-pillar {
+        width: min(220px, 70vw);
+    }
+
     .pol-pillar:nth-child(odd)  { margin-left: 0; }
     .pol-pillar:nth-child(even) { margin-right: 0; }
+
+    .pol-pillar-body::before {
+        width: 220px;
+        height: 150px;
+        top: -90px;
+    }
 
     .pol-signpost { right: 50%; transform: translateX(50%); bottom: 2%; }
     .pol-signpost.pol-reveal { transform: translateX(50%) translateY(46px); }
@@ -3143,26 +3442,109 @@ html.pol-no-scroll body {
 }
 
 /* --- Level 3 — Enhanced Pillars --- */
+.pol-pillar {
+    width: min(280px, 28vw);
+    padding-top: 96px;
+}
+
 .pol-pillar-body {
-    background: linear-gradient(90deg, #0a0f22 0%, #1a2444 22%, #2c3d6e 50%, #1a2444 78%, #080d1c 100%);
-    border: 1px solid rgba(150, 165, 200, 0.3);
+    width: 92px;
+    height: 238px;
+    border: 0;
+    border-radius: 48% 52% 22% 26% / 10% 12% 8% 10%;
+    background:
+        linear-gradient(78deg, transparent 0 17%, rgba(8, 18, 18, .38) 18% 21%, transparent 22% 100%),
+        linear-gradient(104deg, transparent 0 68%, rgba(104, 154, 116, .16) 69% 72%, transparent 73% 100%),
+        linear-gradient(90deg, #101b18 0%, #263d2e 18%, #3f5a3d 43%, #263d2e 70%, #0b1412 100%);
     box-shadow:
-        inset -14px 0 28px rgba(0,0,0,.65),
-        inset 10px 0 22px rgba(190,205,235,.08),
-        0 18px 40px rgba(0,0,0,.65),
-        0 0 40px rgba(127, 231, 196, 0.15);
+        inset -18px 0 24px rgba(0, 0, 0, .62),
+        inset 12px 0 18px rgba(157, 203, 163, .08),
+        0 24px 28px rgba(0, 0, 0, .55),
+        0 0 24px rgba(127, 231, 196, .08);
+    transform-origin: 50% 100%;
+    transition: transform .6s cubic-bezier(.22,1,.36,1), box-shadow .6s ease;
+    overflow: visible;
+}
+
+.pol-pillar-body::before {
+    top: -112px;
+    left: 50%;
+    right: auto;
+    width: 280px;
+    height: 190px;
+    transform: translateX(-50%);
+    border: 0;
+    border-radius: 48% 52% 44% 56%;
+    background:
+        radial-gradient(ellipse at 23% 62%, #172d25 0 25%, transparent 26%),
+        radial-gradient(ellipse at 39% 30%, #294737 0 31%, transparent 32%),
+        radial-gradient(ellipse at 65% 27%, #203d31 0 30%, transparent 31%),
+        radial-gradient(ellipse at 80% 61%, #132a23 0 27%, transparent 28%),
+        radial-gradient(ellipse at 52% 65%, #315441 0 42%, transparent 43%);
+    filter: drop-shadow(0 18px 18px rgba(0, 0, 0, .48));
+    box-shadow: none;
+    opacity: .96;
+}
+
+.pol-pillar-body::after {
+    left: 50%;
+    right: auto;
+    bottom: -17px;
+    width: 170px;
+    height: 42px;
+    transform: translateX(-50%);
+    border: 0;
+    border-radius: 50%;
+    background:
+        linear-gradient(158deg, transparent 0 38%, #17251d 39% 50%, transparent 51%) 0 0 / 50% 100% no-repeat,
+        linear-gradient(202deg, transparent 0 38%, #17251d 39% 50%, transparent 51%) 100% 0 / 50% 100% no-repeat;
+    box-shadow: none;
+}
+
+.pol-pillar-runes {
+    position: relative;
+    z-index: 2;
 }
 
 .pol-pillar.lit .pol-pillar-body,
 .pol-pillar:hover .pol-pillar-body,
 .pol-pillar:focus-visible .pol-pillar-body {
-    border-color: rgba(127, 231, 196, 0.7);
+    border-color: transparent;
+    transform: translateY(-5px) scale(1.025);
     box-shadow:
-        inset -14px 0 28px rgba(0,0,0,.65),
-        inset 10px 0 22px rgba(190,205,235,.08),
-        0 18px 40px rgba(0,0,0,.65),
-        0 0 60px rgba(127, 231, 196, 0.35),
-        inset 0 0 40px rgba(127, 231, 196, 0.08);
+        inset -18px 0 24px rgba(0, 0, 0, .62),
+        inset 12px 0 18px rgba(157, 203, 163, .1),
+        0 28px 34px rgba(0, 0, 0, .6),
+        0 0 42px rgba(127, 231, 196, .28);
+}
+
+.pol-level-3 {
+    width: 100%;
+    max-width: none;
+    padding-left: 0;
+    padding-right: 0;
+    overflow: visible;
+}
+
+.pol-level-3 .pol-level-head {
+    width: min(860px, 92vw);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 0 1.5rem;
+}
+
+.pol-level-3 .pol-pillar-path {
+    width: min(1280px, 100vw);
+    padding: 0 clamp(1rem, 3vw, 2.5rem);
+    box-sizing: border-box;
+}
+
+.pol-level-3 .pol-mystic-trail {
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
 }
 
 .pol-tooltip {
@@ -3390,6 +3772,21 @@ html.pol-no-scroll body {
     height: 200%;
     background: radial-gradient(circle, rgba(255, 217, 122, 0.08) 0%, transparent 70%);
     animation: suratGlow 4s ease-in-out infinite;
+    pointer-events: none;
+}
+
+.pol-destiny-surat::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 4px,
+        rgba(255, 217, 122, 0.02) 4px,
+        rgba(255, 217, 122, 0.02) 8px
+    );
 }
 
 @keyframes suratGlow {

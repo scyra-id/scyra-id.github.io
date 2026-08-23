@@ -72,26 +72,41 @@
                 return;
             }
 
-            chat.classList.add('open');
+            const lines = line.split('||');
 
-            if (REDUCED_MOTION) {
-                chatText.textContent = line;
-                return;
-            }
+            let lineIndex = 0;
+            let charIndex = 0;
+            let currentFullLine = '';
 
-            chatText.textContent = '';
-            let index = 0;
-            const tick = () => {
-                if (token !== chatToken) return; // a newer message took over
-                index += 1;
-                chatText.textContent = line.slice(0, index);
-                if (index < line.length) {
-                    const char = line[index - 1];
-                    const pause = char === '.' || char === '!' || char === '?' ? 260 : char === ',' ? 120 : 0;
-                    chatTimer = setTimeout(tick, 26 + pause);
+            const flushCurrent = () => {
+                chat.classList.add('open');
+                if (REDUCED_MOTION || lineIndex >= lines.length) {
+                    chatText.textContent = currentFullLine;
+                    return;
                 }
+                chatText.textContent = '';
+                charIndex = 0;
+                const tick = () => {
+                    if (token !== chatToken) return;
+                    if (charIndex < currentFullLine.length) {
+                        charIndex += 1;
+                        chatText.textContent = currentFullLine.slice(0, charIndex);
+                        const char = currentFullLine[charIndex - 1];
+                        const pause = char === '.' || char === '!' || char === '?' ? 260 : char === ',' ? 120 : 0;
+                        chatTimer = setTimeout(tick, 26 + pause);
+                    } else if (lineIndex < lines.length - 1) {
+                        chatTimer = setTimeout(() => {
+                            lineIndex += 1;
+                            currentFullLine = lines[lineIndex];
+                            tick();
+                        }, 2000);
+                    }
+                };
+                currentFullLine = lines[lineIndex];
+                tick();
             };
-            tick();
+
+            flushCurrent();
         };
 
         const applyZone = (level) => {
@@ -101,6 +116,7 @@
                 currentZone = pos;
                 setPosition(pos);
             }
+            companion.classList.toggle('kx-anonymous', level.classList.contains('pol-level-0'));
             typeChat(line);
         };
 
@@ -127,6 +143,9 @@
         setPosition('hidden');
 
         return {
+            speak(line) {
+                typeChat(line);
+            },
             retire() {
                 currentZone = 'gone';
                 setPosition('gone');
@@ -501,15 +520,128 @@
        ============================================================ */
     function initWisps(section) {
         const wisps = section.querySelectorAll('.pol-wisp');
-        if (!wisps.length) return;
+        
+        // Create modal dynamically if not found
+        let modal = document.getElementById('pol-wisp-modal');
+        if (!modal) {
+            console.log('Modal not found, creating dynamically...');
+            modal = document.createElement('div');
+            modal.id = 'pol-wisp-modal';
+            modal.className = 'pol-wisp-modal';
+            modal.setAttribute('aria-hidden', 'true');
+            modal.innerHTML = `
+                <div class="pol-wisp-modal-backdrop"></div>
+                <div class="pol-wisp-modal-content">
+                    <button class="pol-wisp-modal-close" aria-label="Tutup">&times;</button>
+                    <div class="pol-wisp-modal-orb" aria-hidden="true"></div>
+                    <h3 id="pol-wisp-modal-title" class="pol-wisp-modal-title"></h3>
+                    <p id="pol-wisp-modal-desc" class="pol-wisp-modal-desc"></p>
+                    <div class="pol-wisp-modal-example">
+                        <strong>Contoh Soal</strong>
+                        <p id="pol-wisp-modal-example"></p>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+        
+        console.log('initWisps called, wisps found:', wisps.length, 'modal found:', !!modal);
+        if (!wisps.length || !modal) return;
 
-        wisps.forEach((wisp) => {
-            wisp.addEventListener('click', () => {
-                const wasOn = wisp.classList.contains('tip-on');
-                wisps.forEach((w) => w.classList.remove('tip-on'));
-                wisp.classList.toggle('tip-on', !wasOn);
-            });
+        const modalTitle = document.getElementById('pol-wisp-modal-title');
+        const modalDesc = document.getElementById('pol-wisp-modal-desc');
+        const modalExample = document.getElementById('pol-wisp-modal-example');
+        const modalOrb = modal.querySelector('.pol-wisp-modal-orb');
+        const closeBtn = modal.querySelector('.pol-wisp-modal-close');
+        const backdrop = modal.querySelector('.pol-wisp-modal-backdrop');
+
+        const isTouch = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+        const LONG_PRESS_MS = 600;
+
+        const openModal = (wisp) => {
+            const card = wisp.querySelector('.pol-wisp-card');
+            const cardTitle = card?.querySelector('h4')?.textContent?.trim();
+            const cardFormat = card?.querySelector('.pol-wisp-format')?.textContent?.trim();
+            const cardExample = card?.querySelector('.pol-wisp-example');
+
+            const title = cardTitle || wisp.dataset.wispTitle || wisp.querySelector('.pol-wisp-name')?.textContent?.trim() || '';
+            const desc = cardFormat || wisp.dataset.wispDesc || '';
+            
+            let exampleHTML = '';
+            if (cardExample) {
+                const cloneEx = cardExample.cloneNode(true);
+                const strongTag = cloneEx.querySelector('strong');
+                if (strongTag) strongTag.remove();
+                exampleHTML = cloneEx.innerHTML.trim();
+            }
+            if (!exampleHTML) {
+                exampleHTML = wisp.dataset.wispExample || '';
+            }
+
+            const hue = wisp.style.getPropertyValue('--h') || '160';
+
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalDesc) modalDesc.textContent = desc;
+            if (modalExample) {
+                modalExample.innerHTML = exampleHTML;
+            }
+            if (modalOrb) {
+                modalOrb.style.setProperty('--modal-color', `hsl(${hue}, 80%, 65%)`);
+            }
+            modal.style.setProperty('--modal-color', `hsl(${hue}, 80%, 65%)`);
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
+        };
+
+        const closeModal = () => {
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        };
+
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+        if (backdrop) backdrop.addEventListener('click', closeModal);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
         });
+
+        if (isTouch) {
+            let longPressTimer = null;
+            let longPressTriggered = false;
+
+            wisps.forEach((wisp) => {
+                wisp.addEventListener('touchstart', (e) => {
+                    longPressTriggered = false;
+                    longPressTimer = setTimeout(() => {
+                        longPressTriggered = true;
+                        openModal(wisp);
+                    }, LONG_PRESS_MS);
+                }, { passive: true });
+
+                wisp.addEventListener('touchend', (e) => {
+                    clearTimeout(longPressTimer);
+                    if (!longPressTriggered) {
+                        const wasOn = wisp.classList.contains('tip-on');
+                        wisps.forEach((w) => w.classList.remove('tip-on'));
+                        wisp.classList.toggle('tip-on', !wasOn);
+                    }
+                    e.preventDefault();
+                });
+
+                wisp.addEventListener('touchmove', () => {
+                    clearTimeout(longPressTimer);
+                }, { passive: true });
+            });
+        } else {
+            // Desktop: klik langsung buka modal
+            wisps.forEach((wisp) => {
+                wisp.style.cursor = 'pointer';
+                wisp.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    openModal(wisp);
+                });
+            });
+        }
 
         document.addEventListener('click', (event) => {
             if (!event.target.closest('.pol-wisp')) {
@@ -637,9 +769,6 @@
 
             lockScroll();
 
-            // Kyra's fixed companionship ends — she ascends to watch
-            if (kyraControl) kyraControl.retire();
-
             const rect = parchment.getBoundingClientRect();
             const burstX = rect.left + rect.width / 2;
             const burstY = Math.max(rect.top - window.innerHeight * 0.42, 60);
@@ -686,8 +815,12 @@
 
             const closeP = document.createElement('p');
             closeP.style.margin = '0.5rem 0 0';
-            closeP.textContent = 'Semoga suatu hari nanti, kamu melihat kembali tulisan ini dengan senyum penuh rasa syukur. Teruslah belajar, berdoa, dan bertumbuh sedikit demi sedikit.';
+            closeP.textContent = 'Semoga suatu hari nanti, kamu dapat melihat kembali tulisan ini dengan senyum penuh rasa syukur. Jangan menyerah hanya karena satu hasil yang buruk. Jangan merasa tertinggal hanya karena langkahmu berbeda. Teruslah belajar, berdoa, dan bertumbuh sedikit demi sedikit. Semoga setiap usaha yang kamu lakukan hari ini menjadi jalan menuju impian yang sedang kamu perjuangkan.';
             greeting.append(closeP);
+        }
+
+        if (kyraControl) {
+            kyraControl.speak('Harapanmu sudah tersimpan.||Jaga baik-baik alasan yang membuatmu memulai.||Suatu hari nanti, semoga kamu kembali ke sini dengan senyum dan cerita bahwa perjuanganmu tidak sia-sia.||Sekarang, jangan biarkan harapanmu berhenti sebagai tulisan.||Mari mengubahnya menjadi latihan, keberanian, dan langkah-langkah nyata.||Pilih jalan belajar yang paling sesuai dengan perjalananmu.');
         }
 
         peak.classList.add('destiny-revealed');

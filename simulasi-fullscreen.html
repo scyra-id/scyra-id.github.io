@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Interaktif - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <script>
+        const themeValue = localStorage.getItem('theme') || localStorage.getItem('darkMode');
+        if (themeValue === 'dark' || themeValue === 'true') document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; background: var(--bg-primary, #fff); }
+        .sim-fullscreen-header {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0.6rem 1.2rem;
+            background: var(--brand-primary, #6b8f5c); color: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        .sim-fullscreen-header span { font-weight: 700; font-size: 1rem; }
+        .sim-fullscreen-header a {
+            color: white; text-decoration: none; font-size: 0.9rem;
+            padding: 0.4rem 1rem; border: 1px solid rgba(255,255,255,0.5);
+            border-radius: 8px; transition: background 0.2s;
+        }
+        .sim-fullscreen-header a:hover { background: rgba(255,255,255,0.15); }
+        .sim-fullscreen-loading {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; color: var(--text-secondary, #666);
+        }
+        .sim-fullscreen-loading .spinner-sage {
+            width: 45px; height: 45px;
+            border: 4px solid var(--border-color, #ddd);
+            border-top: 4px solid var(--brand-primary, #6b8f5c);
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .sim-fullscreen-iframe {
+            position: fixed; top: 52px; left: 0; right: 0; bottom: 0;
+            width: 100%; height: calc(100vh - 52px); border: none; background: #fff;
+        }
+        .sim-fullscreen-error {
+            display: none; flex-direction: column; align-items: center; justify-content: center;
+            height: 100vh; text-align: center; padding: 2rem; color: var(--text-primary, #333);
+        }
+        .sim-fullscreen-error h2 { margin-bottom: 1rem; }
+        .sim-fullscreen-error a {
+            display: inline-block; margin-top: 1rem; padding: 0.6rem 1.5rem;
+            background: var(--brand-primary, #6b8f5c); color: white;
+            text-decoration: none; border-radius: 8px; font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="sim-fullscreen-header">
+        <span>🎮 Simulasi Interaktif</span>
+        <a href="javascript:history.back()">← Kembali</a>
+    </div>
+
+    <div id="simLoading" class="sim-fullscreen-loading">
+        <div class="spinner-sage"></div>
+        <p>Memuat simulasi...</p>
+    </div>
+
+    <div id="simError" class="sim-fullscreen-error">
+        <h2>❌ Gagal Memuat Simulasi</h2>
+        <p id="simErrorMsg">Terjadi kesalahan saat memuat simulasi.</p>
+        <a id="simOpenDirect" href="#" target="_blank">Buka Link Langsung ↗</a>
+        <a href="javascript:history.back()">← Kembali</a>
+    </div>
+
+    <iframe id="simIframe" class="sim-fullscreen-iframe" style="display:none;"></iframe>
+
+    <script>
+        (function() {
+            const params = new URLSearchParams(window.location.search);
+            const simUrl = params.get('url');
+            const loading = document.getElementById('simLoading');
+            const errorEl = document.getElementById('simError');
+            const errorMsg = document.getElementById('simErrorMsg');
+            const openDirect = document.getElementById('simOpenDirect');
+            const iframe = document.getElementById('simIframe');
+
+            if (!simUrl) {
+                loading.style.display = 'none';
+                errorMsg.textContent = 'URL simulasi tidak ditemukan.';
+                errorEl.style.display = 'flex';
+                return;
+            }
+
+            openDirect.href = simUrl;
+
+            fetch(simUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.text();
+                })
+                .then(htmlText => {
+                    const blob = new Blob([htmlText], { type: 'text/html' });
+                    iframe.src = URL.createObjectURL(blob);
+                    iframe.onload = () => {
+                        loading.style.display = 'none';
+                        iframe.style.display = 'block';
+                    };
+                })
+                .catch(err => {
+                    loading.style.display = 'none';
+                    errorMsg.textContent = err.message || 'Terjadi kesalahan saat memuat simulasi.';
+                    errorEl.style.display = 'flex';
+                });
+        })();
+    </script>
+</body>
+</html>
