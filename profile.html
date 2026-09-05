@@ -8,6 +8,7 @@
     <link rel="apple-touch-icon" href="images/logo.svg">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/auth.css"> <!-- Kita pakai styling card yang sama -->
+    <link rel="stylesheet" href="css/achievements.css">
 </head>
 <body class="dashboard-page">
     <div class="dashboard-layout">
@@ -42,6 +43,28 @@
                 <button type="button" id="btnUploadAvatar" class="btn-ganti-foto">📷 Ganti Foto</button>
             </div>
 
+            <!-- 🌟 IDENTITAS GAMIFIKASI PUBLIK -->
+            <div class="profile-gamification-identity" id="profileGamificationIdentity">
+                <div class="profile-gamification-avatar">
+                    <div class="profile-kyra-canvas" id="profileKyraCanvas">
+                        <img class="profile-kyra-base" src="images/maskot.webp" alt="Kyra">
+                        <div class="profile-kyra-layer" id="profileLayerEffect"></div>
+                        <div class="profile-kyra-layer" id="profileLayerBody"></div>
+                        <div class="profile-kyra-layer" id="profileLayerOutfit"></div>
+                        <div class="profile-kyra-layer" id="profileLayerBack"></div>
+                        <div class="profile-kyra-layer" id="profileLayerExpression"></div>
+                        <div class="profile-kyra-layer" id="profileLayerFace"></div>
+                        <div class="profile-kyra-layer" id="profileLayerAntenna"></div>
+                        <div class="profile-kyra-layer" id="profileLayerHead"></div>
+                    </div>
+                </div>
+                <div class="profile-gamification-meta">
+                    <div class="profile-level-badge" id="profilePublicLevel">LV. 1</div>
+                    <div class="profile-streak-badge" id="profilePublicStreak">🔥 1 Hari Streak</div>
+                    <a href="inventory.html" class="profile-kyra-edit-link">Ubah Tampilan Kyra ↗</a>
+                </div>
+            </div>
+
             <!-- Form Profil -->
             <form id="profileForm" class="security-form">
                 <div class="form-group">
@@ -63,6 +86,17 @@
                 <button type="submit" class="btn-submit"> Simpan Profil</button>
             </form>
         </div>
+
+        <!-- ================= FEATURED BADGES SHOWCASE ================= -->
+        <section class="profile-featured-badges">
+            <h3>🏆 Featured Badges</h3>
+            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: -0.5rem 0 1rem;">Badge pencapaian terbaikmu yang ditampilkan di profil.</p>
+            <div class="profile-badges-row" id="profileFeaturedBadges">
+                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 1</span></a>
+                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 2</span></a>
+                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 3</span></a>
+            </div>
+        </section>
 
         <!-- ================= KARTU 2: GANTI EMAIL ================= -->
         <div class="profile-card security-card">
@@ -161,6 +195,9 @@
     <!-- Library & Script -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-engine.js"></script>
+    <script src="js/achievement-engine.js"></script>
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>
     <script src="js/profile.js"></script> <!-- Script khusus halaman ini -->

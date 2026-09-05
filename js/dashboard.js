@@ -9,7 +9,14 @@ document.addEventListener('DOMContentLoaded', () => {
         materi: () => document.getElementById('statMateri'),
         soal: () => document.getElementById('statSoal'),
         skor: () => document.getElementById('statSkor'),
-        streak: () => document.getElementById('statStreak'),
+        streakLabel: () => document.getElementById('statStreak'),
+        userLevel: () => document.getElementById('statUserLevel'),
+        xpBarFill: () => document.getElementById('statXpBarFill'),
+        xpText: () => document.getElementById('statXpText'),
+        unclaimedBadge: () => document.getElementById('statUnclaimedBadge'),
+        streakStatus: () => document.getElementById('dashStreakStatusPill'),
+        streakDot: () => document.getElementById('dashStreakDot'),
+        btnDailyLogin: () => document.getElementById('btnClaimDailyLogin'),
         live: () => document.getElementById('dashLiveStatus'),
         grid: () => document.getElementById('continueGrid'),
         loading: () => document.getElementById('continueLoading'),
@@ -149,11 +156,218 @@ document.addEventListener('DOMContentLoaded', () => {
         const m = el.materi();
         const s = el.soal();
         const sk = el.skor();
-        const st = el.streak();
+        const stLabel = el.streakLabel();
         if (m) animateNumber(m, materiDibaca);
         if (s) animateNumber(s, soalDijawab);
         if (sk) animateNumber(sk, rataRataSkor);
-        if (st) st.textContent = `${streak} Hari`;
+        if (stLabel) stLabel.textContent = `${streak} HARI Streak`;
+
+        // 🎮 Render Gamification XP Widget & Sync Streak
+        if (window.ScyraGamificationEngine) {
+            try {
+                await window.ScyraGamificationEngine.initialize(userId);
+                const gState = window.ScyraGamificationEngine.getState();
+                updateGamificationWidgetUI(gState);
+                if (stLabel && gState.dailyStreak) {
+                    stLabel.textContent = `${gState.dailyStreak} HARI Streak`;
+                }
+                await setupDailyLoginAction(userId);
+                await renderHeroMascot(userId);
+            } catch (err) {
+                console.warn('Gamification widget render error:', err);
+            }
+        }
+    }
+
+    async function renderHeroMascot(userId) {
+        if (!window.ScyraGamification) return;
+        
+        const canvas = document.getElementById('kyraAvatarCanvas');
+        if (!canvas) return;
+
+        try {
+            // 1. Fetch Equipped Setup
+            const equipped = await window.ScyraGamification.getUserEquippedMascot();
+            
+            // 2. Fetch Item Definitions to resolve URLs
+            const definitions = await window.ScyraGamification.getItemDefinitions();
+            const itemMap = new Map((definitions || []).map(i => [i.id, i]));
+
+            // 3. Define Slot to Column Mapping (Standardized)
+            const slotMap = {
+                'effect': equipped.effect_item_id,
+                'body': equipped.body_item_id,
+                'outfit': equipped.outfit_item_id,
+                'back': equipped.back_item_id,
+                'expression': equipped.expression_item_id,
+                'face': equipped.face_item_id,
+                'antenna': equipped.antenna_item_id,
+                'head': equipped.head_item_id
+            };
+
+            // 4. Render Layers
+            const layers = ['effect', 'outfit', 'back', 'expression', 'face', 'antenna', 'head'];
+            
+            layers.forEach(slot => {
+                const layerEl = document.getElementById(`layer-${slot}`);
+                if (!layerEl) return;
+                
+                const itemId = slotMap[slot];
+                const item = itemId ? itemMap.get(itemId) : null;
+
+                if (item && item.asset_url) {
+                    layerEl.innerHTML = `<img src="${item.asset_url}" alt="${slot}">`;
+                } else {
+                    layerEl.innerHTML = '';
+                }
+            });
+
+        } catch (err) {
+            console.warn('Could not render Hero Mascot:', err);
+        }
+    }
+
+    function updateGamificationWidgetUI(gState) {
+        if (!gState) return;
+        const levelNode = el.userLevel();
+        const fillNode = el.xpBarFill();
+        const textNode = el.xpText();
+        const badgeNode = el.unclaimedBadge();
+
+        const currentLevel = gState.currentLevel || 1;
+        const levelXp = gState.levelXp || 0;
+        const xpReq = gState.xpRequired || 100;
+        const pct = xpReq > 0 ? Math.min(100, Math.round((levelXp / xpReq) * 100)) : 100;
+
+        if (levelNode) levelNode.textContent = `LEVEL ${currentLevel}`;
+        if (fillNode) fillNode.style.width = `${pct}%`;
+        if (textNode) {
+            if (currentLevel >= 50) {
+                textNode.textContent = `MAX LEVEL (Level 50)`;
+            } else {
+                textNode.textContent = `${levelXp} / ${xpReq} XP (${pct}%)`;
+            }
+        }
+        if (badgeNode) {
+            if (gState.unclaimedRewardsCount > 0) {
+                badgeNode.style.display = 'inline-block';
+                badgeNode.textContent = `🎁 ${gState.unclaimedRewardsCount} Hadiah!`;
+            } else {
+                badgeNode.style.display = 'none';
+            }
+        }
+    }
+
+    async function setupDailyLoginAction(userId) {
+        const btn = el.btnDailyLogin();
+        const statusNode = el.streakStatus();
+        const dotNode = el.streakDot();
+        if (!btn || !window.ScyraGamification) return;
+
+        const todayKey = `daily_login_${new Date().toISOString().slice(0, 10)}`;
+        let claimedToday = false;
+        try {
+            claimedToday = await window.ScyraGamification.isActivityCompleted('daily_login', todayKey);
+        } catch (_) {
+            claimedToday = false;
+        }
+
+        if (claimedToday) {
+            btn.disabled = true;
+            if (statusNode) {
+                statusNode.textContent = '✓ Login Diklaim';
+                statusNode.classList.add('claimed');
+            }
+            if (dotNode) dotNode.classList.add('claimed');
+        } else {
+            btn.disabled = false;
+            if (statusNode) {
+                statusNode.textContent = 'Klaim XP';
+                statusNode.classList.remove('claimed');
+            }
+            if (dotNode) dotNode.classList.remove('claimed');
+        }
+
+        btn.onclick = async () => {
+            btn.disabled = true;
+            const stLabel = el.streakLabel();
+            const result = await window.ScyraGamificationEngine.triggerDailyLogin(userId);
+            if (result.success) {
+                if (statusNode) {
+                    statusNode.textContent = '✓ Login Diklaim';
+                    statusNode.classList.add('claimed');
+                }
+                if (dotNode) dotNode.classList.add('claimed');
+                const updatedState = window.ScyraGamificationEngine.getState();
+                updateGamificationWidgetUI(updatedState);
+                if (stLabel && updatedState.dailyStreak) {
+                    stLabel.textContent = `${updatedState.dailyStreak} HARI Streak`;
+                }
+            } else {
+                btn.disabled = false;
+                if (statusNode) {
+                    statusNode.textContent = 'Klaim XP';
+                    statusNode.classList.remove('claimed');
+                }
+                if (dotNode) dotNode.classList.remove('claimed');
+            }
+        };
+    }
+
+    async function renderMiniKyraAvatar() {
+        if (!window.ScyraGamification) return;
+        const miniLayers = {
+            EFFECT: document.getElementById('miniLayerEffect'),
+            BODY: document.getElementById('miniLayerBody'),
+            OUTFIT: document.getElementById('miniLayerOutfit'),
+            BACK: document.getElementById('miniLayerBack'),
+            EXPRESSION: document.getElementById('miniLayerExpression'),
+            FACE: document.getElementById('miniLayerFace'),
+            ANTENNA: document.getElementById('miniLayerAntenna'),
+            HEAD: document.getElementById('miniLayerHead')
+        };
+
+        const slotToColumn = {
+            BODY: 'body_item_id',
+            EXPRESSION: 'expression_item_id',
+            ANTENNA: 'antenna_item_id',
+            HEAD: 'head_item_id',
+            FACE: 'face_item_id',
+            OUTFIT: 'outfit_item_id',
+            BACK: 'back_item_id',
+            EFFECT: 'effect_item_id'
+        };
+
+        try {
+            const [equipped, items] = await Promise.all([
+                window.ScyraGamification.getUserEquippedMascot(),
+                window.ScyraGamification.getItemDefinitions()
+            ]);
+
+            const itemMap = new Map((items || []).map(i => [i.id, i]));
+            let equippedCount = 0;
+
+            Object.entries(miniLayers).forEach(([slot, layerNode]) => {
+                if (!layerNode) return;
+                const itemId = equipped?.[slotToColumn[slot]];
+                const item = itemId ? itemMap.get(itemId) : null;
+                if (item?.asset_url) {
+                    equippedCount++;
+                    layerNode.innerHTML = `<img src="${item.asset_url}" alt="">`;
+                    layerNode.style.display = 'block';
+                } else {
+                    layerNode.innerHTML = '';
+                    layerNode.style.display = 'none';
+                }
+            });
+
+            const textNode = el.miniKyraText();
+            if (textNode) {
+                textNode.textContent = equippedCount > 0 ? `${equippedCount} Item Terpasang` : 'Setelan Default';
+            }
+        } catch (e) {
+            console.warn('Mini Kyra render error:', e);
+        }
     }
 
     function animateNumber(node, target) {

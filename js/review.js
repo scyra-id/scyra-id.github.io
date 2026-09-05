@@ -1,4 +1,17 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // =======================================================
+    // FUNGSI KONVERSI SHORTCODE GAMBAR
+    // =======================================================
+    function renderShortcodes(html) {
+        if (!html) return html;
+        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+            const cleanUrl = url.trim();
+            const width = size ? size.trim() : '100%';
+            return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+        });
+    }
+
     const loadReview = async () => {
         if (!window.db) return setTimeout(loadReview, 100);
 
@@ -85,7 +98,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     optionsHtml += `
                         <div class="q-opt ${optClass}">
                             <span class="opt-letter">${opt}.</span>
-                            <span>${optText}</span>
+                            <span>${renderShortcodes(optText)}</span>
                         </div>
                     `;
                 });
@@ -98,17 +111,29 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <span class="q-status ${statusClass}">${statusText}</span>
                         </div>
                         <div class="q-body">
-                            <div class="q-text">${soal.pertanyaan_html}</div>
+                            <div class="q-text">${renderShortcodes(soal.pertanyaan_html)}</div>
                             <div class="q-options">${optionsHtml}</div>
                             
                             <div class="q-pembahasan">
                                 <h4>💡 Pembahasan</h4>
-                                ${soal.pembahasan_html || '<p>Tidak ada pembahasan untuk soal ini.</p>'}
+                                ${renderShortcodes(soal.pembahasan_html) || '<p>Tidak ada pembahasan untuk soal ini.</p>'}
                             </div>
                         </div>
                     </div>
                 `;
             });
+
+            if (listContainer && typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(listContainer, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    throwOnError: false
+                });
+            }
 
             // Tampilkan Konten
             document.getElementById('reviewLoading').style.display = 'none';

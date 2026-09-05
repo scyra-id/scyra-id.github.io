@@ -11,6 +11,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
+    // =======================================================
+    // FUNGSI KONVERSI SHORTCODE GAMBAR
+    // =======================================================
+    function renderShortcodes(html) {
+        if (!html) return html;
+        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+            const cleanUrl = url.trim();
+            const width = size ? size.trim() : '100%';
+            return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+        });
+    }
+
     const sfxBenar = document.getElementById('sfxBenar');
     const sfxSalah = document.getElementById('sfxSalah');
 
@@ -82,7 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         const dataSoal = state.listSoal[index];
         document.getElementById('latihanBadge').textContent = `Soal ${index + 1} dari ${state.listSoal.length}`;
-        document.getElementById('soalText').innerHTML = dataSoal.pertanyaan_html;
+        document.getElementById('soalText').innerHTML = renderShortcodes(dataSoal.pertanyaan_html);
         const opsiContainer = document.getElementById('opsiContainer');
         const tipe = dataSoal.tipe_soal || 'pg';
     
@@ -106,12 +119,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     htmlOpsi += `
                     <div class="opsi-item-box" data-value="${opt}">
                         <div class="huruf-opsi">${opt}.</div>
-                        <div style="flex:1;">${val}</div>
+                        <div style="flex:1;">${renderShortcodes(val)}</div>
                         <div class="icon-status"></div>
                     </div>`;
                 }
             });
             opsiContainer.innerHTML = htmlOpsi;
+        }
+
+        const latihanContent = document.getElementById('latihanContent');
+        if (latihanContent && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(latihanContent, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
         }
 
         const boxBahas = document.getElementById('instanPembahasan');
@@ -161,8 +187,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             boxBahas.innerHTML = `
                 <h4 style="margin-bottom:0.5rem; font-size:1.2rem; color:${isBenar ? '#4caf50' : '#f44336'};">${isBenar ? '🎉 TEPAT SEKALI!' : '❌ YAAH, KURANG TEPAT'}</h4>
                 <div style="font-size:0.95rem; margin-bottom:1rem; font-weight:bold; color:var(--text-secondary);">Kunci Jawaban: ${kunciAsli}</div>
-                <div style="line-height: 1.6;">${dataSoal.pembahasan_html || 'Pembahasan belum tersedia.'}</div>
+                <div style="line-height: 1.6;">${renderShortcodes(dataSoal.pembahasan_html) || 'Pembahasan belum tersedia.'}</div>
             `;
+            if (boxBahas && typeof renderMathInElement !== 'undefined') {
+                renderMathInElement(boxBahas, {
+                    delimiters: [
+                        { left: '$$', right: '$$', display: true },
+                        { left: '$', right: '$', display: false },
+                        { left: '\\(', right: '\\)', display: false },
+                        { left: '\\[', right: '\\]', display: true }
+                    ],
+                    throwOnError: false
+                });
+            }
             state.jawabanHistory.push({ soal: dataSoal, jawaban_user: jawabanUser, kunci_asli: kunciAsli });
             state.currentIndex++;
             btnLanjut.style.display = 'block';
@@ -204,7 +241,7 @@ window.selectBSLatihan = function(btn) {
                         <strong>Soal ${index + 1}</strong>
                         <strong style="color:${isBenar ? '#4caf50' : '#f44336'}">${isBenar ? '✔️ Benar' : '❌ Salah'}</strong>
                     </div>
-                    <div style="margin-bottom: 1rem;">${item.soal.pertanyaan_html}</div>
+                    <div style="margin-bottom: 1rem;">${renderShortcodes(item.soal.pertanyaan_html)}</div>
                     
                     <div style="font-size:0.95rem; background:var(--bg-primary); padding: 1rem; border-radius:8px;">
                         <span style="color:var(--text-secondary);">Jawabanmu: <strong>${item.jawaban_user}</strong></span> | 
@@ -212,7 +249,7 @@ window.selectBSLatihan = function(btn) {
                         
                         <div style="margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
                             <strong style="color:var(--brand-primary);">💡 Pembahasan:</strong><br> 
-                            <div style="margin-top:0.5rem;">${item.soal.pembahasan_html}</div>
+                            <div style="margin-top:0.5rem;">${renderShortcodes(item.soal.pembahasan_html)}</div>
                         </div>
                     </div>
                 </div>
@@ -220,6 +257,16 @@ window.selectBSLatihan = function(btn) {
         });
 
         const skorTotal = Math.round((totalBenar / state.jawabanHistory.length) * 100) || 0;
+
+        // 🎮 TRIGGER SUBCHAPTER MATERI COMPLETION XP (+20 XP First-Time)
+        if (window.ScyraGamificationEngine && state.materiId) {
+            try {
+                const materiJudul = document.getElementById('latihanJudul')?.textContent || 'Latihan Subbab Materi';
+                window.ScyraGamificationEngine.triggerSubbabCompletion(state.materiId, materiJudul);
+            } catch (err) {
+                console.warn('Subbab XP trigger warning:', err);
+            }
+        }
 
         document.querySelector('.latihan-header').style.display = 'none';
         const container = document.getElementById('latihanContent');
@@ -236,6 +283,17 @@ window.selectBSLatihan = function(btn) {
 
             <button id="btnLanjutBab" class="btn-lanjut-bab">🚀 Lanjut ke Bab Berikutnya</button>
         `;
+        if (container && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(container, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        }
 
         // LOGIKA AUTO NEXT BAB
         document.getElementById('btnLanjutBab').onclick = async () => {

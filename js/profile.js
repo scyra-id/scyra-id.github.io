@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return window.location.href = 'login.html';
         }
         await loadProfileData(user);
+        await loadFeaturedBadges(user);
+        await loadProfileGamificationIdentity(user);
         setupProfileForm(user);
         setupAvatarUpload(user);
         setupEmailForm(user);
@@ -67,6 +69,96 @@ async function loadProfileData(user) {
 
     if (profile.avatar_url) {
         injectAvatar(profile.avatar_url + '?t=' + new Date().getTime());
+    }
+}
+
+async function loadFeaturedBadges(user) {
+    const container = document.getElementById('profileFeaturedBadges');
+    if (!container || !window.ScyraAchievementEngine) return;
+
+    try {
+        if (window.syncAuthToPaymentDB) await window.syncAuthToPaymentDB();
+
+        const [featured, summary] = await Promise.all([
+            window.ScyraAchievementEngine.getFeaturedBadges(user.id),
+            window.ScyraAchievementEngine.getFullAchievementSummary(user.id)
+        ]);
+
+        container.innerHTML = [1, 2, 3].map((slot) => {
+            const badge = featured.find((item) => item.slot_position === slot);
+            if (!badge) {
+                return `<a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot ${slot}</span></a>`;
+            }
+
+            const category = window.ScyraAchievementEngine.CATEGORIES[badge.achievement_category];
+            const categorySummary = summary.categories.find((item) => item.key === badge.achievement_category);
+            if (!category) {
+                return `<a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot ${slot}</span></a>`;
+            }
+
+            return `<a href="achievements.html" class="profile-badge-slot filled" title="${category.name} · ${categorySummary?.currentTierLabel || 'Bronze'}"><span>${category.icon}</span><span class="profile-badge-label">${categorySummary?.currentTierLabel || 'Bronze'}</span></a>`;
+        }).join('');
+    } catch (err) {
+        console.warn('Featured badges unavailable:', err);
+    }
+}
+
+async function loadProfileGamificationIdentity(user) {
+    const levelEl = document.getElementById('profilePublicLevel');
+    const streakEl = document.getElementById('profilePublicStreak');
+    if (!window.ScyraGamification) return;
+
+    const profileLayers = {
+        EFFECT: document.getElementById('profileLayerEffect'),
+        BODY: document.getElementById('profileLayerBody'),
+        OUTFIT: document.getElementById('profileLayerOutfit'),
+        BACK: document.getElementById('profileLayerBack'),
+        EXPRESSION: document.getElementById('profileLayerExpression'),
+        FACE: document.getElementById('profileLayerFace'),
+        ANTENNA: document.getElementById('profileLayerAntenna'),
+        HEAD: document.getElementById('profileLayerHead')
+    };
+
+    const slotToColumn = {
+        BODY: 'body_item_id',
+        EXPRESSION: 'expression_item_id',
+        ANTENNA: 'antenna_item_id',
+        HEAD: 'head_item_id',
+        FACE: 'face_item_id',
+        OUTFIT: 'outfit_item_id',
+        BACK: 'back_item_id',
+        EFFECT: 'effect_item_id'
+    };
+
+    try {
+        const [journey, equipped, items] = await Promise.all([
+            window.ScyraGamification.getUserJourneyProgress(),
+            window.ScyraGamification.getUserEquippedMascot(),
+            window.ScyraGamification.getItemDefinitions()
+        ]);
+
+        if (levelEl && journey) {
+            levelEl.textContent = `LV. ${journey.current_level || 1}`;
+        }
+        if (streakEl && journey) {
+            streakEl.textContent = `🔥 ${journey.daily_streak || 1} Hari Streak`;
+        }
+
+        const itemMap = new Map((items || []).map(i => [i.id, i]));
+        Object.entries(profileLayers).forEach(([slot, layerNode]) => {
+            if (!layerNode) return;
+            const itemId = equipped?.[slotToColumn[slot]];
+            const item = itemId ? itemMap.get(itemId) : null;
+            if (item?.asset_url) {
+                layerNode.innerHTML = `<img src="${item.asset_url}" alt="">`;
+                layerNode.style.display = 'block';
+            } else {
+                layerNode.innerHTML = '';
+                layerNode.style.display = 'none';
+            }
+        });
+    } catch (err) {
+        console.warn('Profile gamification identity load warning:', err);
     }
 }
 

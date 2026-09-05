@@ -805,19 +805,34 @@ function setupImageUploader() {
                     .getPublicUrl(fileName);
                 
                 const publicUrl = urlData.publicUrl;
-                const shortcode = `[GAMBAR: ${publicUrl}]`;
                 
-                // Tambahin ke list hasil
+                // Tambahin ke list hasil dengan opsi ukuran
                 const item = document.createElement('div');
                 item.className = 'url-gambar-item';
                 item.innerHTML = `
-                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.8rem;">
-                        <img src="${publicUrl}" alt="${file.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color);">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.2rem; padding: 1rem; background: var(--bg-secondary); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <img src="${publicUrl}" alt="${file.name}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-color); flex-shrink: 0;">
                         <div style="flex: 1; min-width: 0;">
-                            <p style="margin: 0 0 0.3rem 0; font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${file.name}</p>
-                            <code style="display: block; background: var(--bg-tertiary); padding: 0.4rem 0.6rem; border-radius: 4px; font-size: 0.75rem; color: var(--text-secondary); word-break: break-all; margin-bottom: 0.3rem;">${shortcode}</code>
+                            <p style="margin: 0 0 0.5rem 0; font-weight: 600; color: var(--text-primary); font-size: 0.9rem;">${file.name}</p>
+                            
+                            <div style="margin-bottom: 0.8rem;">
+                                <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.4rem;">Pilih Ukuran:</label>
+                                <select class="size-selector" data-url="${publicUrl}" style="width: 100%; padding: 0.4rem 0.6rem; border: 1px solid var(--border-color); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem;">
+                                    <option value="small">Kecil (25% lebar)</option>
+                                    <option value="medium" selected>Sedang (50% lebar)</option>
+                                    <option value="large">Besar (75% lebar)</option>
+                                    <option value="full">Penuh (100% lebar)</option>
+                                    <option value="custom">Custom (ketik manual)</option>
+                                </select>
+                            </div>
+                            
+                            <code class="shortcode-display" style="display: block; background: var(--bg-tertiary); padding: 0.5rem 0.7rem; border-radius: 4px; font-size: 0.75rem; color: var(--text-secondary); word-break: break-all; margin-bottom: 0.5rem;">[GAMBAR: ${publicUrl} | SIZE: 50%]</code>
+                            
+                            <div style="display: flex; gap: 0.5rem;">
+                                <button class="btn-copy-shortcode" data-shortcode="[GAMBAR: ${publicUrl} | SIZE: 50%]" title="Salin Shortcode" style="background: var(--brand-primary); color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: 600; flex: 1;">📋 Salin Kode</button>
+                                <button class="btn-preview-img" data-url="${publicUrl}" title="Preview" style="background: var(--bg-tertiary); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.5rem 0.8rem; border-radius: 6px; cursor: pointer; font-size: 0.85rem;">👁️</button>
+                            </div>
                         </div>
-                        <button class="btn-copy-url-gambar" data-url="${shortcode}" title="Salin Shortcode" style="background: var(--brand-primary); color: white; border: none; width: 40px; height: 40px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; flex-shrink: 0;">📋</button>
                     </div>
                 `;
                 listUrl.appendChild(item);
@@ -835,22 +850,78 @@ function setupImageUploader() {
                     );
                 }
                 
-                // Pasang event listener ke tombol copy
-                document.querySelectorAll('.btn-copy-url-gambar').forEach(btn => {
-                    btn.addEventListener('click', async function() {
+                // Pasang event listener ke size selector
+                document.querySelectorAll('.size-selector').forEach(select => {
+                    select.addEventListener('change', function() {
                         const url = this.getAttribute('data-url');
+                        const size = this.value;
+                        const item = this.closest('.url-gambar-item');
+                        const codeDisplay = item.querySelector('.shortcode-display');
+                        const copyBtn = item.querySelector('.btn-copy-shortcode');
+                        
+                        let shortcode = '';
+                        let sizeText = '';
+                        
+                        switch(size) {
+                            case 'small':
+                                shortcode = `[GAMBAR: ${url} | SIZE: 25%]`;
+                                sizeText = '25%';
+                                break;
+                            case 'medium':
+                                shortcode = `[GAMBAR: ${url} | SIZE: 50%]`;
+                                sizeText = '50%';
+                                break;
+                            case 'large':
+                                shortcode = `[GAMBAR: ${url} | SIZE: 75%]`;
+                                sizeText = '75%';
+                                break;
+                            case 'full':
+                                shortcode = `[GAMBAR: ${url}]`;
+                                sizeText = '100%';
+                                break;
+                            case 'custom':
+                                const customSize = prompt('Masukkan ukuran custom (contoh: 300px, 60%, 400px):', '300px');
+                                if (customSize) {
+                                    shortcode = `[GAMBAR: ${url} | SIZE: ${customSize}]`;
+                                    sizeText = customSize;
+                                } else {
+                                    this.value = 'medium';
+                                    shortcode = `[GAMBAR: ${url} | SIZE: 50%]`;
+                                    sizeText = '50%';
+                                }
+                                break;
+                        }
+                        
+                        codeDisplay.textContent = shortcode;
+                        copyBtn.setAttribute('data-shortcode', shortcode);
+                    });
+                });
+                
+                // Pasang event listener ke tombol copy
+                document.querySelectorAll('.btn-copy-shortcode').forEach(btn => {
+                    btn.addEventListener('click', async function() {
+                        const shortcode = this.getAttribute('data-shortcode');
                         try {
-                            await navigator.clipboard.writeText(url);
+                            await navigator.clipboard.writeText(shortcode);
                             const origText = this.innerHTML;
-                            this.innerHTML = '✅';
+                            this.innerHTML = '✅ Tersalin!';
                             this.style.background = 'var(--success)';
                             setTimeout(() => {
                                 this.innerHTML = origText;
                                 this.style.background = 'var(--brand-primary)';
-                            }, 1500);
+                            }, 2000);
                         } catch (err) {
-                            alert('URL: ' + url);
+                            console.error('Gagal copy:', err);
+                            alert('Gagal menyalin. Copy manual dari kotak kode.');
                         }
+                    });
+                });
+                
+                // Pasang event listener ke tombol preview
+                document.querySelectorAll('.btn-preview-img').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const url = this.getAttribute('data-url');
+                        window.open(url, '_blank');
                     });
                 });
             } else {

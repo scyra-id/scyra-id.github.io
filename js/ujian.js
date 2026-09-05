@@ -18,6 +18,19 @@ let isExamActive = true;
 let lastViolationTime = 0;
 const VIOLATION_COOLDOWN = 2000;
 
+// =======================================================
+// FUNGSI KONVERSI SHORTCODE GAMBAR
+// =======================================================
+function renderShortcodes(html) {
+    if (!html) return html;
+    // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+    return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+        const cleanUrl = url.trim();
+        const width = size ? size.trim() : '100%';
+        return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!window.db) return setTimeout(() => location.reload(), 100);
 
@@ -166,7 +179,7 @@ function updateNavigatorState() {
 function renderQuestion() {
     const q = questions[currentIndex];
     document.getElementById('currentNum').textContent = currentIndex + 1;
-    document.getElementById('questionText').innerHTML = q.pertanyaan_html;
+    document.getElementById('questionText').innerHTML = renderShortcodes(q.pertanyaan_html);
     const optsList = document.getElementById('optionsList');
     optsList.innerHTML = '';
     const tipe = q.tipe_soal || 'pg';
@@ -189,10 +202,22 @@ function renderQuestion() {
                 const btn = document.createElement('button');
                 btn.className = 'opt-btn';
                 if (userAnswers[q.id] === opt) btn.classList.add('selected');
-                btn.innerHTML = `<span class="opt-letter">${opt}</span> <span>${optHtml}</span>`;
+                btn.innerHTML = `<span class="opt-letter">${opt}</span> <span>${renderShortcodes(optHtml)}</span>`;
                 btn.onclick = () => selectOption(q.id, opt);
                 optsList.appendChild(btn);
             }
+        });
+    }
+    const questionCard = document.querySelector('.question-card');
+    if (questionCard && typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(questionCard, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '\\[', right: '\\]', display: true }
+            ],
+            throwOnError: false
         });
     }
     document.getElementById('btnPrev').style.display = currentIndex === 0 ? 'none' : 'block';
@@ -300,6 +325,16 @@ async function finishExam(isDisqualified = false) {
                     kategori_id: currentKategoriId,
                 });
             } catch (_) {}
+        }
+
+        // 🎮 TRIGGER TRYOUT SUBMISSION XP (+100 XP First-Time)
+        if (window.ScyraGamificationEngine && insertedData?.id) {
+            try {
+                const tryoutLabel = isDisqualified ? 'Tryout SNBT' : `Tryout SNBT - ${namaMapel}`;
+                await window.ScyraGamificationEngine.triggerTryoutSubmission(insertedData.id, tryoutLabel, false, user.id);
+            } catch (err) {
+                console.warn('Tryout XP trigger warning:', err);
+            }
         }
 
         if (isDisqualified) {

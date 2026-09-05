@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const surveyContainer = document.getElementById('surveyContent');
     const badge = document.getElementById('surveyBadge');
 
+    // =======================================================
+    // FUNGSI KONVERSI SHORTCODE GAMBAR
+    // =======================================================
+    function renderShortcodes(html) {
+        if (!html) return html;
+        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+            const cleanUrl = url.trim();
+            const width = size ? size.trim() : '100%';
+            return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Survey" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+        });
+    }
+
     if (isSurveyDone) {
         badge.textContent = '✅ Survey Selesai';
         surveyContainer.innerHTML = `
@@ -92,6 +105,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         const list = document.getElementById('surveyQuestionsList');
         questions.forEach((question, i) => list.appendChild(createQuestionCard(question, i + 1)));
 
+        if (surveyContainer && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(surveyContainer, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        }
+
         document.getElementById('btnNextSurveyPage').onclick = async () => {
             if (!collectAndValidatePage(questions)) return;
             if (isLastPage) await submitSurvey();
@@ -138,7 +163,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         card.innerHTML = `
-            <div class="teks-soal" style="margin-bottom:1rem;"><strong style="color:var(--brand-primary);">${number}.</strong> ${question.pertanyaan_html}</div>
+            <div class="teks-soal" style="margin-bottom:1rem;"><strong style="color:var(--brand-primary);">${number}.</strong> ${renderShortcodes(question.pertanyaan_html)}</div>
             <div class="opsi-container" style="display:flex;flex-direction:column;gap:0.75rem;">${inputHtml}</div>
             <p class="survey-validation" style="display:none;color:var(--error);margin-top:0.75rem;font-size:0.9rem;">Jawaban ini wajib diisi.</p>`;
         return card;

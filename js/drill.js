@@ -3,6 +3,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     const CREDIT_ICON = `<img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;">`;
     
     // =======================================================
+    // FUNGSI KONVERSI SHORTCODE GAMBAR
+    // =======================================================
+    function renderShortcodes(html) {
+        if (!html) return html;
+        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+            const cleanUrl = url.trim();
+            const width = size ? size.trim() : '100%';
+            return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+        });
+    }
+    
+    // =======================================================
     // 1. SETUP KANVAS CORET-CORETAN (KEMBALI KE VERSI PRESISI)
     // =======================================================
     const canvas = document.getElementById('scratchpad');
@@ -297,7 +310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const badge = document.querySelector('.soal-header .badge');
         if(badge) badge.textContent = `Soal ${index + 1} dari ${state.listSoal.length}`;
         const teks = document.querySelector('.soal-text');
-        if(teks) teks.innerHTML = dataSoal.pertanyaan_html;
+        if(teks) teks.innerHTML = renderShortcodes(dataSoal.pertanyaan_html);
     
         const opsiContainer = document.querySelector('.opsi-jawaban');
         if(opsiContainer) {
@@ -316,12 +329,24 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opsiContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Ketik jawabanmu di kotak yang tersedia pada soal di atas.</p>`;
             } else {
                 opsiContainer.innerHTML = `
-                    <label class="opsi-item"><input type="radio" name="jawaban" value="A"> <span>A. ${dataSoal.opsi_a_html}</span></label>
-                    <label class="opsi-item"><input type="radio" name="jawaban" value="B"> <span>B. ${dataSoal.opsi_b_html}</span></label>
-                    <label class="opsi-item"><input type="radio" name="jawaban" value="C"> <span>C. ${dataSoal.opsi_c_html}</span></label>
-                    <label class="opsi-item"><input type="radio" name="jawaban" value="D"> <span>D. ${dataSoal.opsi_d_html}</span></label>
-                    <label class="opsi-item"><input type="radio" name="jawaban" value="E"> <span>E. ${dataSoal.opsi_e_html}</span></label>`;
+                    <label class="opsi-item"><input type="radio" name="jawaban" value="A"> <span>A. ${renderShortcodes(dataSoal.opsi_a_html)}</span></label>
+                    <label class="opsi-item"><input type="radio" name="jawaban" value="B"> <span>B. ${renderShortcodes(dataSoal.opsi_b_html)}</span></label>
+                    <label class="opsi-item"><input type="radio" name="jawaban" value="C"> <span>C. ${renderShortcodes(dataSoal.opsi_c_html)}</span></label>
+                    <label class="opsi-item"><input type="radio" name="jawaban" value="D"> <span>D. ${renderShortcodes(dataSoal.opsi_d_html)}</span></label>
+                    <label class="opsi-item"><input type="radio" name="jawaban" value="E"> <span>E. ${renderShortcodes(dataSoal.opsi_e_html)}</span></label>`;
             }
+        }
+        const soalContent = document.querySelector('.soal-content');
+        if (soalContent && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(soalContent, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
         }
         setTimeout(resizeCanvas, 100);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -436,7 +461,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     optStyle = `padding: 0.8rem 1.2rem; border: 2px solid #f44336; border-radius: 8px; background: rgba(244, 67, 54, 0.1); color: #f44336; font-weight: 600;`;
                     icon = '<span style="float:right;">❌ Jawabanmu</span>';
                 }
-                opsiHTML += `<div style="${optStyle}"><strong>${opt}.</strong> ${optText} ${icon}</div>`;
+                opsiHTML += `<div style="${optStyle}"><strong>${opt}.</strong> ${renderShortcodes(optText)} ${icon}</div>`;
             });
             opsiHTML += '</div>';
 
@@ -446,11 +471,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                         <span style="font-weight: bold; color: var(--text-secondary);">Soal ${index + 1}</span>
                         ${statusBadge}
                     </div>
-                    <div style="font-size: 1.1rem; margin-bottom: 1rem;">${item.soal.pertanyaan_html}</div>
+                    <div style="font-size: 1.1rem; margin-bottom: 1rem;">${renderShortcodes(item.soal.pertanyaan_html)}</div>
                     ${opsiHTML} 
                     <div style="margin-top:1rem; border-top: 1px dashed var(--border-color); padding-top:1rem;">
                         <h4>💡 Pembahasan:</h4>
-                        <div style="margin-top:0.5rem;">${item.soal.pembahasan_html || '<p>Pembahasan belum tersedia.</p>'}</div>
+                        <div style="margin-top:0.5rem;">${renderShortcodes(item.soal.pembahasan_html) || '<p>Pembahasan belum tersedia.</p>'}</div>
                     </div>
                 </div>
             `;
@@ -458,6 +483,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const skorTotal = state.jawabanHistory.length > 0 ? Math.round((totalBenar / state.jawabanHistory.length) * 100) : 0;
         const rataWaktu = state.jawabanHistory.length > 0 ? Math.round(state.totalWaktuDetik / state.jawabanHistory.length) : 0;
+
+        // 🎮 TRIGGER DRILL COMPLETION XP (+15 XP First-Time)
+        if (window.ScyraGamificationEngine) {
+            try {
+                const mapelId = urlParams.get('id') || 'drill_session';
+                const mapelJudul = document.getElementById('drillSubJudul')?.textContent || 'Latihan Soal Drill';
+                await window.ScyraGamificationEngine.triggerDrillCompletion(mapelId, mapelJudul);
+            } catch (err) {
+                console.warn('Drill XP trigger warning:', err);
+            }
+        }
 
         // 🚨 NAMA CLASS SUDAH PASTI BENAR SESUAI HTML: .soal-content 🚨
         const container = document.querySelector('.soal-content');
@@ -500,6 +536,17 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             </div>
         `;
+        if (container && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(container, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        }
     };
 
     // 🚀 TEXT ZOOM ENGINE

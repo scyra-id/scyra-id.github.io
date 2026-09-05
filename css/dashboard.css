@@ -92,6 +92,19 @@
     margin-bottom: 3rem;
 }
 
+/* Unclaimed Rewards Badge (used inside HUD level widget) */
+.xp-unclaimed-badge {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(229, 115, 115, 0.15);
+    color: var(--error);
+    border: 1px solid rgba(229, 115, 115, 0.3);
+    animation: livePulse 1.5s infinite;
+    white-space: nowrap;
+}
+
 .dash-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -236,5 +249,611 @@ body.dark-mode .course-badge {
     .welcome-section .btn-primary-lg { 
         width: 100%; 
         text-align: center; 
+    }
+}
+
+/* ============================================================================
+   🎮 TOP HUD BAR (Frameless RPG Style & Glassmorphism)
+   ============================================================================ */
+.top-hud-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+/* Frameless Level Widget */
+.hud-level-widget {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.hud-level-widget:hover {
+    transform: translateY(-2px);
+}
+
+.hud-level-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.6));
+    animation: livePulse 2s infinite;
+}
+
+.hud-level-text {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.hud-xp-bar {
+    width: 140px;
+    height: 5px;
+    background: rgba(128, 128, 128, 0.2);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0 0.4rem;
+}
+
+.hud-xp-fill {
+    height: 100%;
+    background: #4ADE80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-xp-subtext {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+/* Glassmorphic Streak Pill */
+.hud-streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body.dark-mode .hud-streak-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.hud-streak-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.streak-dot {
+    font-size: 0.75rem;
+    color: #4ADE80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+.streak-dot.claimed {
+    color: #4ADE80;
+    animation: livePulse 2s infinite;
+}
+
+.streak-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.streak-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.streak-status.claimed {
+    color: #4ADE80;
+}
+
+@media (max-width: 768px) {
+    .top-hud-bar {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+    .hud-level-widget {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    .hud-streak-pill {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* ============================================================================
+   🎨 KYRA MASCOT COMPANION (HERO SECTION)
+   ============================================================================ */
+
+/* Hero Layout: Text Left, Mascot Right */
+.welcome-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
+    gap: 3rem;
+    flex-wrap: wrap;
+}
+
+.welcome-content {
+    flex: 1;
+    min-width: 300px;
+}
+
+.welcome-title {
+    color: var(--text-primary);
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-title span {
+    color: var(--brand-primary);
+}
+
+.welcome-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Mascot Companion Container */
+.mascot-companion {
+    position: relative;
+    width: 280px;
+    height: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
+}
+
+/* Floating Animation */
+@keyframes kyra-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+/* Avatar Canvas */
+.kyra-avatar-canvas {
+    position: relative;
+    width: 180px;
+    height: 220px;
+    margin-bottom: 1rem;
+    animation: kyra-float 3.5s ease-in-out infinite;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.3));
+    transition: filter 0.3s ease;
+}
+
+.kyra-avatar-canvas:hover {
+    filter: drop-shadow(0 20px 35px rgba(135, 168, 120, 0.4));
+}
+
+/* Layer Stacking Order (Strict Implementation) */
+.kyra-layer-layer,
+.kyra-layer-body {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.kyra-layer-body {
+    z-index: 1;
+    object-fit: contain;
+}
+
+/* Layer IDs mapped to Prompt Requirement:
+   Order: EFFECT -> BODY -> OUTFIT -> BACK -> EXPRESSION -> FACE -> ANTENNA -> HEAD
+*/
+#layer-effect { z-index: 2; }
+#layer-body { z-index: 3; }
+#layer-outfit { z-index: 4; }
+#layer-back { z-index: 5; }
+#layer-expression { z-index: 6; }
+#layer-face { z-index: 7; }
+#layer-antenna { z-index: 8; }
+#layer-head { z-index: 9; }
+
+.kyra-layer-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ============================================================================
+   🎮 TOP HUD BAR (Inline Horizontal Alignment)
+   ============================================================================ */
+.top-hud-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    width: 100%;
+}
+
+.hud-level-widget {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-decoration: none;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0;
+    transition: transform 0.2s ease;
+}
+
+.hud-level-widget:hover {
+    transform: translateY(-2px);
+}
+
+.hud-level-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 8px rgba(74, 222, 128, 0.6));
+    animation: livePulse 2s infinite;
+}
+
+.hud-level-text {
+    font-size: 1.15rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    color: var(--text-primary);
+}
+
+.hud-xp-bar {
+    width: 140px;
+    height: 5px;
+    background: rgba(128, 128, 128, 0.2);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 0 0.4rem;
+}
+
+.hud-xp-fill {
+    height: 100%;
+    background: #4ADE80;
+    box-shadow: 0 0 10px rgba(74, 222, 128, 0.6);
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.hud-xp-subtext {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+/* Glassmorphic Streak Pill */
+.hud-streak-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 8px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+body.dark-mode .hud-streak-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.hud-streak-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    border-color: rgba(74, 222, 128, 0.3);
+}
+
+.streak-dot {
+    font-size: 0.75rem;
+    color: #4ADE80;
+    text-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+}
+
+.streak-dot.claimed {
+    color: #4ADE80;
+    animation: livePulse 2s infinite;
+}
+
+.streak-label {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.streak-status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.streak-status.claimed {
+    color: #4ADE80;
+}
+
+/* ============================================================================
+   🎨 MAIN HERO SECTION (Two-Column Flex Layout)
+   ============================================================================ */
+.welcome-section {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2.5rem;
+    gap: 1.5rem;
+}
+
+.hero-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 3rem;
+    width: 100%;
+}
+
+/* Right Column */
+.welcome-left {
+    flex: 1;
+    min-width: 300px;
+    text-align: left;
+}
+
+.welcome-title {
+    color: var(--text-primary);
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-title span {
+    color: var(--brand-primary);
+}
+
+.welcome-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.live-cta-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: flex-start;
+}
+
+.dash-live-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Left Column: Kyra Companion Group */
+.kyra-companion-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    position: relative;
+    width: 240px;
+    order: -1;
+}
+
+/* Floating Animation */
+@keyframes kyra-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.kyra-avatar-canvas {
+    position: relative;
+    width: 170px;
+    height: 190px;
+    animation: kyra-float 3.5s ease-in-out infinite;
+    filter: drop-shadow(0 15px 25px rgba(0, 0, 0, 0.4));
+    transition: filter 0.3s ease;
+}
+
+.kyra-avatar-canvas:hover {
+    filter: drop-shadow(0 20px 30px rgba(74, 222, 128, 0.35));
+}
+
+.kyra-layer-layer,
+.kyra-layer-body {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.kyra-layer-body {
+    z-index: 1;
+    object-fit: contain;
+}
+
+#layer-effect { z-index: 2; }
+#layer-body { z-index: 3; }
+#layer-outfit { z-index: 4; }
+#layer-back { z-index: 5; }
+#layer-expression { z-index: 6; }
+#layer-face { z-index: 7; }
+#layer-antenna { z-index: 8; }
+#layer-head { z-index: 9; }
+
+.kyra-layer-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Glassmorphic Speech Bubble */
+.kyra-speech-bubble {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 10px 16px;
+    color: #F8FAFC;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-align: center;
+    width: 100%;
+    max-width: 240px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* CTA Pill Button - Refined Glassmorphic style */
+.btn-kyra-customize {
+    padding: 8px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    color: #4ADE80;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(4px);
+    display: inline-block;
+}
+
+.btn-kyra-customize:hover {
+    background: rgba(74, 222, 128, 0.15);
+    border-color: #4ADE80;
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 222, 128, 0.25);
+}
+
+/* ============================================================================
+   🎯 STATS RIBBON (Seamless Horizontal Strip)
+   ============================================================================ */
+.stats-ribbon {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin: 1.5rem 0 3rem 0;
+    background: transparent !important;
+}
+
+.stat-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.stat-divider {
+    width: 1px;
+    height: 36px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.stat-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.1;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    opacity: 0.85;
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .top-hud-bar {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .hud-level-widget,
+    .hud-streak-pill {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .hero-content {
+        flex-direction: column;
+        gap: 2.5rem;
+        text-align: center;
+    }
+
+    .kyra-companion-group {
+        order: 0;
+    }
+
+    .welcome-left {
+        align-items: center;
+        text-align: center;
+    }
+
+    .live-cta-group {
+        align-items: center;
+    }
+
+    .stats-ribbon {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .stat-divider {
+        display: none;
     }
 }

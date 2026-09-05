@@ -28,9 +28,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const renderShortcodes = (html) => {
             let output = html;
-            output = output.replace(/\[GAMBAR:\s*(.*?)\]/gi, (_, url) =>
-                `<img src="${url.trim()}" class="scyra-image" alt="Gambar materi">`
-            );
+            output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (_, url, size) => {
+                const width = size ? size.trim() : '100%';
+                return `<img src="${url.trim()}" class="scyra-image" alt="Gambar materi" style="max-width:${width};height:auto;margin:1rem auto;display:block;">`;
+            });
             output = output.replace(/\[SIMULASI:\s*(.*?)\]/gi, (_, url) => {
                 const simUrl = url.trim();
                 return `<div class="simulasi-container scyra-sim-container" data-simurl="${simUrl}">
@@ -321,9 +322,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // 2. DETEKSI GAMBAR SHORTCODE
             if (inner.includes('[GAMBAR:')) {
-                let imgMatch = inner.match(/\[GAMBAR:\s*(.*?)\]/i);
+                let imgMatch = inner.match(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/i);
                 if (imgMatch) {
-                    appendToCurrentSection(`<img src="${imgMatch[1]}" class="scyra-image">`);
+                    let imgUrl = imgMatch[1].trim();
+                    let imgWidth = imgMatch[2] ? imgMatch[2].trim() : '100%';
+                    appendToCurrentSection(`<img src="${imgUrl}" class="scyra-image" style="max-width:${imgWidth};height:auto;margin:1rem auto;display:block;">`);
                     inner = inner.replace(/\[GAMBAR:\s*.*?\]/gi, '');
                     text = text.replace(/\[GAMBAR:\s*.*?\]/gi, '').trim();
                     if (!inner.trim()) return; 
@@ -781,6 +784,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('detailTanggal').textContent = `📅 Dipublikasikan pada ${tgl}`;
         
         document.getElementById('detailBody').innerHTML = applyScyraMagic(materi.konten_html);
+        const detailBody = document.getElementById('detailBody');
+        if (detailBody && typeof renderMathInElement !== 'undefined') {
+            renderMathInElement(detailBody, {
+                delimiters: [
+                    { left: '$$', right: '$$', display: true },
+                    { left: '$', right: '$', display: false },
+                    { left: '\\(', right: '\\)', display: false },
+                    { left: '\\[', right: '\\]', display: true }
+                ],
+                throwOnError: false
+            });
+        }
         loadingEl.style.display = 'none';
         contentEl.style.display = 'block';
 

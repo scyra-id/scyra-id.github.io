@@ -152,7 +152,29 @@ function setupImageUploader() {
             if (error) throw error;
             
             const { data: urlData } = window.db.storage.from('materi-images').getPublicUrl(fileName);
-            const shortcode = `[GAMBAR: ${urlData.publicUrl}]`;
+            const publicUrl = urlData.publicUrl;
+            
+            // Konfirmasi ukuran gambar dari admin
+            let chosenSize = '100%';
+            const sizeOption = prompt(
+                "Pilih ukuran gambar yang akan ditampilkan:\n" +
+                "1 = Kecil (25%)\n" +
+                "2 = Sedang (50%)\n" +
+                "3 = Besar (75%)\n" +
+                "4 = Penuh (100%)\n" +
+                "Atau ketik langsung ukuran custom (contoh: 300px, 60%):",
+                "2"
+            );
+
+            if (sizeOption === '1') chosenSize = '25%';
+            else if (sizeOption === '2' || sizeOption === null) chosenSize = '50%';
+            else if (sizeOption === '3') chosenSize = '75%';
+            else if (sizeOption === '4') chosenSize = '100%';
+            else if (sizeOption.trim()) chosenSize = sizeOption.trim();
+
+            const shortcode = chosenSize === '100%' 
+                ? `[GAMBAR: ${publicUrl}]` 
+                : `[GAMBAR: ${publicUrl} | SIZE: ${chosenSize}]`;
             
             if (quill) {
                 const range = quill.getSelection(true);
@@ -160,7 +182,7 @@ function setupImageUploader() {
                 quill.clipboard.dangerouslyPasteHTML(index, `<p>${shortcode}</p><p><br></p>`);
                 quill.setSelection(index + 2);
             }
-            await showScyraAlert('Gambar berhasil di-upload! Shortcode otomatis tersisip.', '✅ Sukses', '🖼️');
+            await showScyraAlert(`Gambar berhasil di-upload (${chosenSize})! Shortcode otomatis tersisip.`, '✅ Sukses', '🖼️');
         } catch(err) { 
             await showScyraAlert('Gagal upload: ' + err.message, '⚠️ Error', '❌');
         } finally { 
