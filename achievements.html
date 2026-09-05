@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - Scyra</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/achievements.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <section class="dashboard-body">
+                <div class="achievements-container">
+                    <div class="ach-overall-banner">
+                        <div class="ach-overall-info">
+                            <h1>🏆 Achievement Hall</h1>
+                            <p>Setiap usaha kecilmu adalah pencapaian besar. Kumpulkan badge dan tunjukkan perjalananmu!</p>
+                        </div>
+                        <div class="ach-overall-progress">
+                            <div class="ach-ring">
+                                <svg viewBox="0 0 80 80" aria-hidden="true">
+                                    <circle class="ach-ring-bg" cx="40" cy="40" r="34"></circle>
+                                    <circle class="ach-ring-fill" id="achRingFill" cx="40" cy="40" r="34"></circle>
+                                </svg>
+                                <span class="ach-ring-text" id="achRingText">0/20</span>
+                            </div>
+                            <div class="ach-overall-label" id="achOverallCount">0 / 20 Tier Terbuka</div>
+                        </div>
+                    </div>
+
+                    <div class="ach-showcase-strip">
+                        <div>
+                            <h3>✨ Featured Badges</h3>
+                            <p style="margin: 0.35rem 0 0; font-size: 0.82rem; color: var(--text-secondary);">Pilih hingga 3 pencapaian terbaik untuk ditampilkan di profilmu.</p>
+                        </div>
+                        <div class="ach-showcase-badges">
+                            <div class="showcase-slot empty" title="Klik untuk pasang badge">+</div>
+                            <div class="showcase-slot empty" title="Klik untuk pasang badge">+</div>
+                            <div class="showcase-slot empty" title="Klik untuk pasang badge">+</div>
+                            <button class="btn-edit-showcase" id="btnEditShowcase">✏️ Atur Badge</button>
+                        </div>
+                    </div>
+
+                    <div class="ach-categories-grid" id="achCategoriesGrid">
+                        <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            Memuat pencapaianmu... ⏳
+                        </div>
+                    </div>
+
+                    <div class="micro-footer" style="margin-top: 2.5rem;">&copy; 2026 Scyra. All rights reserved.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- FEATURED BADGE SHOWCASE PICKER MODAL -->
+    <div class="showcase-picker-backdrop" id="showcasePickerBackdrop">
+        <div class="showcase-picker-card">
+            <h2 class="picker-title" id="pickerTitle">Pilih Featured Badge</h2>
+            <p class="picker-subtitle">Pilih satu kategori pencapaian untuk ditampilkan.</p>
+            <div class="picker-options" id="pickerOptions"></div>
+            <div class="picker-actions">
+                <button class="btn-modal-secondary" id="pickerBtnClose">Batal</button>
+                <button class="btn-modal-secondary" id="pickerBtnRemove" style="display:none; color: var(--error);">Hapus Badge</button>
+                <button class="btn-modal-primary" id="pickerBtnConfirm">Simpan Badge</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-engine.js"></script>
+    <script src="js/achievement-engine.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/achievements.js"></script>
+</body>
+</html>

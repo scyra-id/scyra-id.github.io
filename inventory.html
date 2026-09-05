@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyra Customized - Mascot Studio</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    
+    <!-- CSS Global & Inventory Specific -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/inventory.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <!-- 1️⃣ SIDEBAR (Auto-fetch via components/sidebar.html) -->
+        <div id="sidebar-placeholder"></div>
+        
+        <!-- 2️⃣ MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOPBAR (Auto-fetch via components/topbar.html) -->
+            <div id="topbar-placeholder"></div>
+            
+            <!-- Overlay untuk mobile sidebar -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- 🎨 MASCOT STUDIO SECTION -->
+            <section class="dashboard-body">
+                <div class="studio-container">
+                    
+                    <div class="studio-layout">
+                        
+                        <!-- LEFT PANEL: LAYERED AVATAR CANVAS PREVIEW -->
+                        <div class="studio-preview-card">
+                            <div class="studio-preview-header">
+                                <h2>🎨 Studio Kyra</h2>
+                                <span class="badge-equipped-count" id="equippedCountBadge">3/8 Terpasang</span>
+                            </div>
+
+                            <!-- Base Kyra is permanent. Every equipped item is a transparent overlay. -->
+                            <div class="avatar-stage" id="avatarStage">
+                                <img class="kyra-base-image" src="images/maskot.webp" alt="Kyra dasar">
+                                <div class="layer-item layer-effect" id="layerEffect" aria-hidden="true"></div>
+                                <div class="layer-item layer-body" id="layerBody" aria-hidden="true"></div>
+                                <div class="layer-item layer-outfit" id="layerOutfit" aria-hidden="true"></div>
+                                <div class="layer-item layer-back" id="layerBack" aria-hidden="true"></div>
+                                <div class="layer-item layer-expression" id="layerExpression" aria-hidden="true"></div>
+                                <div class="layer-item layer-face" id="layerFace" aria-hidden="true"></div>
+                                <div class="layer-item layer-antenna" id="layerAntenna" aria-hidden="true"></div>
+                                <div class="layer-item layer-head" id="layerHead" aria-hidden="true"></div>
+                            </div>
+
+                            <!-- Equipped 8 Slots Bar -->
+                            <div class="equipped-slots-bar" id="equippedSlotsBar">
+                                <!-- Injected dynamically by inventory.js -->
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="studio-actions">
+                                <button class="btn-reset-look" id="btnResetLook">🔄 Reset</button>
+                                <button class="btn-save-look" id="btnSaveLook">💾 Simpan Tampilan</button>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT PANEL: INVENTORY GRID & FILTERS -->
+                        <div class="inventory-panel">
+                            
+                            <!-- Category Tabs (8 Slots + ALL) -->
+                            <div class="slot-category-tabs" id="slotCategoryTabs">
+                                <button class="slot-tab-btn active" data-slot="ALL">Semua</button>
+                                <button class="slot-tab-btn" data-slot="BODY">Body</button>
+                                <button class="slot-tab-btn" data-slot="EXPRESSION">Ekspresi</button>
+                                <button class="slot-tab-btn" data-slot="ANTENNA">Antena</button>
+                                <button class="slot-tab-btn" data-slot="HEAD">Headwear</button>
+                                <button class="slot-tab-btn" data-slot="FACE">Face</button>
+                                <button class="slot-tab-btn" data-slot="OUTFIT">Outfit</button>
+                                <button class="slot-tab-btn" data-slot="BACK">Back</button>
+                                <button class="slot-tab-btn" data-slot="EFFECT">Effect</button>
+                            </div>
+
+                            <!-- Filters: Rarity & Ownership -->
+                            <div class="inventory-filters">
+                                <div class="filter-group">
+                                    <span class="filter-label">Rarity:</span>
+                                    <select class="filter-select" id="filterRarity">
+                                        <option value="ALL">Semua Rarity</option>
+                                        <option value="COMMON">Common</option>
+                                        <option value="UNCOMMON">Uncommon</option>
+                                        <option value="RARE">Rare</option>
+                                        <option value="EPIC">Epic</option>
+                                        <option value="LEGENDARY">Legendary</option>
+                                        <option value="MYTHIC">Mythic</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <span class="filter-label">Status:</span>
+                                    <select class="filter-select" id="filterOwnership">
+                                        <option value="ALL">Semua Item</option>
+                                        <option value="OWNED">Dimiliki</option>
+                                        <option value="READY">Siap Diklaim</option>
+                                        <option value="LOCKED">Terkunci</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Inventory Items Grid -->
+                            <div class="items-grid" id="inventoryItemsGrid">
+                                <div style="grid-column: 1/-1; text-align:center; padding: 3rem; color: var(--text-secondary);">
+                                    Memuat katalog studio... ⏳
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="micro-footer" style="margin-top: 2.5rem;">&copy; 2026 Scyra. All rights reserved.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-engine.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/inventory.js"></script>
+</body>
+</html>

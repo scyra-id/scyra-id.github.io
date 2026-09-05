@@ -1,0 +1,565 @@
+/* ============================================================================
+   🌟 SCYRA JOURNEY STYLES
+   Pastel sage & gold aesthetic matching Scyra identity
+   ============================================================================ */
+
+.journey-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Header Banner */
+.journey-header {
+    background: linear-gradient(135deg, rgba(135, 168, 120, 0.18), rgba(212, 175, 55, 0.15));
+    border: 1px solid rgba(135, 168, 120, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.journey-header-info h1 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.journey-header-info p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.journey-header-stats {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+    background: var(--bg-secondary);
+    padding: 1rem 1.5rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+}
+
+.journey-stat-item {
+    text-align: center;
+}
+
+.journey-stat-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+}
+
+.journey-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Navigation Tabs */
+.journey-tabs {
+    display: flex;
+    gap: 1rem;
+    border-bottom: 2px solid var(--border-color);
+    margin-bottom: 2rem;
+}
+
+.journey-tab-btn {
+    background: none;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.journey-tab-btn:hover {
+    color: var(--brand-primary);
+}
+
+.journey-tab-btn.active {
+    color: var(--brand-primary);
+    font-weight: 700;
+}
+
+.journey-tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--brand-primary);
+    border-radius: 3px 3px 0 0;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+/* ============================================================================
+   MAP VIEW (Tab 1: Levels 1-50 Vertical Progress Line)
+   ============================================================================ */
+
+.journey-map-wrapper {
+    position: relative;
+    max-width: 750px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Center vertical line */
+.journey-spine-line {
+    position: absolute;
+    top: 3rem;
+    bottom: 3rem;
+    left: 50%;
+    width: 6px;
+    background: var(--border-color);
+    transform: translateX(-50%);
+    border-radius: 999px;
+    z-index: 1;
+}
+
+.journey-spine-fill {
+    width: 100%;
+    background: linear-gradient(180deg, var(--brand-primary), var(--brand-accent));
+    border-radius: 999px;
+    transition: height 0.8s ease;
+}
+
+.journey-nodes-list {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column-reverse; /* Level 50 at top, Level 1 at bottom */
+    gap: 2.2rem;
+}
+
+.journey-node-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 100%;
+}
+
+.journey-node-row:nth-child(even) .node-card-left {
+    display: flex;
+}
+.journey-node-row:nth-child(even) .node-card-right {
+    display: none;
+}
+.journey-node-row:nth-child(odd) .node-card-left {
+    display: none;
+}
+.journey-node-row:nth-child(odd) .node-card-right {
+    display: flex;
+}
+
+.node-card {
+    width: 260px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 0.85rem 1.1rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.node-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(135, 168, 120, 0.18);
+    border-color: var(--brand-primary);
+}
+
+.node-card-left {
+    margin-right: 3rem;
+    text-align: right;
+    align-items: flex-end;
+}
+
+.node-card-right {
+    margin-left: 3rem;
+    text-align: left;
+    align-items: flex-start;
+}
+
+/* Node Circle Badge */
+.journey-node-circle {
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    background: var(--bg-secondary);
+    border: 3px solid var(--border-color);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    flex-shrink: 0;
+}
+
+.journey-node-circle:hover {
+    transform: scale(1.15);
+}
+
+/* Status variants */
+.journey-node-row.status-claimed .journey-node-circle {
+    background: var(--brand-primary);
+    border-color: #6d905c;
+    color: #ffffff;
+}
+
+.journey-node-row.status-ready .journey-node-circle {
+    background: linear-gradient(135deg, #ffd97a, #f9a825);
+    border-color: #d4af37;
+    color: #4a2800;
+    animation: bounceReady 1.6s infinite;
+}
+
+.journey-node-row.status-current .journey-node-circle {
+    background: #ffffff;
+    border: 4px solid var(--brand-primary);
+    color: var(--brand-primary);
+    box-shadow: 0 0 0 6px rgba(135, 168, 120, 0.35);
+}
+
+.journey-node-row.status-locked .journey-node-circle {
+    background: var(--bg-primary);
+    border-color: var(--border-color);
+    color: var(--text-muted);
+    opacity: 0.75;
+}
+
+/* Milestone Node (5, 10, 15... 50) */
+.journey-node-row.is-milestone .journey-node-circle {
+    width: 66px;
+    height: 66px;
+    border-width: 4px;
+    font-size: 1.25rem;
+}
+
+.journey-node-row.is-milestone.status-ready .journey-node-circle {
+    border-color: #ff9800;
+    box-shadow: 0 0 20px rgba(255, 152, 0, 0.6);
+}
+
+.node-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.node-status-tag {
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    display: inline-block;
+}
+
+.tag-claimed { background: rgba(135, 168, 120, 0.2); color: var(--brand-primary); }
+.tag-ready { background: rgba(255, 193, 7, 0.25); color: #b78103; font-weight: 800; }
+.tag-current { background: rgba(33, 150, 243, 0.15); color: #1976d2; }
+.tag-locked { background: rgba(128, 128, 128, 0.12); color: var(--text-muted); }
+
+.node-reward-preview {
+    font-size: 0.8rem;
+    color: var(--brand-accent);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+@keyframes bounceReady {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-6px) scale(1.08); }
+}
+
+/* ============================================================================
+   XP HISTORY (Tab 2)
+   ============================================================================ */
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.history-item {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.history-item:hover {
+    transform: translateX(4px);
+    border-color: var(--brand-primary);
+}
+
+.history-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.history-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(135, 168, 120, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+}
+
+.history-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    margin: 0 0 0.2rem 0;
+}
+
+.history-time {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.history-xp {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+}
+
+/* ============================================================================
+   MODALS (Level Up Celebration & Reward Preview)
+   ============================================================================ */
+
+.scyra-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+}
+
+.scyra-modal-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.scyra-modal-card {
+    background: var(--bg-secondary);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    padding: 2.2rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.scyra-modal-backdrop.open .scyra-modal-card {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.modal-level-badge {
+    display: inline-block;
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    animation: bounceReady 1.2s infinite;
+}
+
+.modal-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.modal-subtitle {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem 0;
+}
+
+/* Reward item preview card inside modal */
+.unlocked-items-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+}
+
+.reward-preview-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+}
+
+.reward-img-frame {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: rgba(135, 168, 120, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    flex-shrink: 0;
+    overflow: hidden;
+}
+
+.reward-img-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.reward-details {
+    flex: 1;
+}
+
+.reward-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    margin: 0 0 0.2rem 0;
+}
+
+.reward-rarity {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--brand-accent);
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+}
+
+.btn-modal-primary {
+    background: linear-gradient(135deg, var(--brand-primary), #6d905c);
+    color: white;
+    font-weight: 700;
+    padding: 0.8rem 1.8rem;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-modal-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(135, 168, 120, 0.35);
+}
+
+.btn-modal-secondary {
+    background: var(--bg-primary);
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 0.8rem 1.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-modal-secondary:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+    .journey-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .journey-header-stats {
+        width: 100%;
+        justify-content: space-around;
+    }
+    .journey-spine-line {
+        left: 28px;
+    }
+    .journey-node-row {
+        justify-content: flex-start;
+        padding-left: 0;
+    }
+    .journey-node-row:nth-child(even) .node-card-left,
+    .journey-node-row:nth-child(odd) .node-card-right {
+        display: flex;
+        margin-left: 1.2rem;
+        margin-right: 0;
+        text-align: left;
+        align-items: flex-start;
+        width: calc(100% - 70px);
+    }
+}

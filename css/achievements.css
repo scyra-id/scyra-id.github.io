@@ -1,0 +1,594 @@
+/* ============================================================================
+   🏆 SCYRA ACHIEVEMENTS PAGE STYLES
+   ============================================================================ */
+
+.achievements-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+/* Overall Progress Banner */
+.ach-overall-banner {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.18), rgba(135, 168, 120, 0.14));
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.ach-overall-info h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.ach-overall-info p {
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.ach-overall-progress {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.ach-ring {
+    position: relative;
+    width: 80px;
+    height: 80px;
+}
+
+.ach-ring svg {
+    transform: rotate(-90deg);
+    width: 80px;
+    height: 80px;
+}
+
+.ach-ring-bg {
+    fill: none;
+    stroke: var(--border-color);
+    stroke-width: 6;
+}
+
+.ach-ring-fill {
+    fill: none;
+    stroke: var(--brand-accent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.8s ease;
+}
+
+.ach-ring-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--brand-accent);
+}
+
+.ach-overall-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* Featured Showcase Strip */
+.ach-showcase-strip {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.ach-showcase-strip h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.ach-showcase-badges {
+    display: flex;
+    gap: 0.8rem;
+    align-items: center;
+}
+
+.showcase-slot {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    border: 2px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bg-primary);
+}
+
+.showcase-slot:hover {
+    border-color: var(--brand-primary);
+    transform: scale(1.08);
+}
+
+.showcase-slot.filled {
+    border: 2px solid var(--brand-primary);
+    background: rgba(135, 168, 120, 0.12);
+}
+
+.showcase-slot.empty {
+    color: var(--text-muted);
+    font-size: 1.5rem;
+}
+
+.btn-edit-showcase {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-edit-showcase:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+/* Category Cards Grid */
+.ach-categories-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.ach-category-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 1.8rem;
+    transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.ach-category-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+.ach-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.ach-card-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    background: rgba(135, 168, 120, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    flex-shrink: 0;
+}
+
+.ach-card-title {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.2rem 0;
+}
+
+.ach-card-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* Tier Badge Strip */
+.ach-tier-strip {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.tier-badge {
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    border: 1px solid transparent;
+    transition: all 0.2s;
+}
+
+.tier-badge.tier-locked {
+    background: rgba(128, 128, 128, 0.1);
+    color: var(--text-muted);
+    border-color: var(--border-color);
+}
+
+.tier-badge.tier-bronze {
+    background: rgba(205, 127, 50, 0.18);
+    color: #cd7f32;
+    border-color: rgba(205, 127, 50, 0.35);
+}
+
+.tier-badge.tier-silver {
+    background: rgba(192, 192, 192, 0.2);
+    color: #808080;
+    border-color: rgba(192, 192, 192, 0.4);
+}
+
+.tier-badge.tier-gold {
+    background: rgba(255, 215, 0, 0.18);
+    color: #b8860b;
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.tier-badge.tier-diamond {
+    background: rgba(0, 191, 255, 0.15);
+    color: #0088cc;
+    border-color: rgba(0, 191, 255, 0.4);
+}
+
+/* Progress Bar */
+.ach-progress-row {
+    margin-bottom: 0.8rem;
+}
+
+.ach-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.35rem;
+}
+
+.ach-progress-bar {
+    width: 100%;
+    height: 10px;
+    background: var(--bg-primary);
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.ach-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.fill-bronze { background: linear-gradient(90deg, #cd7f32, #e8a850); }
+.fill-silver { background: linear-gradient(90deg, #a8a8a8, #c0c0c0); }
+.fill-gold { background: linear-gradient(90deg, #daa520, #ffd700); }
+.fill-diamond { background: linear-gradient(90deg, #00bfff, #87ceeb); }
+.fill-complete { background: linear-gradient(90deg, var(--brand-primary), var(--brand-accent)); }
+
+/* Diamond Reward Preview */
+.ach-diamond-preview {
+    background: var(--bg-primary);
+    border: 1px dashed rgba(0, 191, 255, 0.4);
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.ach-diamond-preview.unlocked {
+    border-style: solid;
+    border-color: rgba(0, 191, 255, 0.6);
+    background: rgba(0, 191, 255, 0.06);
+}
+
+.ach-diamond-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+}
+
+.ach-diamond-name {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    margin: 0 0 0.15rem 0;
+}
+
+.ach-diamond-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #0088cc;
+    letter-spacing: 0.5px;
+}
+
+/* Showcase Picker Modal */
+.showcase-picker-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    padding: 1rem;
+}
+
+.showcase-picker-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.showcase-picker-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 480px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.showcase-picker-backdrop.open .showcase-picker-card {
+    transform: translateY(0) scale(1);
+}
+
+.picker-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.picker-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0 0 1.5rem 0;
+}
+
+.picker-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-bottom: 1.5rem;
+}
+
+.picker-option {
+    background: var(--bg-primary);
+    border: 1.5px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+}
+
+.picker-option:hover {
+    border-color: var(--brand-primary);
+    transform: translateX(4px);
+}
+
+.picker-option.selected {
+    border-color: var(--brand-primary);
+    background: rgba(135, 168, 120, 0.1);
+    box-shadow: 0 0 0 2px var(--brand-primary);
+}
+
+.picker-option-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.picker-option-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+.picker-option-tier {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.picker-actions {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: center;
+}
+
+/* Profile Showcase Section */
+.profile-featured-badges {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-featured-badges h3 {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 1rem 0;
+}
+
+.profile-badges-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.profile-badge-slot {
+    width: 70px;
+    height: 70px;
+    border-radius: 16px;
+    border: 2px dashed var(--border-color);
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    cursor: pointer;
+    transition: all 0.25s;
+}
+
+.profile-badge-slot:hover {
+    border-color: var(--brand-primary);
+    transform: scale(1.08);
+}
+
+.profile-badge-slot.filled {
+    border: 2px solid var(--brand-primary);
+    background: rgba(135, 168, 120, 0.08);
+}
+
+.profile-badge-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-top: 0.2rem;
+}
+
+/* Profile Gamification Identity Card */
+.profile-gamification-identity {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(135, 168, 120, 0.12), rgba(212, 175, 55, 0.1));
+    border: 1px solid rgba(135, 168, 120, 0.28);
+    margin: 1.2rem 0 1.5rem;
+}
+
+.profile-gamification-avatar {
+    flex-shrink: 0;
+}
+
+.profile-kyra-canvas {
+    position: relative;
+    width: 76px;
+    height: 76px;
+    border-radius: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid rgba(135, 168, 120, 0.35);
+    overflow: hidden;
+}
+
+.profile-kyra-base,
+.profile-kyra-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.profile-kyra-base {
+    z-index: 2;
+    object-fit: contain;
+    padding: 8%;
+}
+
+.profile-kyra-layer {
+    display: none;
+    pointer-events: none;
+}
+
+.profile-kyra-layer img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.profile-kyra-layer#profileLayerEffect { z-index: 1; }
+.profile-kyra-layer#profileLayerBody { z-index: 3; }
+.profile-kyra-layer#profileLayerOutfit { z-index: 4; }
+.profile-kyra-layer#profileLayerBack { z-index: 5; }
+.profile-kyra-layer#profileLayerExpression { z-index: 6; }
+.profile-kyra-layer#profileLayerFace { z-index: 7; }
+.profile-kyra-layer#profileLayerAntenna { z-index: 8; }
+.profile-kyra-layer#profileLayerHead { z-index: 9; }
+
+.profile-gamification-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+}
+
+.profile-level-badge {
+    display: inline-block;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+    letter-spacing: 0.5px;
+}
+
+.profile-streak-badge {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--error);
+}
+
+.profile-kyra-edit-link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--brand-accent);
+    text-decoration: none;
+}
+
+.profile-kyra-edit-link:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .ach-overall-banner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ach-showcase-strip {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .ach-categories-grid {
+        grid-template-columns: 1fr;
+    }
+}

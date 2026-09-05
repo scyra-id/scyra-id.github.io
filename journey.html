@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCYRA Journey - Pejuang PTN</title>
+    <link rel="icon" type="image/svg+xml" href="images/logo.svg">
+    
+    <!-- CSS Global & Journey Specific -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/journey.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        
+        <!-- 1️⃣ SIDEBAR (Auto-fetch via components/sidebar.html) -->
+        <div id="sidebar-placeholder"></div>
+        
+        <!-- 2️⃣ MAIN CONTENT AREA -->
+        <main class="main-content">
+            
+            <!-- TOPBAR (Auto-fetch via components/topbar.html) -->
+            <div id="topbar-placeholder"></div>
+            
+            <!-- Overlay untuk mobile sidebar -->
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+            <!-- 🌟 KONTEN JOURNEY -->
+            <section class="dashboard-body">
+                <div class="journey-container">
+                    
+                    <!-- Header Banner -->
+                    <div class="journey-header">
+                        <div class="journey-header-info">
+                            <h1>🌟 SCYRA Journey</h1>
+                            <p>Tingkatkan levelmu, raih milestone, dan kustomisasi maskotmu!</p>
+                        </div>
+                        <div class="journey-header-stats">
+                            <div class="journey-stat-item">
+                                <div class="journey-stat-value" id="journeyCurrentLevel">Level 1</div>
+                                <div class="journey-stat-label">Level Kamu</div>
+                            </div>
+                            <div class="journey-stat-item">
+                                <div class="journey-stat-value" id="journeyXpText" style="color: var(--brand-accent);">0 / 100 XP</div>
+                                <div class="journey-stat-label">Progress Level</div>
+                            </div>
+                            <div class="journey-stat-item">
+                                <div class="journey-stat-value" id="journeyStreakText" style="color: var(--error);">1 Hari</div>
+                                <div class="journey-stat-label">Streak</div>
+                            </div>
+                            <div class="journey-stat-item">
+                                <div class="journey-stat-value" id="journeyTotalXpText" style="color: var(--success);">0 XP</div>
+                                <div class="journey-stat-label">Total XP</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation Tabs -->
+                    <div class="journey-tabs">
+                        <button class="journey-tab-btn active" data-tab="map">🗺️ Journey Map (Level 1–50)</button>
+                        <button class="journey-tab-btn" data-tab="history">📜 Riwayat XP</button>
+                    </div>
+
+                    <!-- TAB 1: JOURNEY MAP (Levels 1–50 Vertical Line) -->
+                    <div class="tab-pane active" id="tab-map">
+                        <div class="journey-map-wrapper">
+                            <!-- Spine vertical line -->
+                            <div class="journey-spine-line">
+                                <div class="journey-spine-fill" id="journeySpineFill" style="height: 0%;"></div>
+                            </div>
+                            <!-- Dynamic Nodes Container -->
+                            <div class="journey-nodes-list" id="journeyNodesContainer">
+                                <div style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                                    Memuat peta perjalanan... ⏳
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: XP HISTORY FEED -->
+                    <div class="tab-pane" id="tab-history">
+                        <div id="journeyHistoryLoading" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            Memuat riwayat XP... ⏳
+                        </div>
+                        <div class="history-list" id="journeyHistoryList">
+                            <!-- Injected by journey.js -->
+                        </div>
+                    </div>
+
+                    <div class="micro-footer">&copy; 2026 Scyra. All rights reserved.</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 🎁 MODAL LEVEL UP & REWARD PREVIEW -->
+    <div class="scyra-modal-backdrop" id="journeyModalBackdrop">
+        <div class="scyra-modal-card">
+            <button class="modal-close-btn" id="journeyModalCloseBtn">&times;</button>
+            <div class="modal-level-badge" id="journeyModalBadge">🎁</div>
+            <h2 class="modal-title" id="journeyModalTitle">Hadiah Terbuka!</h2>
+            <p class="modal-subtitle" id="journeyModalSubtitle">Kamu telah membuka kosmetik baru.</p>
+
+            <div class="unlocked-items-grid" id="journeyModalItemsList">
+                <!-- Injected dynamically -->
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-modal-primary" id="journeyModalActionClaim" style="display: none;">🎁 Klaim Hadiah</button>
+                <button class="btn-modal-primary" id="journeyModalActionEquip" style="display: none; background: linear-gradient(135deg, #f9a825, #d4af37);">✨ Pakai Sekarang</button>
+                <button class="btn-modal-secondary" id="journeyModalActionClose">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS (Urutan penting) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-engine.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/journey.js"></script>
+</body>
+</html>
