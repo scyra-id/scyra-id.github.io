@@ -580,15 +580,215 @@
 }
 
 @media (max-width: 768px) {
+    .achievements-container {
+        padding: 1.5rem 1rem;
+    }
+
     .ach-overall-banner {
         flex-direction: column;
         align-items: flex-start;
+        padding: 1.5rem 1.8rem;
     }
+    
+    .ach-overall-info h1 {
+        font-size: 1.5rem;
+    }
+    
+    .ach-overall-info p {
+        font-size: 0.88rem;
+    }
+    
+    .ach-overall-progress {
+        width: 100%;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    .ach-ring {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .ach-ring svg {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .ach-ring-text {
+        font-size: 1rem;
+    }
+    
+    .ach-overall-label {
+        font-size: 0.8rem;
+    }
+
     .ach-showcase-strip {
         flex-direction: column;
         align-items: flex-start;
+        padding: 1.3rem 1.5rem;
     }
+    
+    .ach-showcase-strip h3 {
+        font-size: 1rem;
+    }
+    
+    .ach-showcase-badges {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+    }
+    
+    .showcase-slot {
+        width: 52px;
+        height: 52px;
+        font-size: 1.5rem;
+    }
+    
+    .btn-edit-showcase {
+        width: 100%;
+        margin-top: 0.5rem;
+        padding: 0.6rem 1rem;
+    }
+
     .ach-categories-grid {
         grid-template-columns: 1fr;
+        gap: 1.2rem;
+    }
+    
+    .ach-category-card {
+        padding: 1.5rem;
+    }
+    
+    .ach-card-icon {
+        width: 48px;
+        height: 48px;
+        font-size: 1.5rem;
+    }
+    
+    .ach-card-title {
+        font-size: 1.05rem;
+    }
+    
+    .ach-card-desc {
+        font-size: 0.78rem;
+    }
+    
+    .ach-tier-strip {
+        gap: 0.4rem;
+        flex-wrap: wrap;
+    }
+    
+    .tier-badge {
+        font-size: 0.7rem;
+        padding: 0.25rem 0.6rem;
+    }
+    
+    .ach-diamond-preview {
+        padding: 0.7rem 0.9rem;
+        gap: 0.7rem;
+    }
+    
+    .ach-diamond-icon {
+        font-size: 1.6rem;
+    }
+    
+    .ach-diamond-name {
+        font-size: 0.85rem;
+    }
+
+    .showcase-picker-card {
+        max-width: 90%;
+        padding: 1.8rem 1.5rem;
+    }
+    
+    .picker-title {
+        font-size: 1.3rem;
+    }
+    
+    .picker-subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .picker-option {
+        padding: 0.9rem 1rem;
+    }
+    
+    .picker-option-icon {
+        font-size: 1.3rem;
+    }
+    
+    .picker-option-name {
+        font-size: 0.88rem;
+    }
+    
+    .picker-actions {
+        flex-wrap: wrap;
+    }
+    
+    .picker-actions button {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .achievements-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .ach-overall-banner {
+        padding: 1.2rem 1.5rem;
+        gap: 1.2rem;
+    }
+    
+    .ach-overall-info h1 {
+        font-size: 1.3rem;
+    }
+    
+    .ach-overall-info p {
+        font-size: 0.82rem;
+    }
+    
+    .ach-ring {
+        width: 65px;
+        height: 65px;
+    }
+    
+    .ach-ring svg {
+        width: 65px;
+        height: 65px;
+    }
+    
+    .ach-ring-text {
+        font-size: 0.95rem;
+    }
+
+    .ach-showcase-strip {
+        padding: 1.2rem 1.3rem;
+    }
+    
+    .showcase-slot {
+        width: 48px;
+        height: 48px;
+        font-size: 1.4rem;
+    }
+
+    .ach-category-card {
+        padding: 1.3rem;
+    }
+    
+    .ach-card-header {
+        gap: 0.8rem;
+    }
+    
+    .ach-card-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 1.4rem;
+    }
+    
+    .ach-card-title {
+        font-size: 1rem;
     }
 }

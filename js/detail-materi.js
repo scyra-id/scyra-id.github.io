@@ -90,6 +90,108 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // =======================================================
+    // 🚨 HYBRID 3-LAYER PATTERN DETECTION SYSTEM
+    // =======================================================
+    
+    /**
+     * Layer 1: Escape Syntax - Backslash prefix disables pattern detection
+     * Layer 2: Explicit Tags - Force trigger with [TAG]
+     * Layer 3: Auto-Detection - Stricter regex (start + colon/dash)
+     */
+    const detectPattern = (text, inner, patternConfig) => {
+        const trimmedText = text.trimStart();
+        
+        // Layer 1: Escape Syntax (Highest Priority)
+        if (trimmedText.startsWith('\\')) {
+            const cleanText = text.replace(/^\s*\\/, '');
+            const cleanInner = inner.replace(/^\s*\\/, '');
+            return { 
+                detected: false, 
+                isEscaped: true, 
+                cleanText, 
+                cleanInner 
+            };
+        }
+        
+        // Layer 2: Explicit Tags (Medium Priority)
+        if (patternConfig.tag) {
+            const tagRegex = new RegExp(`\\[${patternConfig.tag}\\]`, 'i');
+            if (tagRegex.test(inner)) {
+                const cleanInner = inner.replace(tagRegex, '').trim();
+                return { 
+                    detected: true, 
+                    isTagged: true, 
+                    content: cleanInner, 
+                    pattern: patternConfig.name 
+                };
+            }
+        }
+        
+        // Layer 3: Auto-Detection (Lowest Priority)
+        const lower = text.toLowerCase();
+        for (const keyword of patternConfig.keywords) {
+            // Build stricter regex: must be at start + followed by colon/dash
+            const regex = new RegExp(`^\\s*(?:[•\\-\\*]\\s*)?${keyword}\\s*[:\\-]`, 'i');
+            if (regex.test(lower)) {
+                // Extract content after keyword and separator
+                const contentRegex = new RegExp(`^.*?${keyword}\\s*[:\\-]?\\s*`, 'i');
+                const cleanInner = inner
+                    .replace(contentRegex, '')
+                    .replace(/^[•\-\*]\s*/, '')
+                    .replace(/<\/?(p|div|strong|b|span)[^>]*>/gi, '')
+                    .trim();
+                return { 
+                    detected: true, 
+                    isAuto: true, 
+                    content: cleanInner, 
+                    pattern: patternConfig.name 
+                };
+            }
+        }
+        
+        return { detected: false };
+    };
+    
+    // Pattern configuration for all 7 patterns
+    const PATTERNS = {
+        FOKUS: {
+            name: 'fokus',
+            tag: 'FOKUS',
+            keywords: ['fokus materi']
+        },
+        FREKUENSI: {
+            name: 'frekuensi',
+            tag: 'FREKUENSI',
+            keywords: ['frekuensi & estimasi', 'frekuensi']
+        },
+        CIRI: {
+            name: 'ciri',
+            tag: 'CIRI',
+            keywords: ['ciri khas']
+        },
+        TRAP: {
+            name: 'trap',
+            tag: 'TRAP',
+            keywords: ['trap alert', 'jebakan maut']
+        },
+        FYI: {
+            name: 'fyi',
+            tag: 'FYI',
+            keywords: ['fyi', 'for your information']
+        },
+        PEMBAHASAN: {
+            name: 'pembahasan',
+            tag: 'PEMBAHASAN',
+            keywords: ['pembahasan']
+        },
+        LANGKAH: {
+            name: 'langkah',
+            tag: 'LANGKAH',
+            keywords: ['langkah \\d+', 'step \\d+', 'trik \\d+', 'cara \\d+']
+        }
+    };
+    
+    // =======================================================
     // 🚨 SCYRA MAGIC ENGINE (TRAP ALERT ANTI-BOCOR & KELUAR PEMBAHASAN)
     // =======================================================
     function applyScyraMagic(rawHtml) {
@@ -305,19 +407,41 @@ document.addEventListener('DOMContentLoaded', async () => {
                 flushTable();
             }
             
-            // 1. DETEKSI PETA KONSEP
-            if (lower.includes('fokus materi')) { 
-                peta.fokus = inner.replace(/.*fokus materi[:\-]?\s*/i, '').replace(/^[•\-\*]\s*/, '').replace(/<\/?(p|div|strong|b|span)[^>]*>/gi, '').trim(); 
-                return; 
+            // 1. DETEKSI PETA KONSEP (3-Layer Detection)
+            const fokusResult = detectPattern(text, inner, PATTERNS.FOKUS);
+            if (fokusResult.detected) {
+                peta.fokus = fokusResult.content;
+                return;
             }
-            if (lower.includes('frekuensi') && (lower.includes('estimasi') || lower.includes(':'))) { 
-                peta.frekuensi = inner.replace(/.*(frekuensi & estimasi|frekuensi)[:\-]?\s*/i, '').replace(/^[•\-\*]\s*/, '').replace(/<\/?(p|div|strong|b|span)[^>]*>/gi, '').trim(); 
-                return; 
+            if (fokusResult.isEscaped) {
+                // Render as normal text with backslash removed
+                text = fokusResult.cleanText;
+                inner = fokusResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
             }
-            if (lower.includes('ciri khas')) { 
-                peta.ciri = inner.replace(/.*ciri khas[:\-]?\s*/i, '').replace(/^[•\-\*]\s*/, '').replace(/<\/?(p|div|strong|b|span)[^>]*>/gi, '').trim(); 
-                return; 
+            
+            const frekuensiResult = detectPattern(text, inner, PATTERNS.FREKUENSI);
+            if (frekuensiResult.detected) {
+                peta.frekuensi = frekuensiResult.content;
+                return;
             }
+            if (frekuensiResult.isEscaped) {
+                text = frekuensiResult.cleanText;
+                inner = frekuensiResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
+            }
+            
+            const ciriResult = detectPattern(text, inner, PATTERNS.CIRI);
+            if (ciriResult.detected) {
+                peta.ciri = ciriResult.content;
+                return;
+            }
+            if (ciriResult.isEscaped) {
+                text = ciriResult.cleanText;
+                inner = ciriResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
+            }
+            
             renderPeta();
             
             // 2. DETEKSI GAMBAR SHORTCODE
@@ -451,34 +575,108 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             
-            // 7. DETEKSI LANGKAH BARU: HANYA "LANGKAH X:" ATAU ANGKA DI AWAL
-            // Bullet biasa (•, o) TANPA keyword langkah = teks lanjutan, masuk kotak sebelumnya
-            let isKeywordStep = lower.match(/^(?:•|o|-|\*)?\s*(langkah|step|trik|cara)\s*\d+/i);
-            let isNumberedStep = lower.match(/^\s*\d+[\.\)]\s/) && !lower.match(/^(?:•|o|-|\*)\s+\d+/);
-            let isNewStep = isKeywordStep || isNumberedStep;
-            
-            // 🚨 DETEKSI TRAP ALERT 🚨
-            if (lower.includes('trap alert') || lower.includes('jebakan maut')) {
+            // 7. DETEKSI TRAP ALERT (3-Layer Detection) - Must check before LANGKAH
+            const trapResult = detectPattern(text, inner, PATTERNS.TRAP);
+            if (trapResult.detected) {
                 closeActiveBlock();
                 closeAlgo();
                 closePembahasan(); // PAKSA KELUAR DARI DROPDOWN PEMBAHASAN
                 activeBlock = 'trap';
-                let clean = inner.replace(/.*?(trap alert|jebakan maut)[\s:\-\)]*/i, '');
-                clean = clean.replace(/^(?:<[^>]*>)*\s*[•\-\*\d\.]\s*/, '').trim();
-                if (clean) blockHtml = `<p>${clean}</p>`;
+                if (trapResult.content) blockHtml = `<p>${trapResult.content}</p>`;
                 return;
-            } 
-            else if (lower.includes('fyi:') || lower.includes('for your information')) {
+            }
+            if (trapResult.isEscaped) {
+                // Render as normal text with backslash removed
+                text = trapResult.cleanText;
+                inner = trapResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
+            }
+            
+            // 8. DETEKSI FYI (3-Layer Detection)
+            const fyiResult = detectPattern(text, inner, PATTERNS.FYI);
+            if (fyiResult.detected) {
                 closeActiveBlock();
                 closeAlgo();
                 closePembahasan(); 
                 activeBlock = 'fyi';
-                let clean = inner.replace(/.*?(fyi|for your information)[\s:\-\)]*/i, '');
-                clean = clean.replace(/^(?:<[^>]*>)*\s*[•\-\*\d\.]\s*/, '').trim();
-                if (clean) blockHtml = `<p>${clean}</p>`;
+                if (fyiResult.content) blockHtml = `<p>${fyiResult.content}</p>`;
                 return;
-            } 
-            else if (isNewStep && !tag.match(/^H[1-6]$/)) {
+            }
+            if (fyiResult.isEscaped) {
+                text = fyiResult.cleanText;
+                inner = fyiResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
+            }
+            
+            // 9. DETEKSI PEMBAHASAN (3-Layer Detection)
+            const pembahasanResult = detectPattern(text, inner, PATTERNS.PEMBAHASAN);
+            if (pembahasanResult.detected && !inSplit) {
+                closeActiveBlock();
+                closeAlgo();
+                closePembahasan();
+                let cleanTitle = 'Pembahasan';
+                if (pembahasanResult.isTagged) {
+                    // Extract title if available
+                    const titleMatch = text.match(/\[PEMBAHASAN\]\s*(.*)/i);
+                    if (titleMatch && titleMatch[1].trim()) {
+                        cleanTitle = titleMatch[1].trim();
+                    }
+                } else {
+                    const titleMatch = text.match(/^(pembahasan[^:]*):?/i);
+                    cleanTitle = titleMatch ? titleMatch[1] : 'Pembahasan';
+                }
+                cleanTitle = cleanTitle.replace(/[^a-zA-Z0-9 ]/g, '').trim();
+                finalHtml += `<details class="scyra-pembahasan"><summary>💡 ${cleanTitle}</summary><div class="pembahasan-isi">`;
+                isPembahasanOpen = true;
+                if (pembahasanResult.content) {
+                    finalHtml += `<p>${pembahasanResult.content}</p>`;
+                }
+                return;
+            }
+            if (pembahasanResult.isEscaped) {
+                text = pembahasanResult.cleanText;
+                inner = pembahasanResult.cleanInner;
+                rawEl = `<p>${inner}</p>`;
+            }
+            
+            // 10. DETEKSI LANGKAH BARU (3-Layer Detection)
+            // Check for [LANGKAH] tag first
+            const langkahTagMatch = inner.match(/\[LANGKAH\]/i);
+            if (langkahTagMatch) {
+                closeActiveBlock();
+                // Extract step number and content
+                const cleanInner = inner.replace(/\[LANGKAH\]/i, '').trim();
+                const numMatch = cleanInner.match(/\d+/);
+                const num = numMatch ? numMatch[0] : '•';
+                const content = cleanInner.replace(/^\s*\d+[\.\):\-]?\s*/, '').trim();
+                if (content) {
+                    algoHtml += `
+                        <div class="algo-step">
+                            <span class="step-num">${num}</span>
+                            <div class="step-content"><p>${content}</p></div>
+                        </div>`;
+                    inAlgo = true;
+                }
+                return;
+            }
+            
+            // Check for escape syntax for steps
+            const escapedStep = text.trimStart().startsWith('\\') && (
+                text.toLowerCase().match(/\\(langkah|step|trik|cara)\s*\d+/i) ||
+                text.match(/\\\s*\d+[\.\)]/i)
+            );
+            if (escapedStep) {
+                text = text.replace(/^\s*\\/, '');
+                inner = inner.replace(/^\s*\\/, '');
+                rawEl = `<p>${inner}</p>`;
+            }
+            
+            // Auto-detection with stricter rules (must start with keyword/number + colon/dash)
+            let isKeywordStep = lower.match(/^\s*(?:[•\-\*]?\s*)?(langkah|step|trik|cara)\s*\d+\s*[:\-]/i);
+            let isNumberedStep = lower.match(/^\s*\d+[\.\)]\s/) && !lower.match(/^(?:•|o|-|\*)\s+\d+/);
+            let isNewStep = (isKeywordStep || isNumberedStep) && !escapedStep;
+            
+            if (isNewStep && !tag.match(/^H[1-6]$/)) {
                 closeActiveBlock();
                 // Tentukan nomor langkah
                 let numMatch = text.match(/\d+/);
@@ -500,21 +698,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     inAlgo = true;
                 }
                 return;
-            } 
-            else if (lower.startsWith('pembahasan') && !inSplit) { 
-                closeActiveBlock();
-                closeAlgo();
-                closePembahasan(); 
-                let titleMatch = text.match(/^(pembahasan[^:]*):?/i);
-                let cleanTitle = titleMatch ? titleMatch[1] : text;
-                cleanTitle = cleanTitle.replace(/[^a-zA-Z0-9 ]/g, '').trim();
-                finalHtml += `<details class="scyra-pembahasan"><summary>💡 ${cleanTitle}</summary><div class="pembahasan-isi">`;
-                isPembahasanOpen = true; 
-                let sisaTeks = text.replace(/^(pembahasan[^:]*):?/i, '').trim();
-                if (sisaTeks) {
-                    finalHtml += `<p>${sisaTeks}</p>`;
-                }
-            } 
+            }
+            
             // 🚨 DETEKSI KUNCI JAWABAN
             else if (lower.match(/^(jawaban|kunci jawaban)[:\s]+[a-e]/i)) {
                 const match = lower.match(/^(jawaban|kunci jawaban)[:\s]+([a-e])/i);

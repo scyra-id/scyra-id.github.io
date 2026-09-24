@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         xpBarFill: () => document.getElementById('statXpBarFill'),
         xpText: () => document.getElementById('statXpText'),
         unclaimedBadge: () => document.getElementById('statUnclaimedBadge'),
+        achievementCount: () => document.getElementById('statAchievementCount'),
         streakStatus: () => document.getElementById('dashStreakStatusPill'),
         streakDot: () => document.getElementById('dashStreakDot'),
         btnDailyLogin: () => document.getElementById('btnClaimDailyLogin'),
@@ -172,10 +173,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     stLabel.textContent = `${gState.dailyStreak} HARI Streak`;
                 }
                 await setupDailyLoginAction(userId);
+                await renderAchievementWidget(userId);
                 await renderHeroMascot(userId);
             } catch (err) {
                 console.warn('Gamification widget render error:', err);
             }
+        }
+    }
+
+    async function renderAchievementWidget(userId) {
+        const countNode = el.achievementCount();
+        if (!countNode || !window.ScyraAchievementEngine) return;
+
+        try {
+            const summary = await window.ScyraAchievementEngine.getFullAchievementSummary(userId);
+            countNode.textContent = summary.totalTiersUnlocked || 0;
+        } catch (err) {
+            console.warn('Achievement widget render error:', err);
         }
     }
 

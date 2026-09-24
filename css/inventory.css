@@ -11,9 +11,43 @@
 
 .studio-layout {
     display: grid;
-    grid-template-columns: 420px 1fr;
+    grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
     gap: 2rem;
     align-items: start;
+    width: 100%;
+    min-width: 0;
+}
+
+.studio-preview-card,
+.inventory-panel {
+    min-width: 0;
+}
+
+@media (min-width: 901px) and (min-height: 760px) {
+    .studio-layout {
+        height: min(720px, calc(100dvh - 9rem));
+    }
+
+    .studio-preview-card,
+    .inventory-panel {
+        height: 100%;
+    }
+
+    .inventory-panel {
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .items-grid {
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        align-content: start;
+        padding-right: 0.35rem;
+        scrollbar-gutter: stable;
+    }
 }
 
 /* ============================================================================
@@ -31,6 +65,7 @@
     position: sticky;
     top: 5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-sizing: border-box;
 }
 
 .studio-preview-header {
@@ -205,6 +240,7 @@
     border: 1px solid var(--border-color);
     border-radius: 24px;
     padding: 1.8rem;
+    box-sizing: border-box;
 }
 
 /* Slot Category Selector Tabs */
@@ -410,10 +446,304 @@
 
 @media (max-width: 900px) {
     .studio-layout {
-        grid-template-columns: 1fr;
+        height: auto;
     }
+
+    .inventory-panel {
+        display: block;
+        height: auto;
+        overflow: visible;
+    }
+
+    .items-grid {
+        overflow: visible;
+    }
+
+    .studio-container {
+        padding: 1.5rem 1rem;
+    }
+
+    .studio-layout {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
     .studio-preview-card {
         position: static;
         width: 100%;
+        padding: 1.5rem;
+    }
+    
+    .studio-preview-header {
+        margin-bottom: 1rem;
+    }
+    
+    .studio-preview-header h2 {
+        font-size: 1.2rem;
+    }
+    
+    .avatar-stage {
+        width: 280px;
+        height: 280px;
+        margin: 0 auto 1.3rem;
+    }
+    
+    .equipped-slots-bar {
+        gap: 0.4rem;
+    }
+    
+    .slot-indicator {
+        padding: 0.35rem;
+        font-size: 0.7rem;
+    }
+    
+    .slot-indicator-name {
+        font-size: 0.62rem;
+    }
+    
+    .studio-actions {
+        gap: 0.7rem;
+    }
+    
+    .btn-save-look,
+    .btn-reset-look {
+        padding: 0.7rem 0.9rem;
+        font-size: 0.9rem;
+    }
+
+    .inventory-panel {
+        padding: 1.5rem;
+    }
+    
+    .slot-category-tabs {
+        gap: 0.4rem;
+        padding-bottom: 0.6rem;
+        margin-bottom: 1rem;
+    }
+    
+    .slot-tab-btn {
+        padding: 0.4rem 0.85rem;
+        font-size: 0.78rem;
+    }
+    
+    .inventory-filters {
+        gap: 0.8rem;
+    }
+    
+    .filter-label {
+        font-size: 0.75rem;
+    }
+    
+    .filter-select {
+        padding: 0.38rem 0.7rem;
+        font-size: 0.78rem;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.9rem;
+    }
+    
+    .item-card {
+        padding: 0.75rem;
+    }
+    
+    .item-thumb {
+        width: 62px;
+        height: 62px;
+        font-size: 1.85rem;
+    }
+    
+    .item-name {
+        font-size: 0.82rem;
+    }
+    
+    .item-rarity-label {
+        font-size: 0.66rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .studio-container {
+        padding: 1rem 0.8rem;
+    }
+
+    .studio-preview-card {
+        padding: 1.3rem;
+        border-radius: 20px;
+    }
+    
+    .studio-preview-header h2 {
+        font-size: 1.1rem;
+    }
+    
+    .badge-equipped-count {
+        font-size: 0.7rem;
+        padding: 0.18rem 0.5rem;
+    }
+    
+    .avatar-stage {
+        width: 240px;
+        height: 240px;
+        margin-bottom: 1.2rem;
+    }
+    
+    .equipped-slots-bar {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.35rem;
+    }
+    
+    .slot-indicator {
+        padding: 0.3rem;
+        font-size: 0.65rem;
+        border-radius: 8px;
+    }
+    
+    .slot-indicator-name {
+        font-size: 0.58rem;
+    }
+    
+    .studio-actions {
+        flex-direction: column;
+        gap: 0.6rem;
+    }
+    
+    .btn-save-look,
+    .btn-reset-look {
+        flex: 1;
+        width: 100%;
+        padding: 0.65rem 0.8rem;
+        font-size: 0.88rem;
+    }
+
+    .inventory-panel {
+        padding: 1.3rem;
+        border-radius: 20px;
+    }
+    
+    .slot-category-tabs {
+        gap: 0.35rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .slot-tab-btn {
+        padding: 0.38rem 0.75rem;
+        font-size: 0.75rem;
+    }
+    
+    .inventory-filters {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.7rem;
+    }
+    
+    .filter-group {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .filter-select {
+        flex: 1;
+        max-width: none;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 0.75rem;
+        min-height: 240px;
+    }
+    
+    .item-card {
+        padding: 0.65rem;
+        border-radius: 14px;
+    }
+    
+    .item-badge-status {
+        top: 0.4rem;
+        right: 0.4rem;
+        font-size: 0.62rem;
+        padding: 0.12rem 0.35rem;
+    }
+    
+    .item-thumb {
+        width: 56px;
+        height: 56px;
+        font-size: 1.7rem;
+        margin: 0.3rem 0 0.5rem;
+    }
+    
+    .item-name {
+        font-size: 0.78rem;
+    }
+    
+    .item-rarity-label {
+        font-size: 0.64rem;
+    }
+    
+    .item-req-level {
+        font-size: 0.68rem;
+        margin-top: 0.25rem;
+    }
+    
+    .item-claim-link {
+        margin-top: 0.4rem;
+        padding: 0.25rem 0.45rem;
+        font-size: 0.68rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .avatar-stage {
+        width: 220px;
+        height: 220px;
+    }
+    
+    .items-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.65rem;
+    }
+    
+    .item-card {
+        padding: 0.6rem;
+    }
+    
+    .item-thumb {
+        width: 52px;
+        height: 52px;
+        font-size: 1.6rem;
+    }
+}
+
+@media (min-width: 901px) {
+    .studio-layout {
+        height: clamp(560px, calc(100vh - 10rem), 720px);
+        align-items: stretch;
+    }
+
+    .studio-preview-card,
+    .inventory-panel {
+        height: 100%;
+    }
+
+    .studio-preview-card {
+        position: static;
+    }
+
+    .inventory-panel {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+        overflow: hidden;
+    }
+
+    .items-grid {
+        flex: 1 1 0;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        align-content: start;
+        padding-right: 0.35rem;
+        scrollbar-gutter: stable;
     }
 }

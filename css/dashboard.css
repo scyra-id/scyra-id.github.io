@@ -278,7 +278,8 @@ body.dark-mode .course-badge {
     transition: transform 0.2s ease;
 }
 
-.hud-level-widget:hover {
+.hud-level-widget:hover,
+.hud-achievement-widget:hover {
     transform: translateY(-2px);
 }
 
@@ -501,6 +502,31 @@ body.dark-mode .hud-streak-pill {
     width: 100%;
 }
 
+.hud-link-arrow {
+    font-size: 1.35rem;
+    line-height: 1;
+    color: var(--brand-primary);
+}
+
+.hud-achievement-widget {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+.hud-achievement-icon {
+    font-size: 1.15rem;
+}
+
+.hud-achievement-widget strong {
+    color: var(--brand-accent);
+}
+
 .hud-level-widget {
     display: inline-flex;
     align-items: center;
@@ -514,7 +540,8 @@ body.dark-mode .hud-streak-pill {
     transition: transform 0.2s ease;
 }
 
-.hud-level-widget:hover {
+.hud-level-widget:hover,
+.hud-achievement-widget:hover {
     transform: translateY(-2px);
 }
 
@@ -823,6 +850,7 @@ body.dark-mode .hud-streak-pill {
     }
 
     .hud-level-widget,
+    .hud-achievement-widget,
     .hud-streak-pill {
         width: 100%;
         justify-content: space-between;

@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/auth.css"> <!-- Kita pakai styling card yang sama -->
     <link rel="stylesheet" href="css/achievements.css">
+    <link rel="stylesheet" href="css/profile.css">
 </head>
 <body class="dashboard-page">
     <div class="dashboard-layout">
@@ -25,145 +26,161 @@
             <!-- Overlay untuk mobile sidebar -->
             <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-<section class="dashboard-body profile-page-container">
-    <!-- 🎯 GRID WRAPPER: Menyatukan 3 kartu agar sejajar -->
-    <div class="profile-grid">
-        
-        <!-- ================= KARTU 1: INFO PROFIL ================= -->
-        <div class="profile-card main-profile-card">
-            <div class="card-header">
-                <h2>Atur Profile ⚙️</h2>
-                <p class="card-desc">Kelola informasi diri dan foto profilmu</p>
+<section class="dashboard-body">
+    <div class="profile-page-container">
+        <header class="profile-page-header">
+            <div>
+                <p class="profile-page-eyebrow">PUSAT AKUN</p>
+                <h1>👤 Profil & Pengaturan</h1>
+                <p>Kelola identitas, tampilan pejuang, dan keamanan akunmu dalam satu tempat.</p>
             </div>
-            
-            <!-- Avatar Section -->
-            <div class="avatar-section">
-                <img id="avatarPreview" src="" alt="Avatar" class="profile-avatar">
-                <input type="file" id="avatarInput" accept="image/*" hidden>
-                <button type="button" id="btnUploadAvatar" class="btn-ganti-foto">📷 Ganti Foto</button>
+            <div class="profile-header-status">
+                <span class="profile-status-dot" aria-hidden="true"></span>
+                Akun aktif
             </div>
+        </header>
 
-            <!-- 🌟 IDENTITAS GAMIFIKASI PUBLIK -->
-            <div class="profile-gamification-identity" id="profileGamificationIdentity">
-                <div class="profile-gamification-avatar">
-                    <div class="profile-kyra-canvas" id="profileKyraCanvas">
-                        <img class="profile-kyra-base" src="images/maskot.webp" alt="Kyra">
-                        <div class="profile-kyra-layer" id="profileLayerEffect"></div>
-                        <div class="profile-kyra-layer" id="profileLayerBody"></div>
-                        <div class="profile-kyra-layer" id="profileLayerOutfit"></div>
-                        <div class="profile-kyra-layer" id="profileLayerBack"></div>
-                        <div class="profile-kyra-layer" id="profileLayerExpression"></div>
-                        <div class="profile-kyra-layer" id="profileLayerFace"></div>
-                        <div class="profile-kyra-layer" id="profileLayerAntenna"></div>
-                        <div class="profile-kyra-layer" id="profileLayerHead"></div>
+        <div class="profile-layout">
+            <aside class="profile-identity-card">
+                <div class="profile-identity-top">
+                    <div class="profile-avatar-wrap">
+                        <img id="avatarPreview" src="" alt="Foto profil" class="profile-avatar">
+                        <input type="file" id="avatarInput" accept="image/*" hidden>
+                        <button type="button" id="btnUploadAvatar" class="btn-ganti-foto">📷 Ganti Foto</button>
+                    </div>
+                    <div class="profile-identity-copy">
+                        <h2 id="profileIdentityName">Pejuang Scyra</h2>
+                        <p id="profileIdentityUsername">@username</p>
                     </div>
                 </div>
-                <div class="profile-gamification-meta">
-                    <div class="profile-level-badge" id="profilePublicLevel">LV. 1</div>
-                    <div class="profile-streak-badge" id="profilePublicStreak">🔥 1 Hari Streak</div>
-                    <a href="inventory.html" class="profile-kyra-edit-link">Ubah Tampilan Kyra ↗</a>
-                </div>
-            </div>
+                <p class="profile-identity-bio" id="profileIdentityBio">Tambahkan bio untuk memperkenalkan dirimu.</p>
 
-            <!-- Form Profil -->
-            <form id="profileForm" class="security-form">
-                <div class="form-group">
-                    <label>Email (Tidak bisa diubah)</label>
-                    <input type="email" id="profileEmail" disabled>
-                </div>
-                <div class="form-group">
-                    <label>Nama Lengkap</label>
-                    <input type="text" id="profileName" placeholder="Nama lengkap kamu">
-                </div>
-                <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="profileUsername" placeholder="Username unik">
-                </div>
-                <div class="form-group">
-                    <label>Bio</label>
-                    <textarea id="profileBio" rows="3" placeholder="Ceritakan tentang dirimu..."></textarea>
-                </div>
-                <button type="submit" class="btn-submit"> Simpan Profil</button>
-            </form>
-        </div>
+                <div class="profile-identity-divider"></div>
 
-        <!-- ================= FEATURED BADGES SHOWCASE ================= -->
-        <section class="profile-featured-badges">
-            <h3>🏆 Featured Badges</h3>
-            <p style="font-size: 0.82rem; color: var(--text-secondary); margin: -0.5rem 0 1rem;">Badge pencapaian terbaikmu yang ditampilkan di profil.</p>
-            <div class="profile-badges-row" id="profileFeaturedBadges">
-                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 1</span></a>
-                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 2</span></a>
-                <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 3</span></a>
-            </div>
-        </section>
+                <section class="profile-companion" aria-labelledby="profileCompanionTitle">
+                    <div class="profile-section-heading">
+                        <div>
+                            <span class="profile-section-kicker">PARTNER BELAJAR</span>
+                            <h3 id="profileCompanionTitle">Kyra</h3>
+                        </div>
+                        <a href="inventory.html" class="profile-kyra-edit-link">Studio Kyra ↗</a>
+                    </div>
+                    <div class="profile-gamification-identity" id="profileGamificationIdentity">
+                        <div class="profile-gamification-avatar">
+                            <div class="profile-kyra-canvas" id="profileKyraCanvas">
+                                <img class="profile-kyra-base" src="images/maskot.webp" alt="Kyra">
+                                <div class="profile-kyra-layer" id="profileLayerEffect"></div>
+                                <div class="profile-kyra-layer" id="profileLayerBody"></div>
+                                <div class="profile-kyra-layer" id="profileLayerOutfit"></div>
+                                <div class="profile-kyra-layer" id="profileLayerBack"></div>
+                                <div class="profile-kyra-layer" id="profileLayerExpression"></div>
+                                <div class="profile-kyra-layer" id="profileLayerFace"></div>
+                                <div class="profile-kyra-layer" id="profileLayerAntenna"></div>
+                                <div class="profile-kyra-layer" id="profileLayerHead"></div>
+                            </div>
+                        </div>
+                        <div class="profile-gamification-meta">
+                            <div class="profile-level-badge" id="profilePublicLevel">LV. 1</div>
+                            <div class="profile-streak-badge" id="profilePublicStreak">🔥 1 Hari Streak</div>
+                        </div>
+                    </div>
+                </section>
 
-        <!-- ================= KARTU 2: GANTI EMAIL ================= -->
-        <div class="profile-card security-card">
-            <div class="card-header">
-                <h3>📧 Ubah Alamat Email</h3>
-                <p class="card-desc">Email baru akan dikirimkan link verifikasi. Email lama tetap aktif sampai verifikasi selesai.</p>
-            </div>
-            <form id="emailForm" class="security-form">
-                <div class="form-group">
-                    <label for="newEmail">Email Baru</label>
-                    <input type="email" id="newEmail" placeholder="nama@baru.com" required>
-                </div>
-                <div class="form-group">
-                    <label for="emailPassword">Password Saat Ini (Verifikasi Keamanan)</label>
-                    <input type="password" id="emailPassword" placeholder="Masukkan password Anda" required>
-                </div>
-                <div class="captcha-box">
-                    <label>🤖 KEAMANAN: JAWAB PERTANYAAN INI</label>
-                    <div class="captcha-row">
-                        <span class="captcha-question" id="emailCaptcha">5 + 3 = ?</span>
-                        <button type="button" class="btn-refresh-captcha" onclick="generateCaptcha('email')">🔄</button>
-                        <input type="text" id="emailCaptchaAnswer" placeholder="?" required>
+                <section class="profile-featured-badges" aria-labelledby="profileBadgesTitle">
+                    <div class="profile-section-heading">
+                        <div>
+                            <span class="profile-section-kicker">PENCAPAIAN</span>
+                            <h3 id="profileBadgesTitle">🏆 Badge Unggulan</h3>
+                        </div>
+                        <a href="achievements.html" class="profile-section-link">Atur ↗</a>
+                    </div>
+                    <p>Badge terbaik yang tampil di profilmu.</p>
+                    <div class="profile-badges-row" id="profileFeaturedBadges">
+                        <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 1</span></a>
+                        <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 2</span></a>
+                        <a href="achievements.html" class="profile-badge-slot" title="Atur featured badges di Achievement Hall"><span>+</span><span class="profile-badge-label">Slot 3</span></a>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="profile-settings-panel" aria-label="Pengaturan akun">
+                <nav class="profile-tabs" role="tablist" aria-label="Kategori pengaturan">
+                    <button type="button" class="profile-tab active" id="profile-tab-personal" role="tab" aria-selected="true" aria-controls="profile-panel-personal" data-profile-tab="personal">📝 Data Pribadi</button>
+                    <button type="button" class="profile-tab" id="profile-tab-security" role="tab" aria-selected="false" aria-controls="profile-panel-security" data-profile-tab="security">🔒 Keamanan</button>
+                    <button type="button" class="profile-tab profile-tab-danger" id="profile-tab-danger" role="tab" aria-selected="false" aria-controls="profile-panel-danger" data-profile-tab="danger">⚠️ Zona Bahaya</button>
+                </nav>
+
+                <div class="profile-tab-panel active" id="profile-panel-personal" role="tabpanel" aria-labelledby="profile-tab-personal">
+                    <div class="profile-card main-profile-card">
+                        <div class="card-header">
+                            <h2>Data Pribadi</h2>
+                            <p class="card-desc">Perbarui informasi yang akan mewakili dirimu di Scyra.</p>
+                        </div>
+                        <form id="profileForm" class="security-form">
+                            <div class="form-group form-group-wide">
+                                <label for="profileEmail">Email</label>
+                                <input type="email" id="profileEmail" disabled>
+                                <span class="form-hint">Untuk mengubah email, gunakan tab Keamanan.</span>
+                            </div>
+                            <div class="profile-form-grid">
+                                <div class="form-group">
+                                    <label for="profileName">Nama Lengkap</label>
+                                    <input type="text" id="profileName" placeholder="Nama lengkap kamu">
+                                </div>
+                                <div class="form-group">
+                                    <label for="profileUsername">Username</label>
+                                    <input type="text" id="profileUsername" placeholder="Username unik">
+                                </div>
+                            </div>
+                            <div class="form-group form-group-wide">
+                                <label for="profileBio">Bio</label>
+                                <textarea id="profileBio" rows="4" placeholder="Ceritakan tentang dirimu..."></textarea>
+                            </div>
+                            <button type="submit" class="btn-submit">Simpan Perubahan</button>
+                        </form>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">📧 Kirim Link Verifikasi Email</button>
-            </form>
-        </div>
 
-        <!-- ================= KARTU 3: GANTI PASSWORD ================= -->
-        <div class="profile-card security-card">
-            <div class="card-header">
-                <h3> Ubah Password</h3>
-                <p class="card-desc">Gunakan kombinasi huruf, angka, dan simbol minimal 8 karakter untuk keamanan maksimal.</p>
-            </div>
-            <form id="passwordForm" class="security-form">
-                <div class="form-group">
-                    <label for="currentPassword">Password Lama</label>
-                    <input type="password" id="currentPassword" placeholder="Password saat ini" required>
-                </div>
-                <div class="form-group">
-                    <label for="newPassword">Password Baru</label>
-                    <input type="password" id="newPassword" placeholder="Minimal 8 karakter" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirmNewPassword">Konfirmasi Password Baru</label>
-                    <input type="password" id="confirmNewPassword" placeholder="Ketik ulang password baru" required>
-                </div>
-                <div class="captcha-box">
-                    <label>🤖 KEAMANAN: JAWAB PERTANYAAN INI</label>
-                    <div class="captcha-row">
-                        <span class="captcha-question" id="passCaptcha">7 - 2 = ?</span>
-                        <button type="button" class="btn-refresh-captcha" onclick="generateCaptcha('pass')">🔄</button>
-                        <input type="text" id="passCaptchaAnswer" placeholder="?" required>
+                <div class="profile-tab-panel" id="profile-panel-security" role="tabpanel" aria-labelledby="profile-tab-security" hidden>
+                    <div class="profile-security-stack">
+                        <div class="profile-card security-card">
+                            <div class="card-header">
+                                <h2>🔒 Ubah Password</h2>
+                                <p class="card-desc">Gunakan kombinasi huruf, angka, dan simbol minimal 8 karakter.</p>
+                            </div>
+                            <form id="passwordForm" class="security-form">
+                                <div class="form-group"><label for="currentPassword">Password Lama</label><input type="password" id="currentPassword" placeholder="Password saat ini" required></div>
+                                <div class="profile-form-grid"><div class="form-group"><label for="newPassword">Password Baru</label><input type="password" id="newPassword" placeholder="Minimal 8 karakter" required></div><div class="form-group"><label for="confirmNewPassword">Konfirmasi Password Baru</label><input type="password" id="confirmNewPassword" placeholder="Ketik ulang password baru" required></div></div>
+                                <div class="captcha-box"><label>🤖 Keamanan: Jawab pertanyaan ini</label><div class="captcha-row"><span class="captcha-question" id="passCaptcha">7 - 2 = ?</span><button type="button" class="btn-refresh-captcha" onclick="generateCaptcha('pass')" aria-label="Buat pertanyaan baru">🔄</button><input type="text" id="passCaptchaAnswer" placeholder="Jawaban" required></div></div>
+                                <button type="submit" class="btn-submit">Update Password</button>
+                            </form>
+                        </div>
+                        <div class="profile-card security-card">
+                            <div class="card-header">
+                                <h2>📧 Ubah Alamat Email</h2>
+                                <p class="card-desc">Email baru akan menerima link verifikasi. Email lama tetap aktif hingga proses selesai.</p>
+                            </div>
+                            <form id="emailForm" class="security-form">
+                                <div class="form-group"><label for="newEmail">Email Baru</label><input type="email" id="newEmail" placeholder="nama@baru.com" required></div>
+                                <div class="form-group"><label for="emailPassword">Password Saat Ini</label><input type="password" id="emailPassword" placeholder="Masukkan password saat ini" required></div>
+                                <div class="captcha-box"><label>🤖 Keamanan: Jawab pertanyaan ini</label><div class="captcha-row"><span class="captcha-question" id="emailCaptcha">5 + 3 = ?</span><button type="button" class="btn-refresh-captcha" onclick="generateCaptcha('email')" aria-label="Buat pertanyaan baru">🔄</button><input type="text" id="emailCaptchaAnswer" placeholder="Jawaban" required></div></div>
+                                <button type="submit" class="btn-submit">Kirim Link Verifikasi</button>
+                            </form>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="btn-submit">🔒 Update Password</button>
-            </form>
+
+                <div class="profile-tab-panel" id="profile-panel-danger" role="tabpanel" aria-labelledby="profile-tab-danger" hidden>
+                    <section class="profile-card danger-zone" aria-labelledby="deleteAccountTitle">
+                        <div class="card-header">
+                            <h2 id="deleteAccountTitle">Hapus Akun</h2>
+                            <p class="card-desc">Tindakan ini permanen. Data profil, progress belajar, riwayat, dan kredit akun akan dihapus.</p>
+                        </div>
+                        <div class="danger-zone-action"><p>Pastikan semua data penting sudah disimpan sebelum melanjutkan.</p><button type="button" id="btnDeleteAccount" class="btn-delete-account">Hapus Akun Saya</button></div>
+                    </section>
+                </div>
+            </section>
         </div>
-
-        <section class="profile-card danger-zone" aria-labelledby="deleteAccountTitle">
-            <div class="card-header">
-                <h3 id="deleteAccountTitle">Hapus Akun</h3>
-                <p class="card-desc">Tindakan ini permanen. Data profil, progress belajar, riwayat, dan kredit akun akan dihapus.</p>
-            </div>
-            <button type="button" id="btnDeleteAccount" class="btn-delete-account">Hapus Akun Saya</button>
-        </section>
-
     </div>
 </section>
         </main>

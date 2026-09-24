@@ -36,14 +36,22 @@
                     <section class="welcome-section">
                         <!-- Top HUD Bar -->
                         <div class="top-hud-bar">
-                            <a href="journey.html" class="hud-level-widget" id="xpJourneyWidget" title="Buka SCYRA Journey">
-                                <span class="hud-level-icon">🌟</span>
+                            <a href="journey.html" class="hud-level-widget" id="xpJourneyWidget" title="Lihat peta perjalanan dan hadiah level">
+                                <span class="hud-level-icon">🗺️</span>
+                                <span class="hud-level-text">Peta Perjalanan</span>
                                 <span class="hud-level-text" id="statUserLevel">LEVEL 1</span>
                                 <div class="hud-xp-bar">
                                     <div class="hud-xp-fill" id="statXpBarFill" style="width: 0%;"></div>
                                 </div>
                                 <span class="hud-xp-subtext" id="statXpText">0 / 100 XP (0%)</span>
                                 <span class="xp-unclaimed-badge" id="statUnclaimedBadge" style="display: none;">🎁 Hadiah!</span>
+                                <span class="hud-link-arrow" aria-hidden="true">›</span>
+                            </a>
+
+                            <a href="achievements.html" class="hud-achievement-widget" title="Lihat koleksi pencapaianmu">
+                                <span class="hud-achievement-icon">🏆</span>
+                                <span><strong id="statAchievementCount">0</strong> Trofi Dibuka</span>
+                                <span class="hud-link-arrow" aria-hidden="true">›</span>
                             </a>
 
                             <button type="button" class="hud-streak-pill" id="btnClaimDailyLogin" title="Klaim XP Login Harian">
@@ -72,8 +80,8 @@
                                     <div class="kyra-layer-layer" id="layer-head"></div>
                                 </div>
 
-                                <a href="inventory.html" class="btn-kyra-customize" title="Kustomisasi Tampilan Kyra">
-                                    🎨 Makeover Kyra
+                                <a href="inventory.html" class="btn-kyra-customize" title="Masuk ke studio untuk mengubah tampilan Kyra">
+                                    🎨 Masuk Studio Kyra <span aria-hidden="true">›</span>
                                 </a>
                             </div>
 

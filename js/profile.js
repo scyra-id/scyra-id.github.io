@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await loadProfileData(user);
         await loadFeaturedBadges(user);
         await loadProfileGamificationIdentity(user);
+        setupProfileTabs();
+        setupProfileIdentityPreview();
         setupProfileForm(user);
         setupAvatarUpload(user);
         setupEmailForm(user);
@@ -34,7 +36,8 @@ function injectAvatar(urlFoto) {
     let ketemu = false;
     document.querySelectorAll('img').forEach(img => {
         const identitas = (img.id + ' ' + img.className).toLowerCase();
-        if (identitas.includes('avatar') || identitas.includes('profile') || identitas.includes('pic') || identitas.includes('foto') || identitas.includes('user-img')) {
+        const isMascotLayer = identitas.includes('profile-kyra');
+        if (!isMascotLayer && (identitas.includes('avatar') || identitas.includes('profile') || identitas.includes('pic') || identitas.includes('foto') || identitas.includes('user-img'))) {
             img.src = urlFoto;
             ketemu = true;
         }
@@ -66,6 +69,7 @@ async function loadProfileData(user) {
     if(usernameInput) usernameInput.value = profile.username || '';
     if(bioInput) bioInput.value = profile.bio || '';
     if(emailInput) emailInput.value = user.email;
+    updateProfileIdentityPreview();
 
     if (profile.avatar_url) {
         injectAvatar(profile.avatar_url + '?t=' + new Date().getTime());
@@ -162,6 +166,47 @@ async function loadProfileGamificationIdentity(user) {
     }
 }
 
+function setupProfileTabs() {
+    const tabs = document.querySelectorAll('[data-profile-tab]');
+    const panels = document.querySelectorAll('.profile-tab-panel');
+
+    tabs.forEach((tab) => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.profileTab;
+            tabs.forEach((item) => {
+                const isActive = item === tab;
+                item.classList.toggle('active', isActive);
+                item.setAttribute('aria-selected', String(isActive));
+            });
+            panels.forEach((panel) => {
+                const isActive = panel.id === `profile-panel-${target}`;
+                panel.classList.toggle('active', isActive);
+                panel.hidden = !isActive;
+            });
+        });
+    });
+}
+
+function updateProfileIdentityPreview() {
+    const nameInput = getInput('profileName', 'name', 'fullName', 'full_name', 'nama', 'namaLengkap');
+    const usernameInput = getInput('profileUsername', 'username', 'userName', 'namaPengguna');
+    const bioInput = getInput('profileBio', 'bio', 'tentang', 'about');
+    const nameEl = document.getElementById('profileIdentityName');
+    const usernameEl = document.getElementById('profileIdentityUsername');
+    const bioEl = document.getElementById('profileIdentityBio');
+
+    if (nameEl) nameEl.textContent = nameInput?.value.trim() || 'Pejuang Scyra';
+    if (usernameEl) usernameEl.textContent = usernameInput?.value.trim() ? `@${usernameInput.value.trim()}` : '@username';
+    if (bioEl) bioEl.textContent = bioInput?.value.trim() || 'Tambahkan bio untuk memperkenalkan dirimu.';
+}
+
+function setupProfileIdentityPreview() {
+    ['profileName', 'profileUsername', 'profileBio'].forEach((id) => {
+        const input = document.getElementById(id);
+        if (input) input.addEventListener('input', updateProfileIdentityPreview);
+    });
+}
+
 // === 2. SIMPAN FORM PROFIL (ANTI-OVERWRITE KOSONG) ===
 function setupProfileForm(user) {
     const form = document.getElementById('profileForm') || document.querySelector('main form') || document.querySelector('form');
@@ -188,6 +233,7 @@ function setupProfileForm(user) {
             const { error } = await window.db.from('profiles').update(payload).eq('id', user.id);
             if (error) throw error;
             
+            updateProfileIdentityPreview();
             if(window.showScyraAlert) await window.showScyraAlert('Profil diperbarui!', '✅ Sukses', '✅');
             else alert('Profil diperbarui!');
             
