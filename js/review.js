@@ -40,8 +40,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return window.location.href = 'dashboard.html';
             }
 
-            // 2. Render Ringkasan Skor
-            document.getElementById('sumSkor').textContent = hasil.skor;
+            // 2. Render Ringkasan Skor. IRT submissions stay pending until the
+            // live window is calibrated; normal tryouts keep their percentage.
+            const isPendingIrt = hasil.is_irt_live && hasil.score_status === 'PENDING';
+            document.getElementById('sumSkor').textContent = isPendingIrt
+                ? 'Menunggu'
+                : (hasil.irt_score ?? hasil.skor);
             document.getElementById('sumBenar').textContent = hasil.jumlah_benar;
             
             const salah = hasil.total_soal - hasil.jumlah_benar - (hasil.detail_jawaban.filter(d => !d.jawaban).length);
@@ -86,22 +90,35 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 // Generate Opsi HTML
                 let optionsHtml = '';
-                ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
-                    const optText = soal[`opsi_${opt.toLowerCase()}_html`];
-                    if (!optText) return;
+                if (soal.tipe_soal === 'bs') {
+                    const keys = (soal.kunci_jawaban || '').split(',').map(key => key.trim().toUpperCase());
+                    const statements = ['A', 'B', 'C', 'D', 'E']
+                        .map(opt => ({ key: opt, text: soal[`opsi_${opt.toLowerCase()}_html`] }))
+                        .filter(item => item.text);
+                    optionsHtml = `<table class="tabel-soal bs-table"><thead><tr><th>Pernyataan</th><th>Jawabanmu</th><th>Kunci</th></tr></thead><tbody>${statements.map((item, index) => {
+                        const answer = detail.jawaban?.[item.key] || '-';
+                        const key = keys[index] || '-';
+                        const isCorrect = answer === key;
+                        return `<tr><td>${renderShortcodes(item.text)}</td><td class="${isCorrect ? 'user-correct' : 'user-wrong'}">${answer === 'B' ? 'Benar' : answer === 'S' ? 'Salah' : '-'}</td><td>${key === 'B' ? 'Benar' : key === 'S' ? 'Salah' : '-'}</td></tr>`;
+                    }).join('')}</tbody></table>`;
+                } else {
+                    ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+                        const optText = soal[`opsi_${opt.toLowerCase()}_html`];
+                        if (!optText) return;
 
-                    let optClass = '';
-                    if (detail.jawaban === opt && detail.is_correct) optClass = 'user-correct';
-                    else if (detail.jawaban === opt && !detail.is_correct) optClass = 'user-wrong';
-                    else if (opt === soal.kunci_jawaban && !detail.is_correct) optClass = 'actual-correct';
+                        let optClass = '';
+                        if (detail.jawaban === opt && detail.is_correct) optClass = 'user-correct';
+                        else if (detail.jawaban === opt && !detail.is_correct) optClass = 'user-wrong';
+                        else if (opt === soal.kunci_jawaban && !detail.is_correct) optClass = 'actual-correct';
 
-                    optionsHtml += `
-                        <div class="q-opt ${optClass}">
-                            <span class="opt-letter">${opt}.</span>
-                            <span>${renderShortcodes(optText)}</span>
-                        </div>
-                    `;
-                });
+                        optionsHtml += `
+                            <div class="q-opt ${optClass}">
+                                <span class="opt-letter">${opt}.</span>
+                                <span>${renderShortcodes(optText)}</span>
+                            </div>
+                        `;
+                    });
+                }
 
                 // Gabungkan jadi Card
                 listContainer.innerHTML += `

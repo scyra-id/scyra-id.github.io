@@ -14,14 +14,75 @@ document.addEventListener('DOMContentLoaded', async () => {
     // =======================================================
     // FUNGSI KONVERSI SHORTCODE GAMBAR
     // =======================================================
+    /**
+     * Render pipe tables to HTML
+     */
+    function renderPipeTables(html) {
+        if (!html) return html;
+        
+        let result = '';
+        let tableRows = [];
+        
+        const flushTable = () => {
+            if (!tableRows.length) return;
+            const rows = tableRows
+                .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+                .join('');
+            result += `<table class="tabel-soal"><tbody>${rows}</tbody></table>`;
+            tableRows = [];
+        };
+        
+        // Process each line
+        const lines = html.split('\n');
+        
+        for (let line of lines) {
+            line = line.trim();
+            if (!line) {
+                result += '\n';
+                continue;
+            }
+            
+            // Check if line is pipe table format
+            const isPipeRow = line.includes('|') && /^\|?.*\|.*\|?$/.test(line);
+            
+            if (isPipeRow) {
+                const cells = line.split('|').map((cell) => cell.trim()).filter(Boolean);
+                if (cells.length > 1) {
+                    tableRows.push(cells);
+                    continue;
+                }
+            }
+            
+            // Not a table row, flush any pending table
+            flushTable();
+            result += line + '\n';
+        }
+        
+        // Flush any remaining table
+        flushTable();
+        
+        // Convert first row to header
+        result = result.replace(/<tbody>\s*<tr>(.*?)<\/tr>/i, (_, firstRow) =>
+            `<thead><tr>${firstRow.replace(/<td/g, '<th').replace(/<\/td>/g, '</th>')}</tr></thead><tbody>`
+        );
+        
+        return result;
+    }
+
     function renderShortcodes(html) {
         if (!html) return html;
-        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+        
+        // First render pipe tables
+        let output = renderPipeTables(html);
+        
+        // Then convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+        output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
             const cleanUrl = url.trim();
             const width = size ? size.trim() : '100%';
             return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
         });
+        
+        return output;
     }
 
     const sfxBenar = document.getElementById('sfxBenar');
@@ -78,6 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function renderSoalActive(index) {
+        // Scroll to top when changing question
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
         if (index >= state.listSoal.length) {
             try {
                 localStorage.setItem(`latihan_history_${state.userId}_${state.materiId}`, JSON.stringify(state.jawabanHistory));
@@ -101,11 +165,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     
         opsiContainer.innerHTML = '';
         if (tipe === 'bs') {
-            opsiContainer.innerHTML = `
-                <div class="bs-container">
-                    <button class="bs-btn" data-value="A" onclick="selectBSLatihan(this)">✅ Benar</button>
-                    <button class="bs-btn" data-value="B" onclick="selectBSLatihan(this)">❌ Salah</button>
-                </div>`;
+            const statements = ['A', 'B', 'C', 'D', 'E']
+                .map(key => ({ key, text: dataSoal[`opsi_${key.toLowerCase()}_html`] }))
+                .filter(item => item.text);
+            opsiContainer.innerHTML = `<table class="tabel-soal bs-table"><thead><tr><th>Pernyataan</th><th>Benar</th><th>Salah</th></tr></thead><tbody>${statements.map(item => `<tr><td>${renderShortcodes(item.text)}</td><td><button type="button" class="bs-btn" data-statement="${item.key}" data-value="B">Benar</button></td><td><button type="button" class="bs-btn" data-statement="${item.key}" data-value="S">Salah</button></td></tr>`).join('')}</tbody></table><button type="button" id="btnCekBS" class="btn-lanjut-bab" style="margin-top:1rem; background:var(--brand-primary); color:white;">Cek Jawaban</button>`;
+            
+            console.log('[BS] Tombol BS rendered, statements:', statements.length);
         } else if (tipe === 'isian') {
             const inputHtml = `<input type="text" class="kotak-isian" id="isianInputLatihan" placeholder="..." autocomplete="off">`;
             document.getElementById('soalText').innerHTML = document.getElementById('soalText').innerHTML.replace(/<span class="kotak-isian"><\/span>/g, inputHtml);
@@ -159,6 +224,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isBenar = userAns === keyAns && userAns !== '';
                 const input = document.getElementById('isianInputLatihan');
                 if (input) input.classList.add(isBenar ? 'correct' : 'wrong');
+            } else if (tipe === 'bs') {
+                const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => dataSoal[`opsi_${opt.toLowerCase()}_html`]);
+                const keys = (kunciAsli || '').split(',').map(key => key.trim().toUpperCase());
+                isBenar = statements.length > 0 && statements.every((statement, index) => jawabanUser?.[statement] === keys[index]);
             } else {
                 isBenar = jawabanUser === kunciAsli;
             }
@@ -176,10 +245,14 @@ document.addEventListener('DOMContentLoaded', async () => {
                     else { b.style.opacity = '0.4'; }
                 });
             } else if (tipe === 'bs') {
+                const keys = (kunciAsli || '').split(',').map(key => key.trim().toUpperCase());
                 document.querySelectorAll('.bs-btn').forEach(b => {
-                    const val = b.getAttribute('data-value');
-                    if (val === kunciAsli) b.classList.add('correct');
-                    else if (val === jawabanUser && !isBenar) b.classList.add('wrong');
+                    const statement = b.getAttribute('data-statement');
+                    const expected = keys[['A', 'B', 'C', 'D', 'E'].indexOf(statement)];
+                    const value = b.getAttribute('data-value');
+                    if (value === expected) b.classList.add('correct');
+                    else if (value === jawabanUser?.[statement]) b.classList.add('wrong');
+                    b.disabled = true;
                 });
             }
 
@@ -215,14 +288,33 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const input = document.getElementById('isianInputLatihan');
                 processAnswer(input ? input.value.trim() : '');
             };
+        } else if (tipe === 'bs') {
+            const answers = {};
+            const bsBtns = document.querySelectorAll('.bs-btn');
+            console.log('[BS] Attaching event listeners to', bsBtns.length, 'buttons');
+            
+            bsBtns.forEach(btn => {
+                btn.onclick = () => {
+                    const statement = btn.getAttribute('data-statement');
+                    const value = btn.getAttribute('data-value');
+                    answers[statement] = value;
+                    console.log('[BS] Clicked:', statement, value, 'Current answers:', answers);
+                    document.querySelectorAll(`.bs-btn[data-statement="${statement}"]`).forEach(item => item.classList.remove('selected'));
+                    btn.classList.add('selected');
+                };
+            });
+            
+            const btnCek = document.getElementById('btnCekBS');
+            if (btnCek) {
+                btnCek.onclick = () => {
+                    console.log('[BS] Cek jawaban clicked, answers:', answers);
+                    processAnswer(answers);
+                };
+            } else {
+                console.error('[BS] Button btnCekBS not found!');
+            }
         }
     }
-
-window.selectBSLatihan = function(btn) {
-    document.querySelectorAll('.bs-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    setTimeout(() => processAnswer(btn.getAttribute('data-value')), 300); // Auto cek setelah klik
-};
 
     // ===============================================
     // RENDER LAYAR SUMMARY & LIHAT HASIL
@@ -232,7 +324,12 @@ window.selectBSLatihan = function(btn) {
         let reviewHTML = '';
 
         state.jawabanHistory.forEach((item, index) => {
-            const isBenar = item.jawaban_user === item.kunci_asli;
+            const tipe = item.soal.tipe_soal || 'pg';
+            const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => item.soal[`opsi_${opt.toLowerCase()}_html`]);
+            const keys = (item.kunci_asli || '').split(',').map(key => key.trim().toUpperCase());
+            const isBenar = tipe === 'bs'
+                ? statements.length > 0 && statements.every((statement, keyIndex) => item.jawaban_user?.[statement] === keys[keyIndex])
+                : item.jawaban_user === item.kunci_asli;
             if (isBenar) totalBenar++;
             
             reviewHTML += `

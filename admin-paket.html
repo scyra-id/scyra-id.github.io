@@ -66,8 +66,65 @@
                         <option value="nonaktif">Nonaktif (Disembunyikan)</option>
                     </select>
                 </div>
-                <button type="submit" class="btn-admin" style="width:100%;">💾 Simpan & Generate Subtes</button>
+                
+                <!-- IRT System Toggle -->
+                <div class="form-group" style="border: 2px solid var(--brand-accent); padding: 1rem; border-radius: 8px; background: var(--hover-bg);">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" id="enableIRT" style="width: auto;">
+                        <span>🎯 Aktifkan Sistem IRT (Item Response Theory)</span>
+                    </label>
+                    <small style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                        Jika diaktifkan: Skor menggunakan IRT (0-1000), ada window kalibrasi 3 hari, premium user bisa retry unlimited.
+                    </small>
+                </div>
+                
+                <!-- IRT Window (shown only if IRT enabled) -->
+                <div id="irtWindowFields" style="display: none; border-left: 3px solid var(--brand-accent); padding-left: 1rem; margin-top: 1rem;">
+                    <h4 style="margin: 0 0 1rem 0; color: var(--brand-primary);">Window IRT (3 Hari Kalibrasi)</h4>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Window Mulai 📅</label>
+                            <input type="datetime-local" id="irtWindowStart">
+                            <small>Saat window mulai, user bisa join (1x only)</small>
+                        </div>
+                        <div class="form-group">
+                            <label>Window Selesai ⏰</label>
+                            <input type="datetime-local" id="irtWindowEnd">
+                            <small>Setelah selesai, auto-kalibrasi dijalankan</small>
+                        </div>
+                    </div>
+                    <div class="info-box" style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.75rem; border-radius: 4px; margin-top: 1rem;">
+                        <strong>ℹ️ Catatan IRT:</strong>
+                        <ul style="margin: 0.5rem 0 0 1.5rem; padding: 0; font-size: 0.85rem;">
+                            <li>Window biasanya 3 hari untuk kumpulkan data kalibrasi</li>
+                            <li>User hanya bisa ikut 1x selama window (data untuk kalibrasi)</li>
+                            <li>Skor pending sampai kalibrasi selesai</li>
+                            <li>Premium user bisa retry setelah window selesai</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-admin" style="width:100%; margin-top: 1rem;">💾 Simpan & Generate Subtes</button>
             </form>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="poolModalOverlay">
+        <div class="modal-box" style="max-width: 860px;">
+            <div class="modal-header">
+                <h3 id="poolModalTitle">Atur Pool Soal</h3>
+                <button class="btn-close-modal" id="btnClosePoolModal">&times;</button>
+            </div>
+            <div style="padding: 1.5rem;">
+                <p id="poolModalInfo" style="color: var(--text-secondary); margin-top: 0;"></p>
+                <div id="poolSubtestChooser" style="display: grid; gap: .5rem; margin-bottom: 1rem;"></div>
+                <input type="search" id="poolQuestionSearch" placeholder="Cari pertanyaan..." style="width: 100%; margin-bottom: 1rem;">
+                <div id="poolQuestionList" style="max-height: 430px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;"></div>
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem;">
+                    <strong id="poolSelectedCount">0 soal dipilih</strong>
+                    <button type="button" class="btn-admin" id="btnSavePool">Simpan Pool Soal</button>
+                </div>
+            </div>
         </div>
     </div>
 

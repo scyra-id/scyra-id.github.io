@@ -721,8 +721,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 closeAlgo();
                 finalHtml += `
                     <div class="bs-container" style="margin-top: 1rem;">
-                        <button class="bs-btn" data-answer="A" onclick="handleAnswerClick('A', this)">✅ Benar</button>
-                        <button class="bs-btn" data-answer="B" onclick="handleAnswerClick('B', this)">❌ Salah</button>
+                        <button type="button" class="bs-btn" data-answer="A" onclick="handleAnswerClick('A', this)">✅ Benar</button>
+                        <button type="button" class="bs-btn" data-answer="B" onclick="handleAnswerClick('B', this)">❌ Salah</button>
                     </div>`;
                 return;
             }

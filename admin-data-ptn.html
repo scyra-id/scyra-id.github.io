@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data PTN - Admin Scyra</title>
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-data-ptn.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <section class="dashboard-body">
+                <main class="admin-container ptn-browser-container">
+                    <div class="admin-header">
+                        <h1>🏛️ Data PTN & Prodi</h1>
+                        <p>Lihat data PTN yang telah diimpor, program studi, kuota, estimasi skor, dan subtes prioritas.</p>
+                        <div class="ptn-header-actions">
+                            <a href="admin.html" class="btn-back-admin">← Dashboard Admin</a>
+                            <a href="admin-import-ptn.html" class="btn-admin ptn-import-link">📂 Import JSON PTN</a>
+                        </div>
+                    </div>
+
+                    <section class="ptn-stat-grid">
+                        <article><span class="ptn-stat-icon">🏛️</span><strong id="statPtnCount">-</strong><span>PTN Tersimpan</span></article>
+                        <article><span class="ptn-stat-icon">🎓</span><strong id="statProdiCount">-</strong><span>Prodi Aktif</span></article>
+                        <article><span class="ptn-stat-icon">📦</span><strong id="statCapacityCount">-</strong><span>Data Kuota</span></article>
+                    </section>
+
+                    <section class="ptn-browser-card">
+                        <div class="ptn-filter-row">
+                            <input type="search" id="ptnSearch" placeholder="Cari nama atau kode PTN...">
+                            <select id="ptnTypeFilter">
+                                <option value="">Semua Jenis</option>
+                                <option value="Akademik">Akademik</option>
+                                <option value="Vokasi">Vokasi</option>
+                                <option value="PTKIN">PTKIN</option>
+                            </select>
+                        </div>
+                        <div id="ptnTableWrap" class="ptn-table-wrap"><p class="ptn-browser-empty">Memuat data PTN...</p></div>
+                        <div class="ptn-pagination">
+                            <button id="btnPtnPrevious" class="ptn-page-button">← Sebelumnya</button>
+                            <span id="ptnPageInfo">Halaman 1</span>
+                            <button id="btnPtnNext" class="ptn-page-button">Selanjutnya →</button>
+                        </div>
+                    </section>
+                </main>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="ptnDetailModal">
+        <div class="modal-box ptn-detail-modal-box">
+            <div class="modal-header"><h3 id="ptnDetailTitle">Detail PTN</h3><button class="btn-close-modal" id="btnClosePtnDetail">&times;</button></div>
+            <div id="ptnDetailContent" class="ptn-detail-content"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/admin-data-ptn.js?v=20261018-detail-modal-fix"></script>
+</body>
+</html>

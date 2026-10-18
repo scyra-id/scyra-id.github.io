@@ -207,18 +207,32 @@
                     <textarea id="editPertanyaan" rows="4" required style="width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary); font-family: monospace;"></textarea>
                 </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
-                    <div class="form-group"><label>Opsi A</label><input type="text" id="editOpsiA" required></div>
-                    <div class="form-group"><label>Opsi B</label><input type="text" id="editOpsiB" required></div>
-                    <div class="form-group"><label>Opsi C</label><input type="text" id="editOpsiC" required></div>
-                    <div class="form-group"><label>Opsi D</label><input type="text" id="editOpsiD" required></div>
-                    <div class="form-group"><label>Opsi E</label><input type="text" id="editOpsiE" required></div>
-                    <div class="form-group">
-                        <label>Kunci Jawaban</label>
-                        <select id="editKunci" required>
-                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
-                        </select>
-                    </div>
+                <!-- Container Opsi (akan diubah berdasarkan tipe soal) -->
+                <div id="opsiContainer" style="display:grid; grid-template-columns: 1fr 1fr; gap:1rem;">
+                    <div class="form-group"><label id="labelOpsiA">Opsi A</label><input type="text" id="editOpsiA"></div>
+                    <div class="form-group"><label id="labelOpsiB">Opsi B</label><input type="text" id="editOpsiB"></div>
+                    <div class="form-group"><label id="labelOpsiC">Opsi C</label><input type="text" id="editOpsiC"></div>
+                    <div class="form-group"><label id="labelOpsiD">Opsi D</label><input type="text" id="editOpsiD"></div>
+                    <div class="form-group"><label id="labelOpsiE">Opsi E</label><input type="text" id="editOpsiE"></div>
+                </div>
+
+                <!-- Kunci Jawaban (dinamis berdasarkan tipe) -->
+                <div class="form-group">
+                    <label id="labelKunci">Kunci Jawaban</label>
+                    
+                    <!-- Dropdown untuk PG -->
+                    <select id="editKunciPG" style="display:none;">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                    </select>
+                    
+                    <!-- Input text untuk BS dan Isian -->
+                    <input type="text" id="editKunciText" placeholder="Contoh BS: B,S,B atau Isian: Jakarta" style="display:none; width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
+                    
+                    <small id="hintKunci" style="display:block; margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;"></small>
                 </div>
 
                 <div class="form-group">
@@ -243,6 +257,6 @@
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>
     <script src="js/dashboard-layout.js"></script>
-<script src="js/admin-soal.js?v=2"></script>
+<script src="js/admin-soal.js?v=20261018f"></script>
 </body>
 </html>

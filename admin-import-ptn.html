@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Data PTN - Admin Scyra</title>
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-import-ptn.css">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <section class="dashboard-body">
+                <main class="admin-container ptn-import-container">
+                    <div class="admin-header">
+                        <h1>🏛️ Import Data PTN</h1>
+                        <p>Setiap file JSON mewakili satu PTN. Pilih banyak file sekaligus untuk diproses berurutan.</p>
+                        <a href="admin.html" class="btn-back-admin">← Kembali ke Dashboard Admin</a>
+                    </div>
+
+                    <section class="ptn-import-card">
+                        <label class="ptn-dropzone" for="ptnJsonFiles" id="ptnDropzone">
+                            <span class="ptn-dropzone-icon">📂</span>
+                            <strong>Pilih banyak file JSON PTN</strong>
+                            <span>Atau tarik dan lepas file ke area ini</span>
+                            <input id="ptnJsonFiles" type="file" accept="application/json,.json" multiple hidden>
+                        </label>
+                        <div class="ptn-import-actions">
+                            <span id="ptnFileSummary">Belum ada file dipilih.</span>
+                            <button class="btn-admin" id="btnStartPtnImport" disabled>Import File Valid</button>
+                        </div>
+                    </section>
+
+                    <section class="ptn-import-card">
+                        <div class="ptn-section-title"><h2>Preview File</h2><span id="ptnPreviewCount">0 file</span></div>
+                        <div id="ptnFileList" class="ptn-file-list"><p class="ptn-empty">Pilih file JSON untuk melihat validasinya.</p></div>
+                    </section>
+
+                    <section class="ptn-import-card">
+                        <div class="ptn-section-title"><h2>Hasil Import</h2><button class="ptn-text-button" id="btnClearPtnLog">Bersihkan</button></div>
+                        <div id="ptnImportLog" class="ptn-import-log"><p class="ptn-empty">Belum ada proses import.</p></div>
+                    </section>
+                </main>
+            </section>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/admin-import-ptn.js"></script>
+</body>
+</html>

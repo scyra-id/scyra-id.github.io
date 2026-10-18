@@ -73,14 +73,43 @@ document.addEventListener('DOMContentLoaded', async () => {
                  .single();
 
              if (paket && !paketError) {
-                 const titleEl = document.getElementById('toTitle');
-                 if (titleEl) titleEl.textContent = paket.nama_paket || 'Tryout SNBT';
-            }
+                  const titleEl = document.getElementById('toTitle');
+                  if (titleEl) titleEl.textContent = paket.nama_paket || 'Tryout SNBT';
+             } else {
+                 throw paketError || new Error('Paket tryout tidak ditemukan.');
+             }
 
-            // 2. Ambil semua kategori UTBK sebagai subtes
-            const { data: kategoriList, error: kategoriError } = await window.db
-                .from('kategori')
-                .select('*')
+             const sekarang = new Date();
+             const isIRT = Boolean(paket.is_irt_enabled);
+             const irtMulai = paket.irt_window_start ? new Date(paket.irt_window_start) : null;
+             const irtSelesai = paket.irt_window_end ? new Date(paket.irt_window_end) : null;
+             // IRT changes the scoring lifecycle only. The package keeps this
+             // existing detail page and its ordinary subtest UI.
+             if (isIRT && (!irtMulai || !irtSelesai)) {
+                 throw new Error('Konfigurasi window IRT paket belum lengkap.');
+             }
+
+             if (isIRT && sekarang < irtMulai) {
+                 await showScyraAlert('Tryout ini belum dibuka.', 'Terkunci', '🔒');
+                 return window.location.href = 'tryout.html';
+             }
+
+             if (isIRT && sekarang > irtSelesai && !isGold) {
+                 await showScyraAlert('Periode tryout ini telah berakhir. Akses ulang tersedia untuk pengguna premium.', 'Terkunci', '🔒');
+                 return window.location.href = 'tryout.html';
+             }
+
+             if (!isIRT && (sekarang < new Date(paket.waktu_mulai) || sekarang > new Date(paket.waktu_selesai))) {
+                 await showScyraAlert('Tryout ini sedang tidak dapat diakses saat ini.', 'Terkunci', '🔒');
+                 return window.location.href = 'tryout.html';
+             }
+
+             const irtAttemptMode = isIRT && sekarang > irtSelesai ? 'replay' : (isIRT ? 'live' : 'regular');
+
+             // 2. Ambil kategori untuk memetakan kode subtes ke UUID.
+             const { data: kategoriList, error: kategoriError } = await window.db
+                 .from('kategori')
+                 .select('*')
                 .eq('jenjang', 'utbk')
                 .order('nama_mapel');
 
@@ -91,25 +120,53 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // 3. Bentuk data subtes dengan mapping default waktu & soal
-            let subtesData = kategoriList.map(k => {
-                const defaults = subtesDefaults[k.nama_mapel] || { kode: k.slug, waktu: 20, soal: 15 };
-                return {
-                    id: k.id,
-                    nama: k.nama_mapel,
-                    kode: defaults.kode,
-                    waktu: defaults.waktu,
-                    jml_soal: defaults.soal
-                };
-            });
+             // 3. Use the subtests generated for this package. This keeps the
+             // admin-configured duration, question count, and selected pool as
+             // the source of truth. Old packages fall back to the original map.
+             const { data: paketSubtes, error: subtesError } = await window.db
+                 .from('subtes_tryout')
+                 .select('id, nama_subtes, kategori_db, waktu_menit, jml_soal, soal_pool_ids')
+                 .eq('paket_id', toId);
+             if (subtesError) throw subtesError;
+
+             const kategoriByCode = new Map();
+             kategoriList.forEach(kategori => {
+                 if (kategori.slug) kategoriByCode.set(kategori.slug.toUpperCase(), kategori);
+                 const defaults = subtesDefaults[kategori.nama_mapel];
+                 if (defaults?.kode) kategoriByCode.set(defaults.kode.toUpperCase(), kategori);
+             });
+
+             let subtesData = paketSubtes?.length
+                 ? paketSubtes.map(subtes => {
+                     const kategori = kategoriByCode.get((subtes.kategori_db || '').toUpperCase());
+                     return {
+                         id: kategori?.id || subtes.id,
+                         nama: subtes.nama_subtes,
+                         kode: subtes.kategori_db,
+                         waktu: subtes.waktu_menit,
+                         jml_soal: subtes.jml_soal,
+                         poolCount: (subtes.soal_pool_ids || []).length
+                     };
+                 }).filter(subtes => subtes.kode)
+                 : kategoriList.map(k => {
+                     const defaults = subtesDefaults[k.nama_mapel] || { kode: k.slug, waktu: 20, soal: 15 };
+                     return {
+                         id: k.id,
+                         nama: k.nama_mapel,
+                         kode: defaults.kode,
+                         waktu: defaults.waktu,
+                         jml_soal: defaults.soal,
+                         poolCount: 0
+                     };
+                 });
 
             // 4. Load atau acak urutan subtes (persist per user + paket)
             const stateKey = `tryout_state_${user.id}_${toId}`;
             let savedState = localStorage.getItem(stateKey);
             let state;
 
-            if (savedState) {
-                state = JSON.parse(savedState);
+             if (savedState) {
+                 state = JSON.parse(savedState);
                 // Pastikan urutan subtes yang tersimpan masih valid
                 const validIds = subtesData.map(s => s.id);
                 state.order = state.order.filter(id => validIds.includes(id));
@@ -124,18 +181,30 @@ document.addEventListener('DOMContentLoaded', async () => {
                     order: subtesData.sort(() => Math.random() - 0.5).map(s => s.id),
                     completed: []
                 };
-                localStorage.setItem(stateKey, JSON.stringify(state));
-            }
+                 localStorage.setItem(stateKey, JSON.stringify(state));
+             }
+
+             // A premium replay is a fresh attempt of the same package, so it
+             // must not inherit the completed-subtest state of the live attempt.
+             if (irtAttemptMode === 'replay') {
+                 state.completed = [];
+                 localStorage.setItem(stateKey, JSON.stringify(state));
+             }
 
             // 5. Sinkronkan status selesai dari hasil_tryout (agar kalau localStorage hilang tetap valid)
-            const { data: hasilData, error: hasilError } = await window.db
-                .from('hasil_tryout')
-                .select('kategori_id')
-                .eq('user_id', user.id)
-                .not('kategori_id', 'is', null);
+             const { data: hasilData, error: hasilError } = await window.db
+                 .from('hasil_tryout')
+                 .select('kategori_id, is_irt_live')
+                 .eq('user_id', user.id)
+                 .eq('paket_tryout_id', toId)
+                 .not('kategori_id', 'is', null);
 
-            if (!hasilError && hasilData) {
-                const completedIds = hasilData.map(h => h.kategori_id);
+             if (!hasilError && hasilData && irtAttemptMode !== 'replay') {
+                 // During the live IRT window, a subtest may only be submitted
+                 // once. Premium replays happen after the window and remain open.
+                 const completedIds = hasilData
+                     .filter(h => !isIRT || (irtAttemptMode === 'live' && h.is_irt_live))
+                     .map(h => h.kategori_id);
                 state.completed = [...new Set([...state.completed, ...completedIds])];
                 localStorage.setItem(stateKey, JSON.stringify(state));
             }
@@ -156,7 +225,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 let btnText = 'Mulai Ujian 🚀';
                 let btnClass = 'btn-primary-lg';
                 let btnStyle = 'padding: 0.6rem 2rem; font-size: 0.95rem;';
-                let btnOnclick = `onclick="mulaiUjian('${st.kode}', ${st.jml_soal}, ${st.waktu}, '${toId}')"`;
+                 let btnOnclick = `onclick="mulaiUjian('${st.kode}', ${st.jml_soal}, ${st.waktu}, '${toId}', '${irtAttemptMode}')"`;
                 let badge = '';
 
                 if (isCompleted) {
@@ -178,10 +247,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div class="st-info">
                         ${badge}
                         <h4>${st.nama}</h4>
-                        <div class="st-meta">
-                            <span>⏱️ ${st.waktu} Menit</span>
-                            <span>📝 ${st.jml_soal} Soal</span>
-                        </div>
+                         <div class="st-meta">
+                             <span>⏱️ ${st.waktu} Menit</span>
+                             <span>📝 ${st.jml_soal} Soal</span>
+                             ${st.poolCount ? `<span>📚 Pool ${st.poolCount} Soal</span>` : ''}
+                         </div>
                     </div>
                     <button ${btnOnclick} class="${btnClass}" style="${btnStyle}" ${isCompleted || isLocked ? 'disabled' : ''}>
                         ${btnText}
@@ -209,13 +279,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     // Fungsi trigger menuju ujian.html
-    window.mulaiUjian = async (kategori, jmlSoal, waktuMenit, paketId) => {
+    window.mulaiUjian = async (kategori, jmlSoal, waktuMenit, paketId, mode = 'regular') => {
         const konfirmasi = await showScyraConfirm(
             `Siap memulai subtes ini?<br>Waktu ${waktuMenit} menit akan berjalan.`,
             "Mulai Subtes?", "⏳"
         );
         if (konfirmasi) {
-            window.location.href = `ujian.html?kat=${kategori}&limit=${jmlSoal}&time=${waktuMenit}&paket=${paketId}`;
+            window.location.href = `ujian.html?kat=${encodeURIComponent(kategori)}&limit=${jmlSoal}&time=${waktuMenit}&paket=${paketId}&mode=${mode}`;
         }
     };
 });

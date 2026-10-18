@@ -53,8 +53,11 @@ document.addEventListener('DOMContentLoaded', async () => {
              const sekarang = new Date();
 
              data.forEach(to => {
-                 const mulai = new Date(to.waktu_mulai);
-                 const selesai = new Date(to.waktu_selesai);
+                  const mulai = new Date(to.waktu_mulai);
+                  const selesai = new Date(to.waktu_selesai);
+                  const isIrtPackage = Boolean(to.is_irt_enabled);
+                  const irtMulai = to.irt_window_start ? new Date(to.irt_window_start) : null;
+                  const irtSelesai = to.irt_window_end ? new Date(to.irt_window_end) : null;
                  const jmlSubtes = to.subtes_tryout[0]?.count || 0;
                  
                  let isLocked = true;
@@ -65,10 +68,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                  let creditBadge = '';
 
                  // Logika Waktu
-                 if (sekarang < mulai) {
-                     statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(mulai)})`;
-                 } else if (sekarang > selesai) {
-                     statusLabel = `🔒 Sudah Berakhir (Tutup: ${formatTgl(selesai)})`;
+                  if (isIrtPackage && (!irtMulai || !irtSelesai)) {
+                      statusLabel = '🔒 Belum dikonfigurasi';
+                  } else if (isIrtPackage && sekarang < irtMulai) {
+                      statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(irtMulai)})`;
+                  } else if (isIrtPackage && sekarang > irtSelesai) {
+                      // IRT packages remain accessible for premium users after
+                      // their live window, while ordinary packages stay closed.
+                      const isIrtReplayAvailable = isGold;
+                      if (isIrtReplayAvailable) {
+                          isLocked = false;
+                          statusLabel = '🟢 Bisa Dikerjakan';
+                          bgGradient = "linear-gradient(90deg, var(--brand-primary), var(--warning))";
+                          opacityCard = "1";
+                          clickAction = `onclick="window.location.href='detail-tryout.html?id=${to.id}'"`;
+                      } else {
+                          statusLabel = `🔒 Sudah Berakhir (Tutup: ${formatTgl(irtSelesai)})`;
+                      }
+                  } else if (sekarang < mulai) {
+                      statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(mulai)})`;
+                  } else if (sekarang > selesai) {
+                      statusLabel = `🔒 Sudah Berakhir (Tutup: ${formatTgl(selesai)})`;
                  } else {
                      isLocked = false;
                      statusLabel = `🟢 Bisa Dikerjakan (Sisa waktu sampai ${formatTgl(selesai)})`;

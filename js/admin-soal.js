@@ -300,20 +300,39 @@ function renderSoalTable() {
         // UUID short (8 char pertama)
         const uuidShort = soal.id.substring(0, 8);
         
-        // Badge warna untuk kunci jawaban
-        const kunciColors = {
-            'A': '#4caf50', 'B': '#2196f3', 'C': '#ff9800', 
-            'D': '#9c27b0', 'E': '#f44336'
-        };
-        const kunciColor = kunciColors[soal.kunci_jawaban] || '#666';
-
         const tr = document.createElement('tr');
-                const tipeLabels = {
+        const tipeLabels = {
             'pg': '<span class="tipe-badge pg">📝 PG</span>',
             'bs': '<span class="tipe-badge bs">⚖️ B/S</span>',
             'isian': '<span class="tipe-badge isian">✏️ Isian</span>'
         };
         const tipeBadge = tipeLabels[soal.tipe_soal] || tipeLabels['pg'];
+
+        // 🚨 RENDER KUNCI JAWABAN BERDASARKAN TIPE SOAL
+        let kunciDisplay = '';
+        if (soal.tipe_soal === 'pg') {
+            // Pilihan Ganda: badge warna A-E
+            const kunciColors = {
+                'A': '#4caf50', 'B': '#2196f3', 'C': '#ff9800', 
+                'D': '#9c27b0', 'E': '#f44336'
+            };
+            const kunciColor = kunciColors[soal.kunci_jawaban] || '#666';
+            kunciDisplay = `<span class="kunci-badge" style="background: ${kunciColor}; color: white; padding: 0.3rem 0.6rem; border-radius: 6px; font-weight: 600;">${soal.kunci_jawaban || '?'}</span>`;
+        } else if (soal.tipe_soal === 'bs') {
+            // Benar/Salah: tampilkan urutan B/S dengan warna
+            const kunciArray = (soal.kunci_jawaban || '').split(',').map(k => k.trim());
+            kunciDisplay = kunciArray.map(k => {
+                const color = k.toUpperCase() === 'B' ? '#4caf50' : '#f44336';
+                return `<span style="display:inline-block; background: ${color}; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0 2px; font-weight: 600;">${k}</span>`;
+            }).join('');
+        } else if (soal.tipe_soal === 'isian') {
+            // Isian: tampilkan teks jawaban (max 20 char)
+            const kunciText = soal.kunci_jawaban || '?';
+            const displayText = kunciText.length > 20 ? kunciText.substring(0, 20) + '...' : kunciText;
+            kunciDisplay = `<span class="kunci-badge" style="background: #607d8b; color: white; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;" title="${kunciText}">${displayText}</span>`;
+        } else {
+            kunciDisplay = `<span class="kunci-badge" style="background: #666; color: white; padding: 0.3rem 0.6rem; border-radius: 6px;">${soal.kunci_jawaban || '?'}</span>`;
+        }
 
         tr.innerHTML = `
             <td>
@@ -328,9 +347,7 @@ function renderSoalTable() {
             <td><span class="mapel-badge">${katName}</span></td>
             <td><span class="bab-text">${matNum}${matName}</span></td>
             <td style="text-align: center;">${tipeBadge}</td>
-            <td style="text-align: center;">
-                <span class="kunci-badge" style="background: ${kunciColor}; color: white;">${soal.kunci_jawaban || '?'}</span>
-            </td>
+            <td style="text-align: center;">${kunciDisplay}</td>
             <td>
                 <div class="action-buttons">
                     <button class="btn-action btn-edit-small" onclick="editSoal('${soal.id}')" title="Edit Soal">✏️</button>
@@ -420,6 +437,12 @@ async function extractTextFromPDF(file) {
             fullText += lines[y].join(' ') + '\n';
         });
     }
+    
+    // 🚨 DEBUG: Log raw text untuk lihat format aslinya
+    console.log('=== RAW PDF TEXT START ===');
+    console.log(fullText);
+    console.log('=== RAW PDF TEXT END ===');
+    
     return fullText;
 }
 
@@ -443,56 +466,72 @@ function parseQuestions(text, katId, matId) {
     let inPembahasan = false;
     let inTeks = false;
     let currentTeksBacaan = '';
-    let currentTable = ''; // 🚨 STATE BARU UNTUK TABEL
 
     for (let i = 0; i < lines.length; i++) {
         let line = lines[i].trim();
         if (!line) continue;
 
-        // 🚨 1. DETEKSI BARIS TABEL (Format: | col1 | col2 |)
-        if (line.match(/^\|(.+)\|$/)) {
-            const cols = line.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-            currentTable += `<tr>${cols.map(c => `<td>${c}</td>`).join('')}</tr>`;
-            continue;
-        } else {
-            // Kalau baris ini BUKAN tabel, tapi ada tumpukan tabel sebelumnya -> Tutup & Masukkan
-            if (currentTable) {
-                const tableHtml = `<table class="tabel-soal">${currentTable}</table>`;
-                if (q) q.pertanyaan = q.pertanyaan.replace(/<\/p>$/, '') + tableHtml + '<p>';
-                else currentTeksBacaan += tableHtml;
-                currentTable = '';
-            }
-        }
-
-        // 2. DETEKSI TEKS BACAAN
+        // 1. DETEKSI TEKS BACAAN/INFORMASI
         const teksMatch = line.match(/^(?:TEKS|BACAAN|INFORMASI|STUDI KASUS)\s*[:\-]?\s*(.*)/i);
         if (teksMatch) {
             inTeks = true; inPembahasan = false; currentOpt = null;
             const isiTeks = teksMatch[1].trim();
-            if (isiTeks === '-' || isiTeks.toLowerCase() === 'kosong') { currentTeksBacaan = ''; inTeks = false; } 
-            else { currentTeksBacaan = isiTeks ? (isiTeks + '<br>') : ''; }
+            if (isiTeks === '-' || isiTeks.toLowerCase() === 'kosong') { 
+                currentTeksBacaan = ''; 
+                inTeks = false; 
+            } else { 
+                currentTeksBacaan = isiTeks ? (isiTeks + '\n') : ''; 
+            }
             continue;
         }
 
-        // 3. DETEKSI NOMOR SOAL
+        // 2. DETEKSI NOMOR SOAL
         const soalMatch = line.match(/^(\d+)\.\s+(.*)/);
         if (soalMatch) {
-            if (q && q.pertanyaan && q.kunci) questions.push(q);
+            // Save previous question
+            if (q && q.pertanyaan && q.kunci) {
+                console.log('[PARSER] Pushing soal, kunci:', q.kunci);
+                questions.push(q);
+            } else if (q) {
+                console.warn('[PARSER] Skipping soal, missing data:', q);
+            }
+            
             inTeks = false; inPembahasan = false; currentOpt = null;
             
+            console.log('[PARSER] Starting new soal:', soalMatch[1]);
+            
+            // Build pertanyaan dengan bacaan jika ada
             let pertanyaanFinal = '';
             if (currentTeksBacaan) {
                 pertanyaanFinal = `<div class="teks-bacaan" style="background: rgba(107, 143, 92, 0.08); padding: 1.2rem; border-left: 4px solid var(--brand-primary); margin-bottom: 1.5rem; border-radius: 4px; line-height: 1.6;">${currentTeksBacaan}</div>`;
             }
-            pertanyaanFinal += `<p>${soalMatch[2]}</p>`;
-            q = { kategori_id: katId, materi_id: matId, pertanyaan: pertanyaanFinal, opsi: { A: '', B: '', C: '', D: '', E: '' }, kunci: '', pembahasan: '', tipe: 'pg' };
+            pertanyaanFinal += soalMatch[2];
+            
+            q = { 
+                kategori_id: katId, 
+                materi_id: matId, 
+                pertanyaan: pertanyaanFinal, 
+                opsi: { A: '', B: '', C: '', D: '', E: '' }, 
+                kunci: '', 
+                pembahasan: '', 
+                tipe: null 
+            };
             continue;
         }
 
-        if (!q) { currentTeksBacaan += line + '<br>'; continue; }
-        if (inTeks) { currentTeksBacaan += line + '<br>'; continue; }
+        // If no question started yet, accumulate to bacaan
+        if (!q) { 
+            currentTeksBacaan += line + '\n'; 
+            continue; 
+        }
+        
+        // If in bacaan mode, accumulate
+        if (inTeks) { 
+            currentTeksBacaan += line + '\n'; 
+            continue; 
+        }
 
-        // 4. DETEKSI OPSI (A-E)
+        // 3. DETEKSI OPSI (A-E)
         const optMatch = line.match(/^([A-E])\.\s*(.*)/i);
         if (optMatch) {
             currentOpt = optMatch[1].toUpperCase();
@@ -501,66 +540,138 @@ function parseQuestions(text, katId, matId) {
             continue;
         }
 
-        // 5. DETEKSI KUNCI JAWABAN
-        const kunciMatch = line.match(/^(?:kunci|jawaban)\s*[:\-]?\s*([A-Ea-e]|\w+)/i);
+        // 4. DETEKSI KUNCI JAWABAN
+        const kunciMatch = line.match(/^(?:kunci|jawaban)\s*[:\-]?\s*(.+)/i);
         if (kunciMatch) {
             q.kunci = kunciMatch[1].trim();
-            inPembahasan = false; currentOpt = null;
+            console.log('[PARSER] Detected kunci:', q.kunci);
+            inPembahasan = false; 
+            currentOpt = null;
             continue;
         }
 
-        // 6. DETEKSI PEMBAHASAN
+        // 5. DETEKSI PEMBAHASAN
         const bahasMatch = line.match(/^pembahasan\s*[:\-]?\s*(.*)/i);
         if (bahasMatch) {
-            inPembahasan = true; currentOpt = null;
+            inPembahasan = true; 
+            currentOpt = null;
             q.pembahasan += bahasMatch[1] ? (bahasMatch[1] + ' ') : '';
             continue;
         }
 
-        // 7. GABUNG TEKS MULTI-BARIS
-        if (inPembahasan) q.pembahasan += line + ' ';
-        else if (currentOpt) q.opsi[currentOpt] += ' ' + line;
-        else if (q) q.pertanyaan = q.pertanyaan.replace(/<\/p>$/, ` <br>${line}</p>`);
+        // 6. GABUNG TEKS MULTI-BARIS
+        if (inPembahasan) {
+            q.pembahasan += line + ' ';
+        } else if (currentOpt) {
+            q.opsi[currentOpt] += ' ' + line;
+        } else if (q) {
+            // Add to pertanyaan - keep pipe format as is
+            q.pertanyaan += '\n' + line;
+        }
     }
 
-    // 🚨 POST-PROCESS: Bersihkan & Convert Format Khusus
+    // Process last question
     if (q && q.pertanyaan && q.kunci) {
-        // A. Deteksi Benar/Salah (Format: | Soal | Benar | Salah |)
-        const bsMatch = q.pertanyaan.match(/<p>\s*\|\s*(.*?)\s*\|\s*Benar\s*\|\s*Salah\s*\|\s*<\/p>/i);
-        if (bsMatch) {
-            q.pertanyaan = `<p>${bsMatch[1]}</p>`;
-            q.opsi = { A: 'Benar', B: 'Salah', C: '', D: '', E: '' };
+        console.log('[PARSER] Processing last soal, kunci:', q.kunci);
+        questions.push(q);
+    } else if (q) {
+        console.warn('[PARSER] Last soal skipped, missing data:', q);
+    }
+    
+    console.log('[PARSER] Total questions found BEFORE post-process:', questions.length);
+
+    // POST-PROCESS: Detect tipe soal dan convert format
+    questions.forEach((q, index) => {
+        console.log(`[PARSER] Post-processing soal ${index + 1}/${questions.length}...`);
+        
+        if (!q.pertanyaan || !q.kunci) {
+            console.warn('[PARSER] Skipping post-process, missing data:', q);
+            return;
+        }
+        
+        // A. Deteksi Benar/Salah dari tabel pipe format
+        // Check for BS table: | Pernyataan | Benar | Salah |
+        const lines = q.pertanyaan.split('\n');
+        let bsTableLines = [];
+        let foundBSHeader = false;
+        let bsTableStartLine = -1;
+        let bsTableEndLine = -1;
+        
+        for (let idx = 0; idx < lines.length; idx++) {
+            const line = lines[idx].trim();
+            if (line.match(/^\|(.+)\|$/)) {
+                const cols = line.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+                // Check if header row
+                if (cols.length >= 3 && /pernyataan/i.test(cols[0]) && /benar/i.test(cols[1]) && /salah/i.test(cols[2])) {
+                    foundBSHeader = true;
+                    bsTableStartLine = idx;
+                    bsTableLines = [];
+                } else if (foundBSHeader) {
+                    bsTableLines.push(cols[0]); // First column is statement
+                    bsTableEndLine = idx;
+                }
+            } else if (foundBSHeader) {
+                // Non-table line, BS table ended
+                break;
+            }
+        }
+        
+        // If found BS table and has statements
+        if (foundBSHeader && bsTableLines.length > 0 && !Object.values(q.opsi).some(o => o.trim() !== '')) {
+            console.log('[PARSER] ✅ Detected BS table with', bsTableLines.length, 'statements');
+            
+            // Remove ONLY BS table lines from pertanyaan (not all pipe tables!)
+            const filteredLines = lines.filter((line, idx) => {
+                return idx < bsTableStartLine || idx > bsTableEndLine;
+            });
+            q.pertanyaan = filteredLines.join('\n');
+            
+            q.opsi = {
+                A: bsTableLines[0] || '',
+                B: bsTableLines[1] || '',
+                C: bsTableLines[2] || '',
+                D: bsTableLines[3] || '',
+                E: bsTableLines[4] || ''
+            };
             q.tipe = 'bs';
-            if (q.kunci.toLowerCase() === 'benar' || q.kunci === '1') q.kunci = 'A';
-            else if (q.kunci.toLowerCase() === 'salah' || q.kunci === '2') q.kunci = 'B';
+            
+            // Convert kunci
+            const keys = q.kunci.split(/[,;\-/\s]+/).filter(Boolean).map(key => {
+                const value = key.toLowerCase();
+                return value === 'benar' || value === 'b' || value === '1' || value === 'a' ? 'B' : 'S';
+            });
+            q.kunci = keys.slice(0, bsTableLines.length).join(',');
+            console.log('[PARSER] BS kunci converted to:', q.kunci);
         }
 
         // B. Convert Isian Singkat ([ISIAN] atau ___)
-        if (q.pertanyaan.includes('[ISIAN]') || q.pertanyaan.includes('___')) {
+        if (!q.tipe && (q.pertanyaan.includes('[ISIAN]') || q.pertanyaan.includes('___'))) {
+            console.log('[PARSER] ✅ Detected ISIAN format');
             q.pertanyaan = q.pertanyaan.replace(/\[ISIAN\]|_{3,}/g, '<span class="kotak-isian"></span>');
-            q.tipe = q.tipe || 'isian';
+            q.tipe = 'isian';
         }
 
         // C. Default tipe
-        if (!q.tipe) q.tipe = 'pg';
+        if (!q.tipe) {
+            console.log('[PARSER] Defaulting to PG');
+            q.tipe = 'pg';
+        }
+        
+        console.log('[PARSER] Final tipe:', q.tipe);
 
-        // 🖼️ D. CONVERT SHORTCODE GAMBAR DI PERTANYAAN
+        // D. CONVERT SHORTCODE GAMBAR
         q.pertanyaan = convertGambarShortcode(q.pertanyaan);
-
-        // 🖼️ E. CONVERT SHORTCODE GAMBAR DI OPSI JAWABAN (A-E)
         ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
             if (q.opsi[opt]) {
                 q.opsi[opt] = convertGambarShortcode(q.opsi[opt]);
             }
         });
-
-        // 🖼️ F. CONVERT SHORTCODE GAMBAR DI PEMBAHASAN
         if (q.pembahasan) {
             q.pembahasan = convertGambarShortcode(q.pembahasan);
         }
-
-        questions.push(q);
-    }
+    });
+    
+    console.log('[PARSER] Total questions AFTER post-process:', questions.length);
 
     return questions;
 }
@@ -579,6 +690,8 @@ function showPreview() {
         let opsiHTML = '';
         if (q.tipe === 'bs') {
             opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">⚖️ Tipe: Benar / Salah</p>`;
+        } else if (q.tipe === 'isian') {
+            opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">✏️ Tipe: Isian Singkat</p>`;
         } else {
             opsiHTML = `
                 <p><strong>A.</strong> ${q.opsi.A || '-'} &nbsp;|&nbsp; <strong>B.</strong> ${q.opsi.B || '-'}</p>
@@ -589,9 +702,16 @@ function showPreview() {
 
         container.innerHTML += `
             <div class="soal-preview-item">
-                <h4 style="margin-bottom: 0.5rem;">
-                    Soal ${i + 1} 
-                    <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : (q.tipe === 'isian' ? '✏️ Isian' : '📝 PG')}</span>
+                <h4 style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span>
+                        Soal ${i + 1} 
+                        <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : (q.tipe === 'isian' ? '✏️ Isian' : '📝 PG')}</span>
+                    </span>
+                    <select class="tipe-override" data-index="${i}" style="padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; cursor: pointer;">
+                        <option value="pg" ${q.tipe === 'pg' ? 'selected' : ''}>📝 Pilihan Ganda</option>
+                        <option value="bs" ${q.tipe === 'bs' ? 'selected' : ''}>⚖️ Benar/Salah</option>
+                        <option value="isian" ${q.tipe === 'isian' ? 'selected' : ''}>✏️ Isian Singkat</option>
+                    </select>
                 </h4>
                 <div style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto;">
                     ${previewPertanyaan}
@@ -602,6 +722,22 @@ function showPreview() {
             </div>
         `;
     });
+    
+    // 🚨 TAMBAHKAN EVENT LISTENER UNTUK DROPDOWN TIPE OVERRIDE
+    document.querySelectorAll('.tipe-override').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            const newTipe = e.target.value;
+            parsedQuestions[index].tipe = newTipe;
+            console.log(`[OVERRIDE] Soal ${index + 1} tipe diubah menjadi: ${newTipe}`);
+            
+            // Update badge visual
+            const badge = e.target.closest('.soal-preview-item').querySelector('.tipe-badge');
+            badge.className = `tipe-badge ${newTipe}`;
+            badge.textContent = newTipe === 'bs' ? '⚖️ B/S' : (newTipe === 'isian' ? '✏️ Isian' : '📝 PG');
+        });
+    });
+    
     resultsDiv.style.display = 'block';
     resultsDiv.scrollIntoView({ behavior: 'smooth' });
 }
@@ -643,12 +779,105 @@ async function saveToDatabase() {
 // =========================================================
 // ✏️ FITUR EDIT SOAL
 // =========================================================
+
+// 🚨 FUNGSI HELPER: Ubah tampilan form berdasarkan tipe soal
+function updateFormByTipeSoal(tipe) {
+    const opsiA = document.getElementById('editOpsiA');
+    const opsiB = document.getElementById('editOpsiB');
+    const opsiC = document.getElementById('editOpsiC');
+    const opsiD = document.getElementById('editOpsiD');
+    const opsiE = document.getElementById('editOpsiE');
+    const labelA = document.getElementById('labelOpsiA');
+    const labelB = document.getElementById('labelOpsiB');
+    const labelC = document.getElementById('labelOpsiC');
+    const labelD = document.getElementById('labelOpsiD');
+    const labelE = document.getElementById('labelOpsiE');
+    const kunciPG = document.getElementById('editKunciPG');
+    const kunciText = document.getElementById('editKunciText');
+    const hintKunci = document.getElementById('hintKunci');
+    const labelKunci = document.getElementById('labelKunci');
+
+    if (tipe === 'pg') {
+        // Pilihan Ganda: tampilkan semua opsi A-E
+        labelA.textContent = 'Opsi A';
+        labelB.textContent = 'Opsi B';
+        labelC.textContent = 'Opsi C';
+        labelD.textContent = 'Opsi D';
+        labelE.textContent = 'Opsi E';
+        opsiA.required = true;
+        opsiB.required = true;
+        opsiC.required = true;
+        opsiD.required = true;
+        opsiE.required = true;
+        opsiA.parentElement.style.display = 'block';
+        opsiB.parentElement.style.display = 'block';
+        opsiC.parentElement.style.display = 'block';
+        opsiD.parentElement.style.display = 'block';
+        opsiE.parentElement.style.display = 'block';
+        
+        kunciPG.style.display = 'block';
+        kunciPG.required = true;
+        kunciText.style.display = 'none';
+        kunciText.required = false;
+        labelKunci.textContent = 'Kunci Jawaban';
+        hintKunci.textContent = '💡 Pilih jawaban yang benar dari opsi A-E';
+    } else if (tipe === 'bs') {
+        // Benar/Salah: ubah label jadi Pernyataan 1-5, D & E opsional
+        labelA.textContent = 'Pernyataan 1';
+        labelB.textContent = 'Pernyataan 2';
+        labelC.textContent = 'Pernyataan 3';
+        labelD.textContent = 'Pernyataan 4 (opsional)';
+        labelE.textContent = 'Pernyataan 5 (opsional)';
+        opsiA.required = true;
+        opsiB.required = true;
+        opsiC.required = false;
+        opsiD.required = false;
+        opsiE.required = false;
+        opsiA.parentElement.style.display = 'block';
+        opsiB.parentElement.style.display = 'block';
+        opsiC.parentElement.style.display = 'block';
+        opsiD.parentElement.style.display = 'block';
+        opsiE.parentElement.style.display = 'block';
+        
+        kunciPG.style.display = 'none';
+        kunciPG.required = false;
+        kunciText.style.display = 'block';
+        kunciText.required = true;
+        labelKunci.textContent = 'Kunci Jawaban (Format: B,S,B atau Benar,Salah,Benar)';
+        hintKunci.textContent = '💡 Urutan B/S sesuai urutan pernyataan. Contoh: B,S,B,B (artinya pernyataan 1,3,4 benar, pernyataan 2 salah)';
+    } else if (tipe === 'isian') {
+        // Isian: sembunyikan opsi, hanya tampilkan pertanyaan
+        opsiA.required = false;
+        opsiB.required = false;
+        opsiC.required = false;
+        opsiD.required = false;
+        opsiE.required = false;
+        opsiA.parentElement.style.display = 'none';
+        opsiB.parentElement.style.display = 'none';
+        opsiC.parentElement.style.display = 'none';
+        opsiD.parentElement.style.display = 'none';
+        opsiE.parentElement.style.display = 'none';
+        
+        kunciPG.style.display = 'none';
+        kunciPG.required = false;
+        kunciText.style.display = 'block';
+        kunciText.required = true;
+        labelKunci.textContent = 'Kunci Jawaban (Teks Bebas)';
+        hintKunci.textContent = '💡 Ketik jawaban yang benar. Contoh: Jakarta, Fotosintesis, 42, dll.';
+    }
+}
+
 function setupEditModal() {
     const modal = document.getElementById('editSoalModal');
     const btnClose = document.getElementById('btnCloseEditModal');
     
     btnClose.onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+    // 🚨 Event listener untuk perubahan tipe soal
+    document.getElementById('editTipeSoal').addEventListener('change', (e) => {
+        updateFormByTipeSoal(e.target.value);
+    });
 
     // Event listener kalau Kategori di-modal edit diganti
     document.getElementById('editKategoriSoal').addEventListener('change', async (e) => {
@@ -671,6 +900,16 @@ function setupEditModal() {
         btn.disabled = true; btn.textContent = '⏳ Menyimpan...';
         
         const id = document.getElementById('editSoalId').value;
+        const tipeSoal = document.getElementById('editTipeSoal').value;
+        
+        // 🚨 Ambil kunci jawaban dari field yang sesuai
+        let kunciJawaban = '';
+        if (tipeSoal === 'pg') {
+            kunciJawaban = document.getElementById('editKunciPG').value;
+        } else {
+            kunciJawaban = document.getElementById('editKunciText').value;
+        }
+        
         const updates = {
             kategori_id: document.getElementById('editKategoriSoal').value,
             materi_id: document.getElementById('editMateriSoal').value,
@@ -680,8 +919,8 @@ function setupEditModal() {
             opsi_c_html: document.getElementById('editOpsiC').value,
             opsi_d_html: document.getElementById('editOpsiD').value,
             opsi_e_html: document.getElementById('editOpsiE').value,
-            kunci_jawaban: document.getElementById('editKunci').value,
-            tipe_soal: document.getElementById('editTipeSoal').value,
+            kunci_jawaban: kunciJawaban,
+            tipe_soal: tipeSoal,
             pembahasan_html: `<p>${document.getElementById('editPembahasan').value}</p>`
         };
 
@@ -712,9 +951,21 @@ window.editSoal = async (id) => {
     document.getElementById('editOpsiC').value = soal.opsi_c_html || '';
     document.getElementById('editOpsiD').value = soal.opsi_d_html || '';
     document.getElementById('editOpsiE').value = soal.opsi_e_html || '';
-    document.getElementById('editKunci').value = soal.kunci_jawaban || 'A';
     document.getElementById('editPembahasan').value = (soal.pembahasan_html || '').replace(/<\/?p>/g, '');
-    document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg'; // 🚨 BARU
+    document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg';
+    
+    // 🚨 Set kunci jawaban berdasarkan tipe soal
+    const tipeSoal = soal.tipe_soal || 'pg';
+    if (tipeSoal === 'pg') {
+        document.getElementById('editKunciPG').value = soal.kunci_jawaban || 'A';
+        document.getElementById('editKunciText').value = '';
+    } else {
+        document.getElementById('editKunciPG').value = 'A';
+        document.getElementById('editKunciText').value = soal.kunci_jawaban || '';
+    }
+    
+    // 🚨 Update tampilan form berdasarkan tipe soal
+    updateFormByTipeSoal(tipeSoal);
 
     // Populate Dropdown Kategori
     const editKatSelect = document.getElementById('editKategoriSoal');

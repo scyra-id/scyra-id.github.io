@@ -11,6 +11,10 @@ let currentKategoriId = '';
 let namaMapel = '';
 let waktuTotalAwal = 0;
 let paketTryoutId = null;
+let paketTryout = null;
+let examMode = 'regular';
+let isIrtAttempt = false;
+let isIrtLiveAttempt = false;
 
 let violationCount = 0;
 const MAX_VIOLATIONS = 3;
@@ -21,14 +25,78 @@ const VIOLATION_COOLDOWN = 2000;
 // =======================================================
 // FUNGSI KONVERSI SHORTCODE GAMBAR
 // =======================================================
+/**
+ * Render pipe tables to HTML
+ */
+function renderPipeTables(html) {
+    if (!html) return html;
+    
+    let result = '';
+    let tableRows = [];
+    
+    const flushTable = () => {
+        if (!tableRows.length) return;
+        const rows = tableRows
+            .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+            .join('');
+        result += `<table class="tabel-soal"><tbody>${rows}</tbody></table>`;
+        tableRows = [];
+    };
+    
+    // Process each line
+    const lines = html.split('\n');
+    
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) {
+            result += '\n';
+            continue;
+        }
+        
+        // Check if line is pipe table format
+        const isPipeRow = line.includes('|') && /^\|?.*\|.*\|?$/.test(line);
+        
+        if (isPipeRow) {
+            const cells = line.split('|').map((cell) => cell.trim()).filter(Boolean);
+            if (cells.length > 1) {
+                tableRows.push(cells);
+                continue;
+            }
+        }
+        
+        // Not a table row, flush any pending table
+        flushTable();
+        result += line + '\n';
+    }
+    
+    // Flush any remaining table
+    flushTable();
+    
+    // Convert first row to header
+    result = result.replace(/<tbody>\s*<tr>(.*?)<\/tr>/i, (_, firstRow) =>
+        `<thead><tr>${firstRow.replace(/<td/g, '<th').replace(/<\/td>/g, '</th>')}</tr></thead><tbody>`
+    );
+    
+    return result;
+}
+
+/**
+ * Render shortcodes (gambar)
+ */
 function renderShortcodes(html) {
     if (!html) return html;
-    // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-    return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+    
+    // First render pipe tables
+    let output = renderPipeTables(html);
+    
+    // Then convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
+    output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
         const cleanUrl = url.trim();
         const width = size ? size.trim() : '100%';
         return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
     });
+    
+    return output;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -46,11 +114,47 @@ document.addEventListener('DOMContentLoaded', async () => {
     targetLimit = parseInt(urlParams.get('limit')) || 20; // Default 20 soal
     waktuTotalAwal = parseInt(urlParams.get('time')) || 15; // Default 15 menit
     paketTryoutId = urlParams.get('paket');
+    examMode = urlParams.get('mode') || 'regular';
     timeLeft = waktuTotalAwal * 60; // Konversi ke detik
 
     if (!currentKategori) {
         await showScyraAlert('Parameter ujian tidak valid! Anda akan dikembalikan.', '⚠️ Kesalahan', '🛑');
         return window.location.href = 'tryout.html';
+    }
+
+    if (paketTryoutId) {
+        const { data: paket, error: paketError } = await window.db
+            .from('paket_tryout')
+            .select('id, nama_paket, is_irt_enabled, irt_window_start, irt_window_end, irt_status')
+            .eq('id', paketTryoutId)
+            .single();
+
+        if (paketError || !paket) {
+            await showScyraAlert('Paket tryout tidak ditemukan.', '⚠️ Kesalahan', '🛑');
+            return window.location.href = 'tryout.html';
+        }
+
+        paketTryout = paket;
+        isIrtAttempt = Boolean(paket.is_irt_enabled);
+        if (isIrtAttempt && (!paket.irt_window_start || !paket.irt_window_end)) {
+            await showScyraAlert('Konfigurasi window IRT paket belum lengkap.', '⚠️ Kesalahan', '🛑');
+            return window.location.href = `detail-tryout.html?id=${paketTryoutId}`;
+        }
+        const now = new Date();
+        isIrtLiveAttempt = isIrtAttempt && now >= new Date(paket.irt_window_start) && now <= new Date(paket.irt_window_end);
+
+        if (isIrtAttempt && examMode === 'live' && !isIrtLiveAttempt) {
+            await showScyraAlert('Periode tryout ini sudah tidak aktif.', '🔒 Terkunci', '⚠️');
+            return window.location.href = `detail-tryout.html?id=${paketTryoutId}`;
+        }
+
+        if (isIrtAttempt && !isIrtLiveAttempt) {
+            const { data: profile } = await window.db.from('profiles').select('role').eq('id', user.id).single();
+            if (!['gold', 'admin'].includes(profile?.role)) {
+                await showScyraAlert('Akses ulang tryout tersedia untuk pengguna premium.', '🔒 Akses Premium', '⚠️');
+                return window.location.href = `detail-tryout.html?id=${paketTryoutId}`;
+            }
+        }
     }
 
     // 2. RESOLVE KATEGORI KE UUID
@@ -123,16 +227,33 @@ async function resolveKategori(kat) {
 // FUNGSI FETCH SOAL GLOBAL BERDASARKAN KATEGORI
 async function loadGlobalQuestions(user) {
     try {
-        // Ambil soal dari kategori UUID yang sudah diresolve
-        const { data, error } = await window.db.from('bank_soal')
-            .select('*')
-            .eq('kategori_id', currentKategoriId);
+        let selectedPoolIds = [];
+        if (paketTryoutId) {
+            const { data: subtes, error: subtesError } = await window.db
+                .from('subtes_tryout')
+                .select('soal_pool_ids')
+                .eq('paket_id', paketTryoutId)
+                .eq('kategori_db', currentKategori)
+                .maybeSingle();
+            if (subtesError) throw subtesError;
+            selectedPoolIds = subtes?.soal_pool_ids || [];
+        }
+
+        // A configured pool is authoritative. Existing packages without one
+        // continue to draw randomly from their category as before.
+        let questionQuery = window.db.from('bank_soal').select('*').eq('kategori_id', currentKategoriId);
+        if (selectedPoolIds.length) questionQuery = questionQuery.in('id', selectedPoolIds);
+        const { data, error } = await questionQuery;
         
         if (error) throw error;
         
         if (!data || data.length === 0) {
             await showScyraAlert(`Bank soal untuk subtes ${namaMapel} masih kosong!`, '⚠️ Kosong', '⚠️');
             return window.location.href = 'tryout.html';
+        }
+
+        if (selectedPoolIds.length && data.length < targetLimit) {
+            throw new Error(`Pool soal subtes hanya berisi ${data.length} soal, sedangkan paket membutuhkan ${targetLimit} soal.`);
         }
 
         // Acak keseluruhan soal, lalu potong sesuai LIMIT yang ditentukan parameter
@@ -172,11 +293,24 @@ function updateNavigatorState() {
     btns.forEach((btn, i) => {
         btn.classList.remove('current', 'answered');
         if (i === currentIndex) btn.classList.add('current');
-        else if (userAnswers[questions[i].id]) btn.classList.add('answered');
+        else {
+            const q = questions[i];
+            const answer = userAnswers[q.id];
+            const statementCount = q.tipe_soal === 'bs'
+                ? ['a', 'b', 'c', 'd', 'e'].filter(opt => q[`opsi_${opt}_html`]).length
+                : 0;
+            const isAnswered = q.tipe_soal === 'bs'
+                ? answer && Object.keys(answer).length === statementCount
+                : Boolean(answer);
+            if (isAnswered) btn.classList.add('answered');
+        }
     });
 }
 
 function renderQuestion() {
+    // Scroll to top when changing question
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     const q = questions[currentIndex];
     document.getElementById('currentNum').textContent = currentIndex + 1;
     document.getElementById('questionText').innerHTML = renderShortcodes(q.pertanyaan_html);
@@ -185,11 +319,15 @@ function renderQuestion() {
     const tipe = q.tipe_soal || 'pg';
 
     if (tipe === 'bs') {
+        const statements = ['A', 'B', 'C', 'D', 'E']
+            .map(opt => ({ key: opt, text: q[`opsi_${opt.toLowerCase()}_html`] }))
+            .filter(item => item.text);
+        const answers = userAnswers[q.id] || {};
         optsList.innerHTML = `
-            <div class="bs-container">
-                <button class="bs-btn ${userAnswers[q.id] === 'A' ? 'selected' : ''}" data-value="A" onclick="selectOptionBS('${q.id}', 'A')">✅ Benar</button>
-                <button class="bs-btn ${userAnswers[q.id] === 'B' ? 'selected' : ''}" data-value="B" onclick="selectOptionBS('${q.id}', 'B')">❌ Salah</button>
-            </div>`;
+            <table class="tabel-soal bs-table">
+                <thead><tr><th>Pernyataan</th><th>Benar</th><th>Salah</th></tr></thead>
+                <tbody>${statements.map(item => `<tr><td>${renderShortcodes(item.text)}</td><td><button type="button" class="bs-btn ${answers[item.key] === 'B' ? 'selected' : ''}" onclick="selectOptionBS('${q.id}', '${item.key}', 'B')">Benar</button></td><td><button type="button" class="bs-btn ${answers[item.key] === 'S' ? 'selected' : ''}" onclick="selectOptionBS('${q.id}', '${item.key}', 'S')">Salah</button></td></tr>`).join('')}</tbody>
+            </table>`;
     } else if (tipe === 'isian') {
         const inputHtml = `<input type="text" class="kotak-isian" id="isianInputUjian" placeholder="..." autocomplete="off" value="${userAnswers[q.id] || ''}">`;
         document.getElementById('questionText').innerHTML = document.getElementById('questionText').innerHTML.replace(/<span class="kotak-isian"><\/span>/g, inputHtml);
@@ -226,8 +364,8 @@ function renderQuestion() {
     updateNavigatorState();
 }
 
-window.selectOptionBS = function(qId, opt) {
-    userAnswers[qId] = opt;
+window.selectOptionBS = function(qId, statement, value) {
+    userAnswers[qId] = { ...(userAnswers[qId] || {}), [statement]: value };
     renderQuestion();
 };
 
@@ -289,11 +427,15 @@ async function finishExam(isDisqualified = false) {
             const userAns = (ans || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
             const keyAns = (q.kunci_jawaban || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
             isCorrect = userAns === keyAns && userAns !== '';
+        } else if (tipe === 'bs') {
+            const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => q[`opsi_${opt.toLowerCase()}_html`]);
+            const keys = (q.kunci_jawaban || '').split(',').map(key => key.trim().toUpperCase());
+            isCorrect = statements.length > 0 && statements.every((statement, index) => ans?.[statement] === keys[index]);
         } else {
             isCorrect = ans === q.kunci_jawaban;
         }
         if (isCorrect) correct++;
-        detail.push({ soal_id: q.id, jawaban: ans, is_correct: isCorrect });
+        detail.push({ soal_id: q.id, jawaban: tipe === 'bs' ? (ans || null) : ans, is_correct: isCorrect });
     });
 
     const skor = isDisqualified ? 0 : Math.round((correct / questions.length) * 100);
@@ -301,20 +443,52 @@ async function finishExam(isDisqualified = false) {
 
     try {
         const { data: { user } } = await window.db.auth.getUser();
+        const priorAttempts = paketTryoutId
+            ? await window.db.from('hasil_tryout').select('id', { count: 'exact', head: true })
+                .eq('user_id', user.id).eq('paket_tryout_id', paketTryoutId).eq('kategori_id', currentKategoriId)
+            : { count: 0, error: null };
+
+        if (priorAttempts.error) throw priorAttempts.error;
+        if (isIrtLiveAttempt && priorAttempts.count > 0) {
+            throw new Error('Subtes IRT ini sudah pernah Anda kerjakan selama periode berlangsung.');
+        }
+
+        const isPendingIrtScore = isIrtLiveAttempt && !isDisqualified;
+        const replayIrtScore = isIrtAttempt && !isIrtLiveAttempt && !isDisqualified
+            ? calculateReplayIrtScore(detail)
+            : null;
         
         // Simpan hasil
         const { data: insertedData, error: insertError } = await window.db.from('hasil_tryout').insert({
             user_id: user.id,
-            nama_paket: isDisqualified ? 'DIDISKUALIFIKASI' : `Tryout SNBT - ${namaMapel}`,
+            nama_paket: isDisqualified ? 'DIDISKUALIFIKASI' : (paketTryout?.nama_paket || `Tryout SNBT - ${namaMapel}`),
+            paket_tryout_id: paketTryoutId,
             kategori_id: currentKategoriId,
             total_soal: questions.length,
             jumlah_benar: isDisqualified ? 0 : correct,
             skor: skor,
             waktu_detik: waktuPengerjaan,
-            detail_jawaban: detail
+            detail_jawaban: detail,
+            is_irt_live: isIrtLiveAttempt,
+            attempt_number: (priorAttempts.count || 0) + 1,
+            irt_theta: replayIrtScore?.theta ?? null,
+            irt_score: replayIrtScore?.score ?? null,
+            score_status: isPendingIrtScore ? 'PENDING' : 'FINAL'
         }).select('id').single(); 
 
         if (insertError) throw insertError;
+
+        if (isIrtLiveAttempt) {
+            const responseRows = detail.map(item => ({
+                paket_tryout_id: paketTryoutId,
+                user_id: user.id,
+                soal_id: item.soal_id,
+                jawaban: item.jawaban === null ? null : JSON.stringify(item.jawaban),
+                is_correct: item.is_correct
+            }));
+            const { error: responseError } = await window.db.from('irt_item_responses').insert(responseRows);
+            if (responseError) throw responseError;
+        }
 
         if (window.ProgressSystem && user?.id) {
             try {
@@ -340,9 +514,17 @@ async function finishExam(isDisqualified = false) {
         if (isDisqualified) {
             await showScyraAlert("Anda didiskualifikasi.\nSkor Anda: 0", "🚫 Ujian Berakhir", "🚫");
             window.location.href = 'tryout.html';
-        } else {
+        } else if (isPendingIrtScore) {
+            const releaseDate = new Date(paketTryout.irt_window_end).toLocaleString('id-ID', { dateStyle: 'long', timeStyle: 'short' });
             await showScyraAlert(
-                `Skor Anda: ${skor}\nBenar: ${correct} dari ${questions.length}\nWaktu: ${Math.floor(waktuPengerjaan/60)}m ${waktuPengerjaan%60}s`,
+                `Jawabanmu sudah dikumpulkan. Nilai tryout akan tersedia setelah proses kalibrasi, paling cepat setelah ${releaseDate}.`,
+                '🏁 Subtes Selesai!', '⏳'
+            );
+            window.location.href = `detail-tryout.html?id=${paketTryoutId}`;
+        } else {
+            const scoreText = replayIrtScore ? `Nilai IRT: ${replayIrtScore.score}\n` : `Skor Anda: ${skor}\n`;
+            await showScyraAlert(
+                `${scoreText}Benar: ${correct} dari ${questions.length}\nWaktu: ${Math.floor(waktuPengerjaan/60)}m ${waktuPengerjaan%60}s`,
                 "🏁 Subtes Selesai!", "🏆"
             );
             // Kembali ke detail tryout untuk lanjut subtes berikutnya
@@ -355,6 +537,18 @@ async function finishExam(isDisqualified = false) {
         isExamActive = true;
         startTimer();
     }
+}
+
+function calculateReplayIrtScore(detail) {
+    if (!window.ScyraIRTEngine) return null;
+    const itemParameters = {};
+    questions.forEach(question => {
+        const byPaket = question.irt_parameters?.pakets?.[paketTryoutId];
+        const fallback = question.irt_parameters?.global || { b: 0, a: 1, c: 0.2 };
+        itemParameters[question.id] = byPaket || fallback;
+    });
+    const theta = window.ScyraIRTEngine.estimateTheta(detail, itemParameters);
+    return { theta, score: window.ScyraIRTEngine.thetaToUTBKScore(theta) };
 }
 
 // ==========================================
