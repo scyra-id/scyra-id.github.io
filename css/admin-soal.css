@@ -459,6 +459,12 @@ body.dark-mode .tipe-badge.pg { background: rgba(33, 150, 243, 0.2); color: #64b
 body.dark-mode .tipe-badge.bs { background: rgba(255, 152, 0, 0.2); color: #ffb74d; }
 body.dark-mode .tipe-badge.isian { background: rgba(156, 39, 176, 0.2); color: #ce93d8; }
 
+.tipe-badge.pgk {
+    background: rgba(0, 150, 136, 0.15);
+    color: #00796b;
+}
+body.dark-mode .tipe-badge.pgk { background: rgba(0, 150, 136, 0.2); color: #80cbc4; }
+
 /* =====================================================
    🖼️ CARD UPLOAD GAMBAR
 ===================================================== */

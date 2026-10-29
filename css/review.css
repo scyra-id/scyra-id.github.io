@@ -134,7 +134,79 @@
 
 .review-actions { text-align: center; margin-top: 3rem; margin-bottom: 2rem; }
 
+/* ================= ISIAN REVIEW ================= */
+.isian-review {
+    margin-bottom: 1.5rem;
+}
+
+.isian-review-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.isian-review-item {
+    padding: 1rem 1.2rem;
+    border-radius: 12px;
+    border: 1.5px solid var(--border-color);
+    background: var(--bg-primary);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.isian-review-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+}
+
+.isian-review-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.isian-review-item.isian-correct {
+    border-color: var(--success);
+    background: rgba(107, 143, 92, 0.08);
+}
+.isian-review-item.isian-correct .isian-review-label { color: var(--success); }
+.isian-review-item.isian-correct .isian-review-value { color: var(--success); }
+
+.isian-review-item.isian-wrong {
+    border-color: var(--error);
+    background: rgba(229, 115, 115, 0.08);
+}
+.isian-review-item.isian-wrong .isian-review-label { color: var(--error); }
+.isian-review-item.isian-wrong .isian-review-value { color: var(--error); text-decoration: line-through; }
+
+.isian-review-item.isian-empty {
+    border-color: var(--text-muted);
+    background: rgba(136, 136, 136, 0.06);
+}
+.isian-review-item.isian-empty .isian-review-value { color: var(--text-muted); font-style: italic; font-weight: 400; }
+
+.isian-review-item.isian-key {
+    border-color: var(--success);
+    background: rgba(107, 143, 92, 0.08);
+}
+.isian-review-item.isian-key .isian-review-label { color: var(--success); }
+.isian-review-item.isian-key .isian-review-value { color: var(--success); }
+
+.isian-review-hint {
+    margin-top: 0.6rem;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-style: italic;
+    padding-left: 0.2rem;
+}
+
 @media (max-width: 600px) {
     .review-container { padding: 1rem; }
     .summary-value { font-size: 2rem; }
+    .isian-review-row { grid-template-columns: 1fr; }
 }

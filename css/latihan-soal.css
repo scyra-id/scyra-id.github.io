@@ -206,7 +206,7 @@
 
 /* 🚀 TEXT ZOOM ENGINE (LATIHAN) */
 .latihan-content { --zoom-level: 1; }
-.soal-text, .opsi-item-box, .pembahasan-box, .bs-btn, .kotak-isian, .tabel-soal {
+.soal-text, .opsi-item-box, .pgk-opsi, .pembahasan-box, .bs-btn, .kotak-isian, .tabel-soal {
     font-size: calc(1.15rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;
 }

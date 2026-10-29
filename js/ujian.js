@@ -301,6 +301,8 @@ function updateNavigatorState() {
                 : 0;
             const isAnswered = q.tipe_soal === 'bs'
                 ? answer && Object.keys(answer).length === statementCount
+                : q.tipe_soal === 'pgk'
+                ? answer && answer.length > 0
                 : Boolean(answer);
             if (isAnswered) btn.classList.add('answered');
         }
@@ -308,8 +310,10 @@ function updateNavigatorState() {
 }
 
 function renderQuestion() {
-    // Scroll to top when changing question
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Scroll to top: target .exam-question-area karena body overflow:hidden
+    const scrollTarget = document.querySelector('.exam-question-area');
+    if (scrollTarget) scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
     
     const q = questions[currentIndex];
     document.getElementById('currentNum').textContent = currentIndex + 1;
@@ -333,6 +337,21 @@ function renderQuestion() {
         document.getElementById('questionText').innerHTML = document.getElementById('questionText').innerHTML.replace(/<span class="kotak-isian"><\/span>/g, inputHtml);
         optsList.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Ketik jawabanmu di kotak yang tersedia.</p>`;
         document.getElementById('isianInputUjian').oninput = function() { userAnswers[q.id] = this.value.trim().toLowerCase(); updateNavigatorState(); };
+    } else if (tipe === 'pgk') {
+        const selectedArr = userAnswers[q.id] ? userAnswers[q.id].split(',') : [];
+        optsList.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; text-align: center;">☑️ Pilih satu atau lebih jawaban yang benar</p>`;
+        ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+            const optHtml = q[`opsi_${opt.toLowerCase()}_html`];
+            if (optHtml) {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn pgk-opt';
+                if (selectedArr.includes(opt)) btn.classList.add('selected');
+                btn.innerHTML = `<span class="opt-letter">☐</span> <span>${renderShortcodes(optHtml)}</span>`;
+                if (selectedArr.includes(opt)) btn.querySelector('.opt-letter').textContent = '☑';
+                btn.onclick = () => togglePGK(q.id, opt);
+                optsList.appendChild(btn);
+            }
+        });
     } else {
         ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
             const optHtml = q[`opsi_${opt.toLowerCase()}_html`];
@@ -372,6 +391,19 @@ window.selectOptionBS = function(qId, statement, value) {
 function selectOption(qId, opt) {
     userAnswers[qId] = opt;
     renderQuestion(); 
+}
+
+function togglePGK(qId, opt) {
+    let current = userAnswers[qId] ? userAnswers[qId].split(',') : [];
+    if (current.includes(opt)) {
+        current = current.filter(o => o !== opt);
+    } else {
+        current.push(opt);
+    }
+    current.sort();
+    userAnswers[qId] = current.join(',');
+    renderQuestion();
+    updateNavigatorState();
 }
 
 function goToQuestion(i) {
@@ -427,6 +459,10 @@ async function finishExam(isDisqualified = false) {
             const userAns = (ans || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
             const keyAns = (q.kunci_jawaban || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
             isCorrect = userAns === keyAns && userAns !== '';
+        } else if (tipe === 'pgk') {
+            const userArr = (ans || '').split(',').filter(Boolean).sort().join(',');
+            const keyArr = (q.kunci_jawaban || '').split(',').map(k => k.trim().toUpperCase()).sort().join(',');
+            isCorrect = userArr === keyArr && userArr !== '';
         } else if (tipe === 'bs') {
             const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => q[`opsi_${opt.toLowerCase()}_html`]);
             const keys = (q.kunci_jawaban || '').split(',').map(key => key.trim().toUpperCase());

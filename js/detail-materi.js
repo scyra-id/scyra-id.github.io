@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // 🚨 STATE GLOBAL UNTUK KUIS INTERAKTIF (DIPINDAHKAN KE SINI AGAR BISA DIAKSES SEMUA FUNGSI)
     let currentCorrectAnswer = null;
+    let currentQuestionType = 'pg';
     let hasAnswered = false;
     
     // Credit icon HTML helper
@@ -545,6 +546,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     // 🚨 RESET STATE KUIS SETIAP ADA SOAL BARU
                     hasAnswered = false;
                     currentCorrectAnswer = null;
+                    currentQuestionType = 'pg';
                     finalHtml += `<div class="scyra-soal-card"><h2 class="soal-title">🎯 ${text}</h2>`; 
                     return;
                 }
@@ -702,18 +704,31 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // 🚨 DETEKSI KUNCI JAWABAN
             else if (lower.match(/^(jawaban|kunci jawaban)[:\s]+[a-e]/i)) {
-                const match = lower.match(/^(jawaban|kunci jawaban)[:\s]+([a-e])/i);
+                const match = lower.match(/^(jawaban|kunci jawaban)[:\s]+([a-e](?:\s*,\s*[a-e])*)/i);
                 if (match) {
-                    currentCorrectAnswer = match[2].toUpperCase();
+                    currentCorrectAnswer = match[2].split(',').map(answer => answer.trim().toUpperCase()).sort().join(',');
                     return; 
                 }
+            }
+            // 🚨 DETEKSI PGK (Pilihan Ganda Kompleks)
+            else if (/\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/i.test(inner)) {
+                closeActiveBlock();
+                closeAlgo();
+                currentQuestionType = 'pgk';
+                const cleaned = inner.replace(/\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/gi, '').trim();
+                finalHtml += `<p>${cleaned}</p><p style="color: var(--text-muted); font-size: 0.85rem; margin: 0.5rem 0;">☑️ Pilih satu atau lebih jawaban yang benar</p>`;
+                return;
             }
                     // 🚨 DETEKSI OPSI JAWABAN (BIAR BISA DIKLIK)
             else if (text.match(/^[a-e][\.\)]\s/i) && tag === 'P') {
                 closeActiveBlock();
                 closeAlgo();
                 const answerLetter = text.match(/^[a-e]/i)[0].toUpperCase();
-                finalHtml += `<div class="opsi-soal-btn" data-answer="${answerLetter}" onclick="handleAnswerClick('${answerLetter}', this)">${inner}</div>`;
+                if (currentQuestionType === 'pgk') {
+                    finalHtml += `<div class="opsi-soal-btn pgk-bedah-option" data-answer="${answerLetter}" onclick="handlePGKOptionClick('${answerLetter}', this)"><span class="pgk-bedah-check">☐</span>${inner}</div>`;
+                } else {
+                    finalHtml += `<div class="opsi-soal-btn" data-answer="${answerLetter}" onclick="handleAnswerClick('${answerLetter}', this)">${inner}</div>`;
+                }
             } 
         // 🚨 DETEKSI BENAR/SALAH (Format: | Soal | Benar | Salah |)
             else if (text.match(/^\|.*\|.*\|.*\|$/) && lower.includes('benar') && lower.includes('salah')) {
@@ -735,7 +750,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Tambahin tombol cek otomatis
                 finalHtml += `<button class="opsi-soal-btn" style="margin-top: 0.5rem; text-align: center;" onclick="handleIsianClick(this)">Cek Jawaban</button>`;
                 return;
-            } 
+            }
             else {
                 if (activeBlock === 'trap' || activeBlock === 'fyi') {
                     blockHtml += rawEl;
@@ -822,6 +837,65 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 soalCard.appendChild(feedbackDiv);
             }
+        }
+    };
+
+    // PGK pada Bedah Soal: siswa boleh memilih lebih dari satu opsi sebelum mengecek.
+    window.handlePGKOptionClick = function(selectedAnswer, clickedElement) {
+        if (hasAnswered) return;
+        clickedElement.classList.toggle('selected');
+        const check = clickedElement.querySelector('.pgk-bedah-check');
+        if (check) check.textContent = clickedElement.classList.contains('selected') ? '☑' : '☐';
+
+        let btnCek = document.getElementById('btnCekPGKBedah');
+        if (!btnCek) {
+            btnCek = document.createElement('button');
+            btnCek.id = 'btnCekPGKBedah';
+            btnCek.type = 'button';
+            btnCek.className = 'opsi-soal-btn';
+            btnCek.style.cssText = 'margin-top: 0.75rem; text-align: center; width: 100%;';
+            btnCek.textContent = 'Cek Jawaban';
+            btnCek.onclick = () => window.checkPGKAnswer(btnCek);
+            const card = clickedElement.closest('.scyra-soal-card');
+            const target = card?.querySelector('.scyra-pembahasan, .scyra-trap');
+            if (target) card.insertBefore(btnCek, target);
+            else clickedElement.parentElement?.appendChild(btnCek);
+        }
+    };
+
+    window.checkPGKAnswer = function(btn) {
+        if (hasAnswered) return;
+        const correctAnswers = (currentCorrectAnswer || '').split(',').filter(Boolean).sort();
+        const selectedAnswers = [...document.querySelectorAll('.pgk-bedah-option.selected')]
+            .map(option => option.dataset.answer)
+            .sort();
+        const isCorrect = selectedAnswers.length > 0
+            && selectedAnswers.length === correctAnswers.length
+            && selectedAnswers.every((answer, index) => answer === correctAnswers[index]);
+
+        hasAnswered = true;
+        document.querySelectorAll('.pgk-bedah-option').forEach(option => {
+            const answer = option.dataset.answer;
+            const isKey = correctAnswers.includes(answer);
+            const isSelected = selectedAnswers.includes(answer);
+            option.style.pointerEvents = 'none';
+            if (isSelected && isKey) option.classList.add('opsi-correct');
+            else if (isSelected) option.classList.add('opsi-wrong');
+            else if (isKey) option.classList.add('opsi-correct');
+            else option.style.opacity = '0.5';
+        });
+        btn.remove();
+
+        const soalCard = document.querySelector('.scyra-soal-card');
+        if (soalCard) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `feedback-soal ${isCorrect ? 'feedback-correct' : 'feedback-wrong'}`;
+            feedbackDiv.innerHTML = isCorrect
+                ? '<span class="feedback-icon">✅</span><strong>Benar Sekali!</strong>'
+                : `<span class="feedback-icon">❌</span><strong>Kurang Tepat.</strong> Jawaban yang benar adalah <strong>${correctAnswers.join(', ')}</strong>.`;
+            const insertTarget = soalCard.querySelector('.scyra-pembahasan, .scyra-trap');
+            if (insertTarget) soalCard.insertBefore(feedbackDiv, insertTarget);
+            else soalCard.appendChild(feedbackDiv);
         }
     };
 

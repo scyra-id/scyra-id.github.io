@@ -304,7 +304,8 @@ function renderSoalTable() {
         const tipeLabels = {
             'pg': '<span class="tipe-badge pg">📝 PG</span>',
             'bs': '<span class="tipe-badge bs">⚖️ B/S</span>',
-            'isian': '<span class="tipe-badge isian">✏️ Isian</span>'
+            'isian': '<span class="tipe-badge isian">✏️ Isian</span>',
+            'pgk': '<span class="tipe-badge pgk">☑️ PGK</span>'
         };
         const tipeBadge = tipeLabels[soal.tipe_soal] || tipeLabels['pg'];
 
@@ -330,6 +331,13 @@ function renderSoalTable() {
             const kunciText = soal.kunci_jawaban || '?';
             const displayText = kunciText.length > 20 ? kunciText.substring(0, 20) + '...' : kunciText;
             kunciDisplay = `<span class="kunci-badge" style="background: #607d8b; color: white; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;" title="${kunciText}">${displayText}</span>`;
+        } else if (soal.tipe_soal === 'pgk') {
+            // PGK: tampilkan badge multi-jawaban
+            const kunciArray = (soal.kunci_jawaban || '').split(',').map(k => k.trim());
+            kunciDisplay = kunciArray.map(k => {
+                const kunciColors = { 'A': '#4caf50', 'B': '#2196f3', 'C': '#ff9800', 'D': '#9c27b0', 'E': '#f44336' };
+                return `<span style="display:inline-block; background: ${kunciColors[k] || '#666'}; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem; margin: 0 2px; font-weight: 600;">${k}</span>`;
+            }).join('');
         } else {
             kunciDisplay = `<span class="kunci-badge" style="background: #666; color: white; padding: 0.3rem 0.6rem; border-radius: 6px;">${soal.kunci_jawaban || '?'}</span>`;
         }
@@ -651,6 +659,24 @@ function parseQuestions(text, katId, matId) {
             q.tipe = 'isian';
         }
 
+        // B2. Deteksi PGK (Pilihan Ganda Kompleks)
+        // Penanda eksplisit [PGK], [MULTI], [MULTI-SELECT], [PILIHAN GANDA KOMPLEKS]
+        if (!q.tipe && /\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/i.test(q.pertanyaan)) {
+            console.log('[PARSER] ✅ Detected PGK via tag');
+            q.pertanyaan = q.pertanyaan.replace(/\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/gi, '').trim();
+            q.tipe = 'pgk';
+        }
+        // Atau: kunci jawaban mengandung lebih dari 1 huruf opsi (misal: A,C atau B,D,E)
+        if (!q.tipe && q.kunci && /^[A-E]\s*,\s*[A-E](?:\s*,\s*[A-E])*$/i.test(q.kunci.trim())) {
+            console.log('[PARSER] ✅ Detected PGK via multi-key:', q.kunci);
+            q.tipe = 'pgk';
+        }
+        // Normalisasi kunci PGK: sort dan uppercase
+        if (q.tipe === 'pgk' && q.kunci) {
+            q.kunci = q.kunci.split(',').map(k => k.trim().toUpperCase()).sort().join(',');
+            console.log('[PARSER] PGK kunci normalized to:', q.kunci);
+        }
+
         // C. Default tipe
         if (!q.tipe) {
             console.log('[PARSER] Defaulting to PG');
@@ -692,6 +718,13 @@ function showPreview() {
             opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">⚖️ Tipe: Benar / Salah</p>`;
         } else if (q.tipe === 'isian') {
             opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">✏️ Tipe: Isian Singkat</p>`;
+        } else if (q.tipe === 'pgk') {
+            opsiHTML = `
+                <p style="color: #00796b; font-weight:bold; margin-bottom:0.5rem;">☑️ Tipe: PG Kompleks (Multi-Select)</p>
+                <p><strong>A.</strong> ${q.opsi.A || '-'} &nbsp;|&nbsp; <strong>B.</strong> ${q.opsi.B || '-'}</p>
+                <p><strong>C.</strong> ${q.opsi.C || '-'} &nbsp;|&nbsp; <strong>D.</strong> ${q.opsi.D || '-'}</p>
+                <p><strong>E.</strong> ${q.opsi.E || '-'}</p>
+            `;
         } else {
             opsiHTML = `
                 <p><strong>A.</strong> ${q.opsi.A || '-'} &nbsp;|&nbsp; <strong>B.</strong> ${q.opsi.B || '-'}</p>
@@ -705,12 +738,13 @@ function showPreview() {
                 <h4 style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
                     <span>
                         Soal ${i + 1} 
-                        <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : (q.tipe === 'isian' ? '✏️ Isian' : '📝 PG')}</span>
+                        <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : q.tipe === 'isian' ? '✏️ Isian' : q.tipe === 'pgk' ? '☑️ PGK' : '📝 PG'}</span>
                     </span>
                     <select class="tipe-override" data-index="${i}" style="padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; cursor: pointer;">
                         <option value="pg" ${q.tipe === 'pg' ? 'selected' : ''}>📝 Pilihan Ganda</option>
                         <option value="bs" ${q.tipe === 'bs' ? 'selected' : ''}>⚖️ Benar/Salah</option>
                         <option value="isian" ${q.tipe === 'isian' ? 'selected' : ''}>✏️ Isian Singkat</option>
+                        <option value="pgk" ${q.tipe === 'pgk' ? 'selected' : ''}>☑️ PG Kompleks</option>
                     </select>
                 </h4>
                 <div style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto;">
@@ -734,7 +768,7 @@ function showPreview() {
             // Update badge visual
             const badge = e.target.closest('.soal-preview-item').querySelector('.tipe-badge');
             badge.className = `tipe-badge ${newTipe}`;
-            badge.textContent = newTipe === 'bs' ? '⚖️ B/S' : (newTipe === 'isian' ? '✏️ Isian' : '📝 PG');
+            badge.textContent = newTipe === 'bs' ? '⚖️ B/S' : newTipe === 'isian' ? '✏️ Isian' : newTipe === 'pgk' ? '☑️ PGK' : '📝 PG';
         });
     });
     
@@ -864,6 +898,38 @@ function updateFormByTipeSoal(tipe) {
         kunciText.required = true;
         labelKunci.textContent = 'Kunci Jawaban (Teks Bebas)';
         hintKunci.textContent = '💡 Ketik jawaban yang benar. Contoh: Jakarta, Fotosintesis, 42, dll.';
+    } else if (tipe === 'pgk') {
+        // PG Kompleks: tampilkan opsi A-E, kunci pakai checkbox
+        labelA.textContent = 'Opsi A';
+        labelB.textContent = 'Opsi B';
+        labelC.textContent = 'Opsi C';
+        labelD.textContent = 'Opsi D';
+        labelE.textContent = 'Opsi E';
+        opsiA.required = true;
+        opsiB.required = true;
+        opsiC.required = false;
+        opsiD.required = false;
+        opsiE.required = false;
+        opsiA.parentElement.style.display = 'block';
+        opsiB.parentElement.style.display = 'block';
+        opsiC.parentElement.style.display = 'block';
+        opsiD.parentElement.style.display = 'block';
+        opsiE.parentElement.style.display = 'block';
+        
+        kunciPG.style.display = 'none';
+        kunciPG.required = false;
+        kunciText.style.display = 'none';
+        kunciText.required = false;
+        const kunciPGK = document.getElementById('editKunciPGK');
+        if (kunciPGK) kunciPGK.style.display = 'flex';
+        labelKunci.textContent = 'Kunci Jawaban (Centang semua yang benar)';
+        hintKunci.textContent = '💡 Centang semua opsi yang merupakan jawaban benar. Contoh: A dan C.';
+    }
+
+    // Sembunyikan kunciPGK jika bukan pgk
+    if (tipe !== 'pgk') {
+        const kunciPGK = document.getElementById('editKunciPGK');
+        if (kunciPGK) kunciPGK.style.display = 'none';
     }
 }
 
@@ -906,8 +972,18 @@ function setupEditModal() {
         let kunciJawaban = '';
         if (tipeSoal === 'pg') {
             kunciJawaban = document.getElementById('editKunciPG').value;
+        } else if (tipeSoal === 'pgk') {
+            const checked = [...document.querySelectorAll('.pgk-kunci-cb:checked')].map(cb => cb.value).sort();
+            kunciJawaban = checked.join(',');
         } else {
             kunciJawaban = document.getElementById('editKunciText').value;
+        }
+
+        if (tipeSoal === 'pgk' && !kunciJawaban) {
+            btn.disabled = false;
+            btn.textContent = '💾 Simpan Perubahan';
+            await showScyraAlert('Pilih minimal satu opsi sebagai kunci jawaban PG Kompleks.', '⚠️ Kunci Belum Dipilih', '⚠️');
+            return;
         }
         
         const updates = {
@@ -959,6 +1035,16 @@ window.editSoal = async (id) => {
     if (tipeSoal === 'pg') {
         document.getElementById('editKunciPG').value = soal.kunci_jawaban || 'A';
         document.getElementById('editKunciText').value = '';
+    } else if (tipeSoal === 'pgk') {
+        document.getElementById('editKunciPG').value = 'A';
+        document.getElementById('editKunciText').value = '';
+        // Set checkbox PGK
+        document.querySelectorAll('.pgk-kunci-cb').forEach(cb => cb.checked = false);
+        const kunciArr = (soal.kunci_jawaban || '').split(',').map(k => k.trim().toUpperCase());
+        kunciArr.forEach(k => {
+            const cb = document.querySelector(`.pgk-kunci-cb[value="${k}"]`);
+            if (cb) cb.checked = true;
+        });
     } else {
         document.getElementById('editKunciPG').value = 'A';
         document.getElementById('editKunciText').value = soal.kunci_jawaban || '';

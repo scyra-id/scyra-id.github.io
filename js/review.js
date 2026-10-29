@@ -101,6 +101,48 @@ document.addEventListener('DOMContentLoaded', async () => {
                         const isCorrect = answer === key;
                         return `<tr><td>${renderShortcodes(item.text)}</td><td class="${isCorrect ? 'user-correct' : 'user-wrong'}">${answer === 'B' ? 'Benar' : answer === 'S' ? 'Salah' : '-'}</td><td>${key === 'B' ? 'Benar' : key === 'S' ? 'Salah' : '-'}</td></tr>`;
                     }).join('')}</tbody></table>`;
+                } else if (soal.tipe_soal === 'isian') {
+                    const userAns = detail.jawaban || '';
+                    const kunciAns = soal.kunci_jawaban || '';
+                    const isCorrect = detail.is_correct;
+                    const hasAnswer = userAns !== '';
+
+                    optionsHtml = `
+                        <div class="isian-review">
+                            <div class="isian-review-row">
+                                <div class="isian-review-item ${hasAnswer ? (isCorrect ? 'isian-correct' : 'isian-wrong') : 'isian-empty'}">
+                                    <span class="isian-review-label">Jawabanmu</span>
+                                    <span class="isian-review-value">${hasAnswer ? userAns : '<em>Tidak dijawab</em>'}</span>
+                                </div>
+                                <div class="isian-review-item isian-key">
+                                    <span class="isian-review-label">Kunci Jawaban</span>
+                                    <span class="isian-review-value">${kunciAns}</span>
+                                </div>
+                            </div>
+                            ${!isCorrect && hasAnswer ? `<div class="isian-review-hint">Penilaian mengabaikan huruf besar-kecil dan tanda baca.</div>` : ''}
+                        </div>
+                    `;
+                } else if (soal.tipe_soal === 'pgk') {
+                    const userArr = detail.jawaban ? detail.jawaban.split(',').map(k => k.trim().toUpperCase()) : [];
+                    const keyArr = (soal.kunci_jawaban || '').split(',').map(k => k.trim().toUpperCase());
+                    ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+                        const optText = soal[`opsi_${opt.toLowerCase()}_html`];
+                        if (!optText) return;
+                        const isKey = keyArr.includes(opt);
+                        const isPicked = userArr.includes(opt);
+                        let optClass = '';
+                        let marker = '';
+                        if (isPicked && isKey) { optClass = 'user-correct'; marker = '✔️'; }
+                        else if (isPicked && !isKey) { optClass = 'user-wrong'; marker = '❌'; }
+                        else if (!isPicked && isKey) { optClass = 'actual-correct'; marker = '⬅ Kunci'; }
+                        optionsHtml += `
+                            <div class="q-opt ${optClass}">
+                                <span class="opt-letter">${isPicked ? '☑' : '☐'} ${opt}.</span>
+                                <span>${renderShortcodes(optText)}</span>
+                                ${marker ? `<span style="margin-left:auto; font-size:0.85rem; font-weight:600; flex-shrink:0;">${marker}</span>` : ''}
+                            </div>
+                        `;
+                    });
                 } else {
                     ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
                         const optText = soal[`opsi_${opt.toLowerCase()}_html`];

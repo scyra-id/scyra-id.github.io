@@ -283,6 +283,20 @@ body.window-blurred .exam-header {
 
 /* 🚀 TEXT ZOOM ENGINE (UJIAN) */
 .question-card { --zoom-level: 1; }
+.opt-btn.pgk-opt .opt-letter {
+    font-size: 1.1rem;
+    background: none;
+    border: none;
+    width: auto;
+    height: auto;
+    color: var(--text-muted);
+}
+.opt-btn.pgk-opt.selected .opt-letter {
+    color: var(--brand-primary);
+    background: none;
+    border: none;
+}
+
 .question-text, .opt-btn, .bs-btn, .kotak-isian, .tabel-soal {
     font-size: calc(1.15rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;

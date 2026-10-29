@@ -99,6 +99,11 @@
 }
 .opsi-item:hover { border-color: var(--brand-primary); background: rgba(107, 143, 92, 0.05); }
 
+.pgk-drill-item { cursor: pointer; }
+.pgk-drill-item input[type="checkbox"] { display: none; }
+.pgk-drill-item .pgk-check-icon { font-size: 1.1rem; flex-shrink: 0; }
+.pgk-drill-item:has(input:checked) { border-color: var(--brand-primary); background: rgba(135, 168, 120, 0.1); }
+
 .drill-navigation {
     display: flex;
     justify-content: space-between;
@@ -399,7 +404,7 @@
 
 /* 🚀 TEXT ZOOM ENGINE (DRILL) */
 .soal-content { --zoom-level: 1; }
-.soal-text, .opsi-item span, .bs-btn, .kotak-isian, .tabel-soal, .pembahasan-box {
+.soal-text, .opsi-item span, .pgk-drill-item span, .bs-btn, .kotak-isian, .tabel-soal, .pembahasan-box {
     font-size: calc(1.2rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;
 }

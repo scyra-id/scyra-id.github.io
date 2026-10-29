@@ -139,7 +139,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function renderSoalActive(index) {
-        // Scroll to top when changing question
+        // Scroll to top
+        const scrollTarget = document.querySelector('.latihan-container') || document.documentElement;
+        scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
         if (index >= state.listSoal.length) {
@@ -175,6 +177,22 @@ document.addEventListener('DOMContentLoaded', async () => {
             const inputHtml = `<input type="text" class="kotak-isian" id="isianInputLatihan" placeholder="..." autocomplete="off">`;
             document.getElementById('soalText').innerHTML = document.getElementById('soalText').innerHTML.replace(/<span class="kotak-isian"><\/span>/g, inputHtml);
             opsiContainer.innerHTML = `<button id="btnCekIsian" class="btn-lanjut-bab" style="margin-top:1rem; background: var(--brand-primary); color:white;">Cek Jawaban</button>`;
+        } else if (tipe === 'pgk') {
+            const opsiList = ['A', 'B', 'C', 'D', 'E'];
+            let htmlOpsi = '<p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem;">☑️ Pilih satu atau lebih jawaban yang benar</p>';
+            opsiList.forEach(opt => {
+                const val = dataSoal[`opsi_${opt.toLowerCase()}_html`];
+                if(val) {
+                    htmlOpsi += `
+                    <div class="opsi-item-box pgk-opsi" data-value="${opt}" style="cursor:pointer;">
+                        <div class="huruf-opsi pgk-check">☐</div>
+                        <div style="flex:1;">${renderShortcodes(val)}</div>
+                        <div class="icon-status"></div>
+                    </div>`;
+                }
+            });
+            htmlOpsi += `<button id="btnCekPGK" class="btn-lanjut-bab" style="margin-top:1rem; background: var(--brand-primary); color:white;">Cek Jawaban</button>`;
+            opsiContainer.innerHTML = htmlOpsi;
         } else {
             const opsiList = ['A', 'B', 'C', 'D', 'E'];
             let htmlOpsi = '';
@@ -224,6 +242,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 isBenar = userAns === keyAns && userAns !== '';
                 const input = document.getElementById('isianInputLatihan');
                 if (input) input.classList.add(isBenar ? 'correct' : 'wrong');
+            } else if (tipe === 'pgk') {
+                const userArr = (jawabanUser || '').split(',').filter(Boolean).sort().join(',');
+                const keyArr = (kunciAsli || '').split(',').map(k => k.trim().toUpperCase()).sort().join(',');
+                isBenar = userArr === keyArr && userArr !== '';
             } else if (tipe === 'bs') {
                 const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => dataSoal[`opsi_${opt.toLowerCase()}_html`]);
                 const keys = (kunciAsli || '').split(',').map(key => key.trim().toUpperCase());
@@ -242,6 +264,19 @@ document.addEventListener('DOMContentLoaded', async () => {
                     b.style.cursor = 'default';
                     if (val === kunciAsli) { b.style.borderColor = '#4caf50'; b.style.background = 'rgba(76, 175, 80, 0.15)'; b.querySelector('.icon-status').innerHTML = '✔️'; }
                     else if (val === jawabanUser && !isBenar) { b.style.borderColor = '#f44336'; b.style.background = 'rgba(244, 67, 54, 0.1)'; b.querySelector('.icon-status').innerHTML = '❌'; }
+                    else { b.style.opacity = '0.4'; }
+                });
+            } else if (tipe === 'pgk') {
+                const keyArr = (kunciAsli || '').split(',').map(k => k.trim().toUpperCase());
+                const userArr = (jawabanUser || '').split(',').filter(Boolean);
+                document.querySelectorAll('.opsi-item-box.pgk-opsi').forEach(b => {
+                    const val = b.getAttribute('data-value');
+                    const isKey = keyArr.includes(val);
+                    const isPicked = userArr.includes(val);
+                    b.style.cursor = 'default';
+                    if (isPicked && isKey) { b.style.borderColor = '#4caf50'; b.style.background = 'rgba(76, 175, 80, 0.15)'; b.querySelector('.icon-status').innerHTML = '✔️'; }
+                    else if (isPicked && !isKey) { b.style.borderColor = '#f44336'; b.style.background = 'rgba(244, 67, 54, 0.1)'; b.querySelector('.icon-status').innerHTML = '❌'; }
+                    else if (!isPicked && isKey) { b.style.borderColor = '#4caf50'; b.style.background = 'rgba(76, 175, 80, 0.08)'; b.querySelector('.icon-status').innerHTML = '⬅ Kunci'; }
                     else { b.style.opacity = '0.4'; }
                 });
             } else if (tipe === 'bs') {
@@ -288,6 +323,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const input = document.getElementById('isianInputLatihan');
                 processAnswer(input ? input.value.trim() : '');
             };
+        } else if (tipe === 'pgk') {
+            const pgkSelected = {};
+            document.querySelectorAll('.opsi-item-box.pgk-opsi').forEach(box => {
+                box.addEventListener('click', function() {
+                    const val = this.getAttribute('data-value');
+                    pgkSelected[val] = !pgkSelected[val];
+                    const check = this.querySelector('.pgk-check');
+                    if (pgkSelected[val]) {
+                        this.style.borderColor = 'var(--brand-primary)';
+                        this.style.background = 'rgba(135, 168, 120, 0.1)';
+                        if (check) check.textContent = '☑';
+                    } else {
+                        this.style.borderColor = '';
+                        this.style.background = '';
+                        if (check) check.textContent = '☐';
+                    }
+                });
+            });
+            document.getElementById('btnCekPGK').onclick = () => {
+                const selected = Object.keys(pgkSelected).filter(k => pgkSelected[k]).sort().join(',');
+                processAnswer(selected);
+            };
         } else if (tipe === 'bs') {
             const answers = {};
             const bsBtns = document.querySelectorAll('.bs-btn');
@@ -329,8 +386,17 @@ document.addEventListener('DOMContentLoaded', async () => {
             const keys = (item.kunci_asli || '').split(',').map(key => key.trim().toUpperCase());
             const isBenar = tipe === 'bs'
                 ? statements.length > 0 && statements.every((statement, keyIndex) => item.jawaban_user?.[statement] === keys[keyIndex])
+                : tipe === 'pgk'
+                ? (item.jawaban_user || '').split(',').filter(Boolean).sort().join(',') === (item.kunci_asli || '').split(',').map(k => k.trim().toUpperCase()).sort().join(',')
                 : item.jawaban_user === item.kunci_asli;
             if (isBenar) totalBenar++;
+
+            const jawabanTampil = tipe === 'pgk'
+                ? (item.jawaban_user ? item.jawaban_user.split(',').join(', ') : '<em style="color:var(--text-muted);">Tidak dijawab</em>')
+                : tipe === 'bs'
+                ? (item.jawaban_user ? Object.entries(item.jawaban_user).map(([opsi, jawaban]) => `${opsi}: ${jawaban === 'B' ? 'Benar' : 'Salah'}`).join(', ') : '<em style="color:var(--text-muted);">Tidak dijawab</em>')
+                : (item.jawaban_user || '<em style="color:var(--text-muted);">Tidak dijawab</em>');
+            const kunciTampil = tipe === 'pgk' ? (item.kunci_asli || '').split(',').map(k => k.trim()).join(', ') : item.kunci_asli;
             
             reviewHTML += `
                 <div style="background:var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
@@ -341,8 +407,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <div style="margin-bottom: 1rem;">${renderShortcodes(item.soal.pertanyaan_html)}</div>
                     
                     <div style="font-size:0.95rem; background:var(--bg-primary); padding: 1rem; border-radius:8px;">
-                        <span style="color:var(--text-secondary);">Jawabanmu: <strong>${item.jawaban_user}</strong></span> | 
-                        <strong style="color:#4caf50;">Kunci: ${item.kunci_asli}</strong>
+                        <span style="color:var(--text-secondary);">Jawabanmu: <strong>${jawabanTampil}</strong></span> | 
+                        <strong style="color:#4caf50;">Kunci: ${kunciTampil}</strong>
                         
                         <div style="margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
                             <strong style="color:var(--brand-primary);">💡 Pembahasan:</strong><br> 

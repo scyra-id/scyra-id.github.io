@@ -356,6 +356,10 @@ box-shadow: 0 0 0 4px var(--bg-primary);
     border-color: var(--brand-primary);
 }
 
+.pgk-bedah-option { display: flex; align-items: flex-start; gap: 0.65rem; }
+.pgk-bedah-check { flex-shrink: 0; font-size: 1.1em; line-height: 1.35; }
+.pgk-bedah-option.selected { border-color: var(--brand-primary); background: rgba(135, 168, 120, 0.1); }
+
 .opsi-soal-btn.opsi-correct {
     background: linear-gradient(135deg, #4caf50, #81c784) !important;
     border-color: #2e7d32 !important;

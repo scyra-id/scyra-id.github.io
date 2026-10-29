@@ -366,8 +366,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 4. RENDER SOAL DINAMIS
     // =======================================================
     function renderSoal(index) {
-        // Scroll to top when changing question
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Scroll to top: target .drill-container karena body overflow:hidden
+        const scrollTarget = document.querySelector('.drill-container');
+        if (scrollTarget) scrollTarget.scrollTo({ top: 0, behavior: 'smooth' });
+        else window.scrollTo({ top: 0, behavior: 'smooth' });
         
         if (index >= state.listSoal.length) { window.akhiriDrill(true); return; }
         const dataSoal = state.listSoal[index];
@@ -401,6 +403,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const inputHtml = `<input type="text" class="kotak-isian" id="isianInput" placeholder="..." autocomplete="off">`;
                 teks.innerHTML = teks.innerHTML.replace(/<span class="kotak-isian"><\/span>/g, inputHtml);
                 opsiContainer.innerHTML = `<p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Ketik jawabanmu di kotak yang tersedia pada soal di atas.</p>`;
+            } else if (tipe === 'pgk') {
+                let pgkHtml = '<p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.8rem; text-align: center;">☑️ Pilih satu atau lebih jawaban yang benar</p>';
+                ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+                    const optText = dataSoal[`opsi_${opt.toLowerCase()}_html`];
+                    if (optText) {
+                        pgkHtml += `<label class="opsi-item pgk-drill-item"><input type="checkbox" name="jawaban_pgk" value="${opt}" class="pgk-cb"> <span class="pgk-check-icon">☐</span> <span>${opt}. ${renderShortcodes(optText)}</span></label>`;
+                    }
+                });
+                opsiContainer.innerHTML = pgkHtml;
+                setTimeout(() => {
+                    document.querySelectorAll('.pgk-cb').forEach(cb => {
+                        cb.addEventListener('change', () => {
+                            const icon = cb.parentElement.querySelector('.pgk-check-icon');
+                            if (icon) icon.textContent = cb.checked ? '☑' : '☐';
+                        });
+                    });
+                }, 0);
             } else {
                 opsiContainer.innerHTML = `
                     <label class="opsi-item"><input type="radio" name="jawaban" value="A"> <span>A. ${renderShortcodes(dataSoal.opsi_a_html)}</span></label>
@@ -448,6 +467,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } else if (tipe === 'isian') {
             const input = document.getElementById('isianInput');
             jawaban_user = input ? input.value.trim().toLowerCase() : null;
+        } else if (tipe === 'pgk') {
+            const checked = [...document.querySelectorAll('.pgk-cb:checked')].map(cb => cb.value).sort();
+            jawaban_user = checked.length > 0 ? checked.join(',') : null;
         } else {
             const selected = document.querySelector('input[name="jawaban"]:checked');
             jawaban_user = selected ? selected.value : null;
@@ -459,10 +481,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             kunci_asli: dataSoalSekarang.kunci_jawaban 
         });
         state.currentIndex++;
-        
-        // Scroll to top immediately before rendering next question
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-        
         renderSoal(state.currentIndex);
     };
 
@@ -479,13 +497,32 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (state.timerInt) clearInterval(state.timerInt); 
 
         // Simpan soal terakhir ke memori
-        const jawabanDipilih = document.querySelector('input[name="jawaban"]:checked');
         const dataSoalSekarang = state.listSoal[state.currentIndex];
+        let jawabanAkhir = null;
+        if (dataSoalSekarang) {
+            const tipeAkhir = dataSoalSekarang.tipe_soal || 'pg';
+            if (tipeAkhir === 'pgk') {
+                const checked = [...document.querySelectorAll('.pgk-cb:checked')].map(cb => cb.value).sort();
+                jawabanAkhir = checked.length > 0 ? checked.join(',') : null;
+            } else if (tipeAkhir === 'bs') {
+                jawabanAkhir = {};
+                document.querySelectorAll('.bs-btn.selected').forEach(btn => {
+                    jawabanAkhir[btn.getAttribute('data-statement')] = btn.getAttribute('data-value');
+                });
+                if (!Object.keys(jawabanAkhir).length) jawabanAkhir = null;
+            } else if (tipeAkhir === 'isian') {
+                const input = document.getElementById('isianInput');
+                jawabanAkhir = input ? input.value.trim().toLowerCase() : null;
+            } else {
+                const jawabanDipilih = document.querySelector('input[name="jawaban"]:checked');
+                jawabanAkhir = jawabanDipilih ? jawabanDipilih.value : null;
+            }
+        }
         
         if (dataSoalSekarang && state.jawabanHistory.length === state.currentIndex) {
             state.jawabanHistory.push({
                 soal: dataSoalSekarang,
-                jawaban_user: jawabanDipilih ? jawabanDipilih.value : null,
+                jawaban_user: jawabanAkhir,
                 kunci_asli: dataSoalSekarang.kunci_jawaban 
             });
         }
@@ -513,6 +550,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userAns = (item.jawaban_user || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
                 const keyAns = (item.kunci_asli || '').replace(/[^a-z0-9]/gi, '').toLowerCase();
                 isBenar = (userAns === keyAns) && (userAns !== ''); 
+            } else if (tipe === 'pgk') {
+                const userArr = (item.jawaban_user || '').split(',').filter(Boolean).sort().join(',');
+                const keyArr = (item.kunci_asli || '').split(',').map(k => k.trim().toUpperCase()).sort().join(',');
+                isBenar = userArr === keyArr && userArr !== '';
             } else if (tipe === 'bs') {
                 const statements = ['A', 'B', 'C', 'D', 'E'].filter(opt => item.soal[`opsi_${opt.toLowerCase()}_html`]);
                 const keys = (item.kunci_asli || '').split(',').map(key => key.trim().toUpperCase());
@@ -568,6 +609,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                     <p><strong>Jawabanmu:</strong> ${item.jawaban_user || '<em style="color:var(--text-muted);">Tidak dijawab</em>'}</p>
                     <p style="margin-top:0.5rem;"><strong>Kunci Jawaban:</strong> <span style="color:#4caf50; font-weight:bold;">${item.kunci_asli}</span></p>
                 </div>`;
+            } else if (tipe === 'pgk') {
+                // Render PGK (multi-select)
+                const keyArr = (item.kunci_asli || '').split(',').map(k => k.trim().toUpperCase());
+                const userArr = (item.jawaban_user || '').split(',').filter(Boolean);
+                opsiHTML = '<div style="display: flex; flex-direction: column; gap: 0.8rem; margin: 1.5rem 0;">';
+                ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
+                    const optText = item.soal[`opsi_${opt.toLowerCase()}_html`];
+                    if (!optText) return;
+                    const isKey = keyArr.includes(opt);
+                    const isPicked = userArr.includes(opt);
+                    let optStyle = `padding: 0.8rem 1.2rem; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary);`;
+                    let icon = '';
+                    if (isPicked && isKey) {
+                        optStyle = `padding: 0.8rem 1.2rem; border: 2px solid #4caf50; border-radius: 8px; background: rgba(76, 175, 80, 0.1); color: #4caf50; font-weight: 600;`;
+                        icon = '<span style="float:right;">✔️</span>';
+                    } else if (isPicked && !isKey) {
+                        optStyle = `padding: 0.8rem 1.2rem; border: 2px solid #f44336; border-radius: 8px; background: rgba(244, 67, 54, 0.1); color: #f44336; font-weight: 600;`;
+                        icon = '<span style="float:right;">❌</span>';
+                    } else if (!isPicked && isKey) {
+                        optStyle = `padding: 0.8rem 1.2rem; border: 2px solid #4caf50; border-radius: 8px; background: rgba(76, 175, 80, 0.06); color: #4caf50; font-weight: 600;`;
+                        icon = '<span style="float:right;">⬅ Kunci</span>';
+                    }
+                    opsiHTML += `<div style="${optStyle}"><strong>${isPicked ? '☑' : '☐'} ${opt}.</strong> ${renderShortcodes(optText)} ${icon}</div>`;
+                });
+                opsiHTML += '</div>';
             } else {
                 // Render PG (A-E)
                 opsiHTML = '<div style="display: flex; flex-direction: column; gap: 0.8rem; margin: 1.5rem 0;">';

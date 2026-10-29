@@ -190,6 +190,7 @@
                             <option value="pg">📝 Pilihan Ganda (A-E)</option>
                             <option value="bs">⚖️ Benar / Salah</option>
                             <option value="isian">✏️ Isian Singkat</option>
+                            <option value="pgk">☑️ PG Kompleks (Multi)</option>
                         </select>
                     </div>
                     <div class="form-group">
@@ -232,6 +233,24 @@
                     <!-- Input text untuk BS dan Isian -->
                     <input type="text" id="editKunciText" placeholder="Contoh BS: B,S,B atau Isian: Jakarta" style="display:none; width:100%; padding:0.8rem; border-radius:8px; border:1px solid var(--border-color); background:var(--bg-primary); color:var(--text-primary);">
                     
+                    <!-- Checkbox untuk PGK -->
+                    <div id="editKunciPGK" style="display:none; gap:0.8rem; flex-wrap:wrap;">
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; padding:0.4rem 0.8rem; border:1.5px solid var(--border-color); border-radius:8px; font-weight:600;">
+                            <input type="checkbox" value="A" class="pgk-kunci-cb"> A
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; padding:0.4rem 0.8rem; border:1.5px solid var(--border-color); border-radius:8px; font-weight:600;">
+                            <input type="checkbox" value="B" class="pgk-kunci-cb"> B
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; padding:0.4rem 0.8rem; border:1.5px solid var(--border-color); border-radius:8px; font-weight:600;">
+                            <input type="checkbox" value="C" class="pgk-kunci-cb"> C
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; padding:0.4rem 0.8rem; border:1.5px solid var(--border-color); border-radius:8px; font-weight:600;">
+                            <input type="checkbox" value="D" class="pgk-kunci-cb"> D
+                        </label>
+                        <label style="display:flex; align-items:center; gap:0.4rem; cursor:pointer; padding:0.4rem 0.8rem; border:1.5px solid var(--border-color); border-radius:8px; font-weight:600;">
+                            <input type="checkbox" value="E" class="pgk-kunci-cb"> E
+                        </label>
+                    </div>
                     <small id="hintKunci" style="display:block; margin-top:0.5rem; color:var(--text-secondary); font-size:0.85rem;"></small>
                 </div>
 
