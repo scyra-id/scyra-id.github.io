@@ -404,7 +404,7 @@
 
 /* 🚀 TEXT ZOOM ENGINE (DRILL) */
 .soal-content { --zoom-level: 1; }
-.soal-text, .opsi-item span, .pgk-drill-item span, .bs-btn, .kotak-isian, .tabel-soal, .pembahasan-box {
+.soal-text, .opsi-item span, .pgk-drill-item span, .bs-btn, .kotak-isian, .tabel-soal, .pembahasan-box, .teks-bacaan {
     font-size: calc(1.2rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;
 }

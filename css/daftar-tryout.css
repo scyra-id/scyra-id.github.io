@@ -1,0 +1,588 @@
+/* =====================================================
+   DAFTAR TRYOUT & TARGET PTN STYLES (Scyra Theme)
+   ===================================================== */
+
+.daftar-to-container {
+    max-width: 920px;
+    margin: 0 auto;
+    width: 100%;
+    padding-bottom: 3rem;
+}
+
+.daftar-header {
+    margin-bottom: 1.75rem;
+}
+
+.btn-back-katalog {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--brand-primary);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.btn-back-katalog:hover {
+    color: var(--brand-primary-dark);
+    transform: translateX(-3px);
+}
+
+.daftar-title-wrap {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.daftar-title-wrap h1 {
+    font-size: 1.85rem;
+    color: var(--text-primary);
+    margin-bottom: 0.35rem;
+    font-weight: 800;
+}
+
+.daftar-title-wrap p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.paket-badge-pill {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    color: white;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    box-shadow: 0 4px 14px var(--shadow-color);
+}
+
+/* Rules Card */
+.snbt-rules-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--brand-accent);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 18px var(--shadow-color);
+}
+
+.snbt-rules-card h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-bottom: 0.6rem;
+}
+
+.snbt-rules-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.rule-pill {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.rule-pill strong {
+    color: var(--text-primary);
+    display: block;
+    margin-bottom: 0.2rem;
+}
+
+/* Choices Slots */
+.choices-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+}
+
+.choice-slot-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.choice-slot-card.is-active {
+    border-color: var(--brand-primary);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.choice-slot-card.is-filled {
+    border-color: var(--brand-primary-light);
+}
+
+.choice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.choice-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.choice-number-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.choice-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.choice-req-tag {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.choice-req-tag.required {
+    background: rgba(229, 115, 115, 0.15);
+    color: var(--error);
+}
+
+.choice-req-tag.optional {
+    background: rgba(135, 168, 120, 0.15);
+    color: var(--brand-primary);
+}
+
+.btn-remove-choice {
+    background: none;
+    border: 1px solid var(--border-color);
+    color: var(--error);
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-remove-choice:hover {
+    background: rgba(229, 115, 115, 0.1);
+}
+
+/* Search & Selector UI */
+.ptn-search-box {
+    position: relative;
+    margin-bottom: 0.5rem;
+}
+
+.ptn-search-input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.8rem;
+    border: 2px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ptn-search-input:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 4px rgba(135, 168, 120, 0.15);
+}
+
+.ptn-search-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.ptn-dropdown-results {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    max-height: 320px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+}
+
+.ptn-dropdown-results.active {
+    display: block;
+}
+
+.ptn-search-item {
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    transition: background 0.15s;
+}
+
+.ptn-search-item:last-child {
+    border-bottom: none;
+}
+
+.ptn-search-item:hover,
+.ptn-search-item.highlighted {
+    background: var(--bg-tertiary);
+}
+
+.ptn-item-main {
+    flex: 1;
+}
+
+.ptn-item-name {
+    font-weight: 700;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    margin-bottom: 0.2rem;
+}
+
+.ptn-item-univ {
+    font-size: 0.82rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.ptn-item-badge-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.jenjang-badge {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+}
+
+.jenjang-badge.s1 {
+    background: rgba(135, 168, 120, 0.2);
+    color: var(--brand-primary-dark);
+}
+
+.jenjang-badge.d4 {
+    background: rgba(212, 175, 55, 0.2);
+    color: #b58d10;
+}
+
+.jenjang-badge.d3 {
+    background: rgba(155, 137, 179, 0.2);
+    color: #7b659c;
+}
+
+.rumpun-badge {
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+/* Selected Prodi Card */
+.selected-prodi-view {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.selected-prodi-info h4 {
+    font-size: 1.05rem;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    font-weight: 700;
+}
+
+.selected-prodi-univ {
+    font-size: 0.9rem;
+    color: var(--brand-primary);
+    font-weight: 600;
+    margin-bottom: 0.6rem;
+}
+
+.selected-meta-chips {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.meta-chip {
+    font-size: 0.78rem;
+    padding: 0.25rem 0.6rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: var(--text-secondary);
+}
+
+.meta-chip strong {
+    color: var(--text-primary);
+}
+
+.meta-chip.score-chip {
+    border-color: rgba(212, 175, 55, 0.4);
+    background: rgba(212, 175, 55, 0.1);
+    color: #9c7b12;
+}
+
+.btn-change-prodi {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-change-prodi:hover {
+    background: var(--bg-primary);
+    border-color: var(--brand-primary);
+}
+
+/* Add Choice Action */
+.add-choice-wrapper {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.btn-add-choice {
+    background: var(--bg-secondary);
+    border: 2px dashed var(--brand-primary);
+    color: var(--brand-primary);
+    padding: 0.85rem 1.4rem;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+}
+
+.btn-add-choice:hover {
+    background: rgba(135, 168, 120, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Summary & Validation Section */
+.validation-summary-card {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-color);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 18px var(--shadow-color);
+}
+
+.val-summary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.val-summary-header h3 {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.val-status-badge {
+    padding: 0.35rem 0.85rem;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.val-status-badge.valid {
+    background: rgba(107, 143, 92, 0.15);
+    color: var(--brand-primary-dark);
+}
+
+.val-status-badge.invalid {
+    background: rgba(229, 115, 115, 0.15);
+    color: var(--error);
+}
+
+.val-counts-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.count-box {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.7rem 1.1rem;
+    flex: 1;
+    min-width: 140px;
+}
+
+.count-box span {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: block;
+}
+
+.count-box strong {
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.val-message-box {
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.val-message-box.valid {
+    background: rgba(107, 143, 92, 0.1);
+    color: var(--brand-primary-dark);
+    border-left: 4px solid var(--brand-primary);
+}
+
+.val-message-box.invalid {
+    background: rgba(229, 115, 115, 0.1);
+    color: #c93b3b;
+    border-left: 4px solid var(--error);
+}
+
+/* Submit Section */
+.daftar-action-section {
+    text-align: center;
+    padding-top: 1rem;
+}
+
+.permanent-notice-box {
+    background: rgba(212, 175, 55, 0.12);
+    border: 1px solid rgba(212, 175, 55, 0.35);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    max-width: 650px;
+    margin: 0 auto 1.5rem auto;
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+    text-align: left;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.btn-submit-pendaftaran {
+    background: linear-gradient(135deg, var(--brand-primary), var(--brand-primary-dark));
+    color: white;
+    border: none;
+    padding: 1rem 3rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    border-radius: 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px var(--shadow-color);
+    transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.btn-submit-pendaftaran:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(107, 143, 92, 0.25);
+}
+
+.btn-submit-pendaftaran:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: var(--text-muted);
+    box-shadow: none;
+}
+
+@media (max-width: 768px) {
+    .daftar-title-wrap {
+        flex-direction: column;
+    }
+    .choice-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .selected-prodi-view {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .btn-submit-pendaftaran {
+        width: 100%;
+        justify-content: center;
+    }
+}

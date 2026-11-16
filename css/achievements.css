@@ -431,6 +431,15 @@
     display: flex;
     gap: 0.8rem;
     justify-content: center;
+    align-items: center;
+    margin-top: 1.2rem;
+    flex-wrap: wrap;
+}
+
+.picker-actions .btn-modal-primary,
+.picker-actions .btn-modal-secondary,
+.picker-actions .btn-modal-danger {
+    min-width: 110px;
 }
 
 /* Profile Showcase Section */

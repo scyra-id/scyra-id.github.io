@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderShortcodes(html) {
         if (!html) return html;
         // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+        return html.replace(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, (match, url, size) => {
             const cleanUrl = url.trim();
             const width = size ? size.trim() : '100%';
             return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Survey" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;

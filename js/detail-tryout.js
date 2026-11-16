@@ -55,8 +55,12 @@ document.addEventListener('DOMContentLoaded', async () => {
              if (needsCredit && !isGold && window.CreditSystem) {
                  const isUnlocked = await window.CreditSystem.isContentUnlocked('tryout', toId);
                  if (!isUnlocked) {
+                     const isSilver = currentUserRole === 'silver';
+                     const msg = isSilver
+                         ? `Tryout ini belum di-unlock.<br><br>Kembali ke katalog untuk mengaktifkan akses tryout ini (tersedia jatah gratis dari Paket Silver kamu)!`
+                         : `Tryout ini memerlukan unlock dengan credit.<br><br>Kembali ke katalog dan unlock dengan 50 ${CREDIT_ICON} credit untuk akses penuh!`;
                      await showScyraAlert(
-                         `Tryout ini memerlukan unlock dengan credit.<br><br>Kembali ke katalog dan unlock dengan 50 ${CREDIT_ICON} credit untuk akses penuh!`,
+                         msg,
                          '🔒 Akses Ditolak',
                          '🔒'
                      );
@@ -79,12 +83,46 @@ document.addEventListener('DOMContentLoaded', async () => {
                  throw paketError || new Error('Paket tryout tidak ditemukan.');
              }
 
+             // 🚨 CEK PENDAFTARAN TRYOUT & TARGET PTN
+             const { data: pendaftaran, error: pendError } = await window.db
+                 .from('tryout_pendaftaran')
+                 .select('id')
+                 .eq('paket_id', toId)
+                 .eq('user_id', user.id)
+                 .maybeSingle();
+
+             if (!pendaftaran) {
+                 await showScyraAlert(
+                     'Anda belum mendaftar tryout ini. Silakan pilih target program studi PTN Anda terlebih dahulu untuk menganalisis peluang kelulusan.',
+                     'Pendaftaran Diperlukan',
+                     '📋'
+                 );
+                 window.location.href = `daftar-tryout.html?id=${toId}`;
+                 return;
+             }
+
              const sekarang = new Date();
              const isIRT = Boolean(paket.is_irt_enabled);
              const irtMulai = paket.irt_window_start ? new Date(paket.irt_window_start) : null;
              const irtSelesai = paket.irt_window_end ? new Date(paket.irt_window_end) : null;
-             // IRT changes the scoring lifecycle only. The package keeps this
-             // existing detail page and its ordinary subtest UI.
+             const irtCalibrated = paket.irt_status === 'CALIBRATED';
+
+             // Untuk paket IRT: Gold bisa akses setelah kalibrasi selesai (walaupun waktu_selesai lewat)
+             // Untuk paket non-IRT: waktu_selesai adalah batas mutlak
+             if (sekarang > new Date(paket.waktu_selesai)) {
+                 if (isIRT && isGold && irtCalibrated) {
+                     // Gold + IRT terkalibrasi = boleh lanjut (replay mode)
+                 } else {
+                     await showScyraAlert('Tryout ini sudah berakhir.', 'Terkunci', '🔒');
+                     return window.location.href = 'tryout.html';
+                 }
+             }
+
+             if (sekarang < new Date(paket.waktu_mulai)) {
+                 await showScyraAlert('Tryout ini belum dibuka.', 'Terkunci', '🔒');
+                 return window.location.href = 'tryout.html';
+             }
+
              if (isIRT && (!irtMulai || !irtSelesai)) {
                  throw new Error('Konfigurasi window IRT paket belum lengkap.');
              }
@@ -95,12 +133,12 @@ document.addEventListener('DOMContentLoaded', async () => {
              }
 
              if (isIRT && sekarang > irtSelesai && !isGold) {
-                 await showScyraAlert('Periode tryout ini telah berakhir. Akses ulang tersedia untuk pengguna premium.', 'Terkunci', '🔒');
+                 await showScyraAlert('Periode window IRT tryout ini telah berakhir. Akses ulang tersedia untuk pengguna premium.', 'Terkunci', '🔒');
                  return window.location.href = 'tryout.html';
              }
 
-             if (!isIRT && (sekarang < new Date(paket.waktu_mulai) || sekarang > new Date(paket.waktu_selesai))) {
-                 await showScyraAlert('Tryout ini sedang tidak dapat diakses saat ini.', 'Terkunci', '🔒');
+             if (isIRT && sekarang > irtSelesai && isGold && !irtCalibrated) {
+                 await showScyraAlert('Kalibrasi IRT sedang diproses. Tryout akan tersedia kembali setelah kalibrasi selesai.', '⏳ Menunggu Kalibrasi', '⏳');
                  return window.location.href = 'tryout.html';
              }
 

@@ -47,55 +47,19 @@ window.ReferralSystem = (function() {
     async function getOrCreateReferralCode() {
         const { data: { user } } = await getAuthDb().auth.getUser();
         if (!user) return null;
-        
-        const db = getDb();
-        
-        // Check apakah sudah punya referral code
-        const { data: existingCode, error } = await db
-            .from('referral_codes')
-            .select('code')
-            .eq('user_id', user.id)
-            .single();
-        
-        if (existingCode && !error) {
-            return existingCode.code;
-        }
-        
-        // Generate code baru
-        let newCode = generateReferralCode();
-        let isUnique = false;
-        let attempts = 0;
-        
-        while (!isUnique && attempts < 10) {
-            const { data: check } = await db
-                .from('referral_codes')
-                .select('id')
-                .eq('code', newCode)
-                .single();
-            
-            if (!check) {
-                isUnique = true;
-            } else {
-                newCode = generateReferralCode();
-                attempts++;
-            }
-        }
-        
-        // Insert referral code
-        const { error: insertError } = await db
-            .from('referral_codes')
-            .insert({
-                user_id: user.id,
-                code: newCode,
-                is_active: true
-            });
-        
-        if (insertError) {
-            console.error('Error creating referral code:', insertError);
+
+        if (!window.ReferralCreditGateway) {
+            console.error('Referral credit gateway belum tersedia');
             return null;
         }
-        
-        return newCode;
+
+        try {
+            const result = await window.ReferralCreditGateway.call('referral.code.get_or_create');
+            return result?.code || null;
+        } catch (error) {
+            console.error('Error creating referral code:', error);
+            return null;
+        }
     }
     
     /**

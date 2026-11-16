@@ -52,6 +52,13 @@ function renderPipeTables(html) {
             result += '\n';
             continue;
         }
+
+        // Jangan proses baris shortcode gambar sebagai tabel
+        if (line.includes('[GAMBAR:')) {
+            flushTable();
+            result += line + '\n';
+            continue;
+        }
         
         // Check if line is pipe table format
         const isPipeRow = line.includes('|') && /^\|?.*\|.*\|?$/.test(line);
@@ -86,14 +93,22 @@ function renderPipeTables(html) {
 function renderShortcodes(html) {
     if (!html) return html;
     
-    // First render pipe tables
-    let output = renderPipeTables(html);
-    
-    // Then convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-    output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+    // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img> terlebih dahulu
+    let output = html.replace(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, (match, url, size) => {
         const cleanUrl = url.trim();
         const width = size ? size.trim() : '100%';
         return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+    });
+
+    // Render pipe tables
+    output = renderPipeTables(output);
+    
+    // Remove any legacy teks-bacaan-header if present
+    output = output.replace(/<div class="teks-bacaan-header">[\s\S]*?<\/div>/gi, '');
+
+    // Convert [BACAAN]...[/BACAAN] menjadi <div class="teks-bacaan">
+    output = output.replace(/\[BACAAN\]([\s\S]*?)\[\/BACAAN\]/gi, (match, content) => {
+        return `<div class="teks-bacaan">${content.trim()}</div>`;
     });
     
     return output;
@@ -125,7 +140,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (paketTryoutId) {
         const { data: paket, error: paketError } = await window.db
             .from('paket_tryout')
-            .select('id, nama_paket, is_irt_enabled, irt_window_start, irt_window_end, irt_status')
+            .select('id, nama_paket, is_irt_enabled, irt_window_start, irt_window_end, irt_status, waktu_selesai')
             .eq('id', paketTryoutId)
             .single();
 
@@ -135,12 +150,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         paketTryout = paket;
-        isIrtAttempt = Boolean(paket.is_irt_enabled);
+        const now = new Date();
+        const isIrtEnabled = Boolean(paket.is_irt_enabled);
+        const irtCalibrated = paket.irt_status === 'CALIBRATED';
+
+        // Cek waktu reguler paket
+        if (paket.waktu_selesai && now > new Date(paket.waktu_selesai)) {
+            // Gold + IRT terkalibrasi = boleh lanjut (replay)
+            if (isIrtEnabled && irtCalibrated) {
+                const { data: profile } = await window.db.from('profiles').select('role').eq('id', user.id).single();
+                if (!['gold', 'admin'].includes(profile?.role)) {
+                    await showScyraAlert('Tryout ini sudah berakhir. Akses replay tersedia untuk pengguna premium.', '🔒 Terkunci', '⚠️');
+                    return window.location.href = 'tryout.html';
+                }
+            } else {
+                await showScyraAlert('Tryout ini sudah berakhir.', '🔒 Terkunci', '⚠️');
+                return window.location.href = 'tryout.html';
+            }
+        }
+
+        isIrtAttempt = isIrtEnabled;
         if (isIrtAttempt && (!paket.irt_window_start || !paket.irt_window_end)) {
             await showScyraAlert('Konfigurasi window IRT paket belum lengkap.', '⚠️ Kesalahan', '🛑');
             return window.location.href = `detail-tryout.html?id=${paketTryoutId}`;
         }
-        const now = new Date();
         isIrtLiveAttempt = isIrtAttempt && now >= new Date(paket.irt_window_start) && now <= new Date(paket.irt_window_end);
 
         if (isIrtAttempt && examMode === 'live' && !isIrtLiveAttempt) {

@@ -72,16 +72,18 @@
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Tombol Lanjut Bab */
-.btn-lanjut-bab {
+/* Tombol Lanjut Bab / Soal */
+.btn-lanjut, .btn-lanjut-bab {
     display: block; width: 100%; padding: 1.2rem;
     background: linear-gradient(135deg, var(--brand-accent), #f9a826);
     color: #1a1a1a; font-size: 1.2rem; font-weight: 800;
     text-align: center; border-radius: 12px; border: none;
     cursor: pointer; transition: all 0.3s ease;
     margin-top: 2rem;
+    font-family: inherit;
+    text-decoration: none;
 }
-.btn-lanjut-bab:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
+.btn-lanjut:hover, .btn-lanjut-bab:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.3); }
 
 /* =====================================================
    🚀 STYLING TIPE SOAL BARU (ISIAN, B/S, TABEL)
@@ -201,12 +203,12 @@
 }
 
 .zoom-tools { display: flex; gap: 0.5rem; margin-left: auto; }
-.btn-zoom { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); width: 36px; height: 36px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-.btn-zoom:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+.btn-zoom, .tool-btn { background: var(--bg-secondary); border: 1px solid var(--border-color); color: var(--text-primary); width: 36px; height: 36px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+.btn-zoom:hover, .tool-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
 
 /* 🚀 TEXT ZOOM ENGINE (LATIHAN) */
 .latihan-content { --zoom-level: 1; }
-.soal-text, .opsi-item-box, .pgk-opsi, .pembahasan-box, .bs-btn, .kotak-isian, .tabel-soal {
+.soal-text, .opsi-item-box, .pgk-opsi, .pembahasan-box, .bs-btn, .kotak-isian, .tabel-soal, .teks-bacaan {
     font-size: calc(1.15rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;
 }

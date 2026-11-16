@@ -129,26 +129,12 @@ async function loadRequests(status = 'all') {
     `;
     
     try {
-        const db = getDb();
-        
-        // Load ALL requests first (for stats and search)
-        const { data: allData, error } = await db
-            .from('free_credit_requests')
-            .select(`
-                id,
-                instagram_username,
-                status,
-                credits_amount,
-                admin_notes,
-                created_at,
-                processed_at,
-                user_id
-            `)
-            .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        allRequests = allData || [];
+        if (!window.ReferralCreditGateway) {
+            throw new Error('Gateway credit Instagram belum tersedia');
+        }
+
+        // Load semua request melalui gateway server-side.
+        allRequests = await window.ReferralCreditGateway.call('instagram_credit.admin.list');
         
         // Fetch user profiles from main db for each request
         const authDb = getAuthDb();
@@ -564,130 +550,27 @@ async function handleConfirmAction() {
 // APPROVE REQUEST
 // =========================================================
 async function approveRequest(requestId) {
-    const { data: { user: adminUser } } = await getAuthDb().auth.getUser();
-    const db = getDb();
-    
-    console.log('🔍 Approving request:', requestId);
-    
-    // Get request details
-    const { data: request, error: fetchError } = await db
-        .from('free_credit_requests')
-        .select('user_id, credits_amount, instagram_username')
-        .eq('id', requestId)
-        .single();
-    
-    if (fetchError) {
-        console.error('❌ Error fetching request:', fetchError);
-        throw fetchError;
+    if (!window.ReferralCreditGateway) {
+        throw new Error('Gateway credit Instagram belum tersedia');
     }
-    if (!request) throw new Error('Request tidak ditemukan');
-    
-    console.log(' Request details:', request);
-    
-    // Update request status
-    const { error: updateError } = await db
-        .from('free_credit_requests')
-        .update({
-            status: 'approved',
-            processed_at: new Date().toISOString(),
-            processed_by: adminUser.id
-        })
-        .eq('id', requestId);
-    
-    if (updateError) {
-        console.error('❌ Error updating request status:', updateError);
-        throw updateError;
-    }
-    
-    console.log('✅ Request status updated to approved');
-    
-    // Add credit to user
-    try {
-        // Check if user already has credit record
-        const { data: userCredit, error: creditFetchError } = await db
-            .from('user_credits')
-            .select('*')
-            .eq('user_id', request.user_id)
-            .single();
-        
-        if (creditFetchError) {
-            console.warn('⚠️ User credit record not found, creating new one...');
-            // Create new credit record
-            const { error: insertError } = await db
-                .from('user_credits')
-                .insert({
-                    user_id: request.user_id,
-                    total_credits: 0,
-                    bonus_credits: request.credits_amount,
-                    used_credits: 0
-                });
-            
-            if (insertError) {
-                console.error('❌ Error creating credit record:', insertError);
-                throw insertError;
-            }
-            
-            console.log('✅ New credit record created with bonus_credits:', request.credits_amount);
-        } else {
-            console.log('📊 Existing credit record found:', userCredit);
-            // Update existing record
-            const { error: updateCreditError } = await db
-                .from('user_credits')
-                .update({
-                    bonus_credits: (userCredit.bonus_credits || 0) + request.credits_amount
-                })
-                .eq('user_id', request.user_id);
-            
-            if (updateCreditError) {
-                console.error('❌ Error updating credit record:', updateCreditError);
-                throw updateCreditError;
-            }
-            
-            console.log('✅ Credit record updated. New bonus_credits:', userCredit.bonus_credits + request.credits_amount);
-        }
-        
-        // Log transaction
-        const { error: logError } = await db
-            .from('credit_transactions')
-            .insert({
-                user_id: request.user_id,
-                type: 'free_credit',
-                amount: request.credits_amount,
-                description: `Free credit dari Instagram (@${request.instagram_username})`,
-                reference_id: requestId
-            });
-        
-        if (logError) {
-            console.error('❌ Error logging transaction:', logError);
-            // Don't throw here, credit already added
-        } else {
-            console.log('✅ Transaction logged successfully');
-        }
-        
-    } catch (err) {
-        console.error('❌ Error adding credits:', err);
-        throw err;
-    }
+    await window.ReferralCreditGateway.call('instagram_credit.admin.process', {
+        requestId,
+        decision: 'approved'
+    });
 }
 
 // =========================================================
 // REJECT REQUEST
 // =========================================================
 async function rejectRequest(requestId, notes = '') {
-    const { data: { user: adminUser } } = await getAuthDb().auth.getUser();
-    const db = getDb();
-    
-    const { error } = await db
-        .from('free_credit_requests')
-        .update({
-            status: 'rejected',
-            admin_notes: notes || null,
-            processed_at: new Date().toISOString(),
-            processed_by: adminUser.id
-        })
-        .eq('id', requestId);
-    
-    if (error) throw error;
+    if (!window.ReferralCreditGateway) {
+        throw new Error('Gateway credit Instagram belum tersedia');
+    }
+    await window.ReferralCreditGateway.call('instagram_credit.admin.process', {
+        requestId,
+        decision: 'rejected',
+        notes
+    });
 }
 
 // =========================================================

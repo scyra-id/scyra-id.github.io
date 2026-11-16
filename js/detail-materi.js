@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         const renderShortcodes = (html) => {
             let output = html;
-            output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (_, url, size) => {
+            output = output.replace(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, (_, url, size) => {
                 const width = size ? size.trim() : '100%';
                 return `<img src="${url.trim()}" class="scyra-image" alt="Gambar materi" style="max-width:${width};height:auto;margin:1rem auto;display:block;">`;
             });
@@ -50,7 +50,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const html = element.innerHTML.trim();
             if (!text && !html && tag !== 'IMG') return;
 
-            const isPipeRow = text.includes('|') && /^\|?.*\|.*\|?$/.test(text);
+            // Jangan anggap baris shortcode gambar sebagai baris tabel markdown
+            const isGambarRow = text.includes('[GAMBAR:');
+            const isPipeRow = !isGambarRow && text.includes('|') && /^\|?.*\|.*\|?$/.test(text);
             const isCsvRow = text.includes('","') && text.includes('"');
             if (isPipeRow || isCsvRow) {
                 const cells = isCsvRow
@@ -400,8 +402,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
 
-            // Identifikasi apakah baris saat ini adalah bagian dari tabel
-            let isTableRow = text.includes('|') || pendingTableRow !== '' || (text.includes('","') && text.includes('"'));
+            // Identifikasi apakah baris saat ini adalah bagian dari tabel (abaikan jika baris shortcode [GAMBAR:)
+            const hasGambarShortcode = text.includes('[GAMBAR:');
+            let isTableRow = (!hasGambarShortcode && text.includes('|')) || pendingTableRow !== '' || (text.includes('","') && text.includes('"'));
 
             // Tutup dan proses tabel jika elemen saat ini bukan tabel
             if (!isTableRow) {
@@ -447,7 +450,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             // 2. DETEKSI GAMBAR SHORTCODE
             if (inner.includes('[GAMBAR:')) {
-                let imgMatch = inner.match(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/i);
+                let imgMatch = inner.match(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/i);
                 if (imgMatch) {
                     let imgUrl = imgMatch[1].trim();
                     let imgWidth = imgMatch[2] ? imgMatch[2].trim() : '100%';

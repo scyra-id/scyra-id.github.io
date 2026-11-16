@@ -10,6 +10,10 @@ let currentSearchTerm = '';
 let currentFilterKategori = '';
 let currentFilterMateri = '';
 
+// 🎨 QUILL EDITOR INSTANCES
+let quillPertanyaan = null;
+let quillPembahasan = null;
+
 document.addEventListener('DOMContentLoaded', () => {
     const checkAdmin = async () => {
         if (!window.db) return setTimeout(checkAdmin, 100);
@@ -28,6 +32,7 @@ async function initPage() {
     }
     await loadKategori();
     setupForm();
+    setupTemplateDownload();
     setupImageUploader();
     setupDaftarSoal(); 
     setupEditModal();
@@ -75,36 +80,132 @@ async function loadKategori() {
     });
 }
 
+function setupTemplateDownload() {
+    const btn = document.getElementById('btnDownloadTemplate');
+    if (!btn) return;
+
+    btn.addEventListener('click', async () => {
+        try {
+            const res = await fetch('template_soal_utbk.json');
+            let jsonText = '';
+            if (res.ok) {
+                jsonText = await res.text();
+            } else {
+                jsonText = JSON.stringify([
+                    {
+                        "tipe": "pg",
+                        "pertanyaan": "Sebuah mobil bergerak dengan kecepatan awal $v_0 = 10\\text{ m/s}$ dan percepatan $a = 2\\text{ m/s}^2$.\n\nBerapakah kecepatannya setelah $t = 5\\text{ detik}$?",
+                        "opsi": {
+                            "A": "15 m/s",
+                            "B": "20 m/s",
+                            "C": "25 m/s",
+                            "D": "30 m/s",
+                            "E": "35 m/s"
+                        },
+                        "kunci": "B",
+                        "pembahasan": "Gunakan rumus GLBB:\n$$v_t = v_0 + a \\cdot t = 10 + (2 \\times 5) = 20\\text{ m/s}$$"
+                    },
+                    {
+                        "tipe": "pgk",
+                        "pertanyaan": "Manakah pernyataan yang BENAR mengenai sistem periodik unsur modern? [Pilih lebih dari satu]",
+                        "opsi": {
+                            "A": "Disusun berdasarkan kenaikan nomor atom",
+                            "B": "Terdiri atas 7 periode",
+                            "C": "Unsur golongan IA disebut halogen",
+                            "D": "Unsur golongan VIIIA disebut gas mulia",
+                            "E": "Disusun berdasarkan kenaikan massa atom relatif"
+                        },
+                        "kunci": "A,B,D",
+                        "pembahasan": "A, B, dan D benar. Golongan IA adalah alkali, bukan halogen."
+                    },
+                    {
+                        "tipe": "bs",
+                        "pertanyaan": "Tentukan kebenaran pernyataan mengenai sistem respirasi berikut!",
+                        "pernyataan": [
+                            "Pertukaran gas oksigen dan karbon dioksida terjadi di alveolus.",
+                            "Diafragma mendatar saat fase ekspirasi normal.",
+                            "Hemoglobin mengikat oksigen membentuk oksihemoglobin."
+                        ],
+                        "kunci": "B,S,B",
+                        "pembahasan": "Pernyataan 1 Benar, Pernyataan 2 Salah, Pernyataan 3 Benar."
+                    },
+                    {
+                        "tipe": "isian",
+                        "pertanyaan": "Ibu kota negara Indonesia yang baru di Kalimantan Timur adalah [ISIAN].",
+                        "kunci": "Nusantara",
+                        "pembahasan": "Ibu kota baru Indonesia dinamakan Nusantara."
+                    }
+                ], null, 2);
+            }
+
+            const blob = new Blob([jsonText], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'template_soal_utbk.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error('Gagal unduh template:', err);
+            await showScyraAlert('Gagal mengunduh template: ' + err.message, '⚠️ Error', '⚠️');
+        }
+    });
+}
+
 function setupForm() {
     const form = document.getElementById('soalForm');
     const btnScan = document.getElementById('btnScan');
     form.onsubmit = async (e) => {
         e.preventDefault();
         btnScan.disabled = true;
-        btnScan.textContent = '🤖 AI sedang membaca PDF...';
+        btnScan.textContent = '⏳ Sedang memproses file JSON...';
         parsedQuestions = [];
-        const files = document.getElementById('pdfSoalFile').files;
+        const fileInput = document.getElementById('jsonSoalFile') || document.getElementById('pdfSoalFile');
+        const files = fileInput ? fileInput.files : [];
         const katId = document.getElementById('kategoriSoal').value;
         const matId = document.getElementById('materiSoal').value;
         if (!katId || !matId) { 
             await showScyraAlert('Pilih kategori dan bab materi terlebih dahulu!', '⚠️ Peringatan', '⚠️'); 
             btnScan.disabled = false; 
-            btnScan.textContent = '⚡ Scan & Simpan ke Database'; 
+            btnScan.textContent = '⚡ Parse & Preview Soal'; 
             return; 
+        }
+        if (!files || files.length === 0) {
+            await showScyraAlert('Pilih setidaknya satu file JSON soal!', '⚠️ Peringatan', '⚠️');
+            btnScan.disabled = false;
+            btnScan.textContent = '⚡ Parse & Preview Soal';
+            return;
         }
         try {
             for (let i = 0; i < files.length; i++) {
-                const text = await extractTextFromPDF(files[i]);
-                const questions = parseQuestions(text, katId, matId); 
-                parsedQuestions.push(...questions);
+                const file = files[i];
+                if (file.name.toLowerCase().endsWith('.pdf')) {
+                    // Fallback jika ada yang coba upload PDF
+                    const text = await extractTextFromPDF(file);
+                    const questions = parseQuestions(text, katId, matId); 
+                    parsedQuestions.push(...questions);
+                } else {
+                    // File JSON
+                    const text = await file.text();
+                    let json;
+                    try {
+                        json = JSON.parse(text);
+                    } catch (parseErr) {
+                        throw new Error(`File "${file.name}" bukan format JSON yang valid: ${parseErr.message}`);
+                    }
+                    const questions = parseJsonQuestions(json, katId, matId);
+                    parsedQuestions.push(...questions);
+                }
             }
-            if (parsedQuestions.length === 0) throw new Error("Tidak ada soal yang terdeteksi.");
+            if (parsedQuestions.length === 0) throw new Error("Tidak ada soal yang valid terdeteksi dari file yang diupload.");
             showPreview();
         } catch (err) {
-            await showScyraAlert('Gagal memproses PDF: ' + err.message, '⚠️ Error', '⚠️');
+            await showScyraAlert('Gagal memproses file: ' + err.message, '⚠️ Error', '⚠️');
         } finally {
             btnScan.disabled = false;
-            btnScan.textContent = '⚡ Scan & Simpan ke Database';
+            btnScan.textContent = '⚡ Parse & Preview Soal';
         }
     };
     document.getElementById('btnConfirmSave').onclick = async () => {
@@ -454,18 +555,277 @@ async function extractTextFromPDF(file) {
     return fullText;
 }
 
-// 🖼️ HELPER: Convert [GAMBAR: url] jadi <img> tag
+// 🖼️ HELPER: Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] jadi <img> tag
 function convertGambarShortcode(text) {
     if (!text) return text;
     return text.replace(
-        /\[GAMBAR:\s*(.*?)\]/gi, 
-        (match, url) => {
+        /\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, 
+        (match, url, size) => {
             const cleanUrl = url.trim();
-            return `<img src="${cleanUrl}" class="img-soal" alt="Gambar Soal" style="max-width:100%; border-radius:8px; margin:0.8rem 0; display:block;">`;
+            const width = size ? size.trim() : '100%';
+            return `<img src="${cleanUrl}" class="img-soal scyra-image" alt="Gambar Soal" style="max-width:${width}; height:auto; border-radius:8px; margin:0.8rem 0; display:block;">`;
         }
     );
 }
 
+// 📊 HELPER: Convert pipe table format markdown ke tabel HTML
+function renderPipeTables(html) {
+    if (!html || typeof html !== 'string') return html;
+    
+    let result = '';
+    let tableRows = [];
+    
+    const flushTable = () => {
+        if (!tableRows.length) return;
+        const rows = tableRows
+            .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+            .join('');
+        result += `<table class="tabel-soal"><tbody>${rows}</tbody></table>`;
+        tableRows = [];
+    };
+    
+    const lines = html.split('\n');
+    for (let line of lines) {
+        const trimmed = line.trim();
+        // Skip separator baris tabel markdown seperti |---|---|
+        if (/^\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?$/.test(trimmed)) {
+            continue;
+        }
+
+        // Jangan proses baris shortcode gambar sebagai tabel
+        if (trimmed.includes('[GAMBAR:')) {
+            flushTable();
+            result += line + '\n';
+            continue;
+        }
+        
+        const isPipeRow = trimmed.includes('|') && /^\|?.*\|.*\|?$/.test(trimmed);
+        if (isPipeRow) {
+            const cells = trimmed.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
+            if (cells.length > 1) {
+                tableRows.push(cells);
+                continue;
+            }
+        }
+        flushTable();
+        result += line + '\n';
+    }
+    flushTable();
+    
+    result = result.replace(/<tbody>\s*<tr>(.*?)<\/tr>/i, (_, firstRow) =>
+        `<thead><tr>${firstRow.replace(/<td/g, '<th').replace(/<\/td>/g, '</th>')}</tr></thead><tbody>`
+    );
+    
+    return result.trimEnd();
+}
+
+// 🔤 HELPER: Format teks dengan dukungan KaTeX, Tabel, Newline, dan Gambar
+function formatTextContent(text) {
+    if (!text) return '';
+    if (typeof text !== 'string') text = String(text);
+    let content = text.trim();
+    if (!content) return '';
+
+    // 1. Konversi shortcode [GAMBAR: ...] terlebih dahulu agar tanda '|' pada SIZE tidak dianggap pemisah tabel
+    content = convertGambarShortcode(content);
+
+    // 2. Render pipe table
+    content = renderPipeTables(content);
+
+    // 3. Lindungi block yang tidak boleh diinjeksi <br> (Tabel HTML & KaTeX Math)
+    const preservedBlocks = [];
+    
+    // Protect <table>...</table>
+    content = content.replace(/<table[\s\S]*?<\/table>/gi, (match) => {
+        const id = `___PRESERVED_BLOCK_${preservedBlocks.length}___`;
+        preservedBlocks.push(match);
+        return id;
+    });
+
+    // Protect display math $$...$$
+    content = content.replace(/\$\$[\s\S]*?\$\$/g, (match) => {
+        const id = `___PRESERVED_BLOCK_${preservedBlocks.length}___`;
+        preservedBlocks.push(match);
+        return id;
+    });
+
+    // Protect inline math $...$
+    content = content.replace(/\$(?!\$)((?:\\.|[^$\\])+)\$/g, (match) => {
+        const id = `___PRESERVED_BLOCK_${preservedBlocks.length}___`;
+        preservedBlocks.push(match);
+        return id;
+    });
+
+    // 4. Konversi newline \n menjadi <br> secara cerdas
+    content = content
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        .replace(/\n{2,}/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+
+    // 5. Kembalikan block yang dilindungi
+    preservedBlocks.forEach((block, idx) => {
+        content = content.replace(`___PRESERVED_BLOCK_${idx}___`, block);
+    });
+
+    // 6. Konversi shortcode [GAMBAR: ...] (fallback jika ada shortcode di dalam block yang dilindungi)
+    content = convertGambarShortcode(content);
+
+    // 7. Konversi shortcode [BACAAN]...[/BACAAN]
+    content = content.replace(/\[BACAAN\]([\s\S]*?)\[\/BACAAN\]/gi, (match, inner) => {
+        return `<div class="teks-bacaan">${inner.trim()}</div>`;
+    });
+
+    return content;
+}
+
+// 🚀 PARSER UTAMA UNTUK FILE JSON
+function parseJsonQuestions(jsonData, katId, matId) {
+    let items = [];
+    if (Array.isArray(jsonData)) {
+        items = jsonData;
+    } else if (jsonData && typeof jsonData === 'object') {
+        if (Array.isArray(jsonData.soal)) items = jsonData.soal;
+        else if (Array.isArray(jsonData.questions)) items = jsonData.questions;
+        else if (Array.isArray(jsonData.data)) items = jsonData.data;
+        else items = [jsonData];
+    }
+
+    const questions = [];
+
+    items.forEach((item, index) => {
+        if (!item || typeof item !== 'object') return;
+
+        // 1. Teks Bacaan / Stimulus jika ada
+        let bacaanHtml = '';
+        const rawBacaan = item.bacaan || item.stimulus || item.teks || item.informasi || '';
+        if (rawBacaan && rawBacaan.trim()) {
+            bacaanHtml = `<div class="teks-bacaan">${formatTextContent(rawBacaan)}</div>`;
+        }
+
+        // 2. Pertanyaan
+        let rawPertanyaan = item.pertanyaan || item.soal || item.question || '';
+        let pertanyaanFinal = bacaanHtml + formatTextContent(rawPertanyaan);
+
+        // 3. Kunci & Tipe Soal
+        let rawKunci = item.kunci ?? item.kunci_jawaban ?? item.jawaban ?? item.key ?? '';
+        let tipe = (item.tipe || item.tipe_soal || item.type || '').toLowerCase().trim();
+
+        // Auto-detect tipe jika belum ditentukan di JSON
+        if (!tipe) {
+            if (item.pernyataan && Array.isArray(item.pernyataan)) {
+                tipe = 'bs';
+            } else if (/\[ISIAN\]|_{3,}/i.test(rawPertanyaan)) {
+                tipe = 'isian';
+            } else if (Array.isArray(rawKunci) || (typeof rawKunci === 'string' && /^[A-E]\s*,\s*[A-E]/i.test(rawKunci.trim()))) {
+                tipe = 'pgk';
+            } else {
+                tipe = 'pg';
+            }
+        }
+
+        // Penyesuaian kotak isian jika tipe isian
+        if (tipe === 'isian') {
+            pertanyaanFinal = pertanyaanFinal.replace(/\[ISIAN\]|_{3,}/gi, '<span class="kotak-isian"></span>');
+            if (!pertanyaanFinal.includes('kotak-isian')) {
+                pertanyaanFinal += ' <span class="kotak-isian"></span>';
+            }
+        }
+
+        const opsi = { A: '', B: '', C: '', D: '', E: '' };
+        let kunciFinal = '';
+
+        if (tipe === 'bs') {
+            // Tipe Benar / Salah
+            if (Array.isArray(item.pernyataan)) {
+                item.pernyataan.slice(0, 5).forEach((p, idx) => {
+                    const letter = ['A', 'B', 'C', 'D', 'E'][idx];
+                    opsi[letter] = formatTextContent(p);
+                });
+            } else if (item.opsi && typeof item.opsi === 'object') {
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    const val = item.opsi[letter] ?? item.opsi[letter.toLowerCase()] ?? '';
+                    if (val) opsi[letter] = formatTextContent(val);
+                });
+            }
+
+            if (Array.isArray(rawKunci)) {
+                kunciFinal = rawKunci.map(k => {
+                    const s = String(k).trim().toUpperCase();
+                    return (s === 'B' || s === 'BENAR' || s === 'TRUE' || s === '1') ? 'B' : 'S';
+                }).join(',');
+            } else if (typeof rawKunci === 'string') {
+                kunciFinal = rawKunci.split(/[,;\-/\s]+/).filter(Boolean).map(k => {
+                    const s = k.trim().toUpperCase();
+                    return (s === 'B' || s === 'BENAR' || s === 'TRUE' || s === '1') ? 'B' : 'S';
+                }).join(',');
+            }
+        } else if (tipe === 'isian') {
+            // Tipe Isian Singkat
+            kunciFinal = String(rawKunci).trim();
+        } else if (tipe === 'pgk') {
+            // Tipe Pilihan Ganda Kompleks (Multi-Select)
+            if (Array.isArray(item.opsi)) {
+                item.opsi.slice(0, 5).forEach((opt, idx) => {
+                    const letter = ['A', 'B', 'C', 'D', 'E'][idx];
+                    opsi[letter] = formatTextContent(opt);
+                });
+            } else if (item.opsi && typeof item.opsi === 'object') {
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    const val = item.opsi[letter] ?? item.opsi[letter.toLowerCase()] ?? '';
+                    if (val) opsi[letter] = formatTextContent(val);
+                });
+            }
+
+            if (Array.isArray(rawKunci)) {
+                kunciFinal = rawKunci.map(k => String(k).trim().toUpperCase()).filter(k => /^[A-E]$/.test(k)).sort().join(',');
+            } else if (typeof rawKunci === 'string') {
+                kunciFinal = rawKunci.split(/[,;\s]+/).filter(Boolean).map(k => k.trim().toUpperCase()).filter(k => /^[A-E]$/.test(k)).sort().join(',');
+            }
+        } else {
+            // Tipe Pilihan Ganda Biasa (PG)
+            tipe = 'pg';
+            if (Array.isArray(item.opsi)) {
+                item.opsi.slice(0, 5).forEach((opt, idx) => {
+                    const letter = ['A', 'B', 'C', 'D', 'E'][idx];
+                    opsi[letter] = formatTextContent(opt);
+                });
+            } else if (item.opsi && typeof item.opsi === 'object') {
+                ['A', 'B', 'C', 'D', 'E'].forEach(letter => {
+                    const val = item.opsi[letter] ?? item.opsi[letter.toLowerCase()] ?? '';
+                    if (val) opsi[letter] = formatTextContent(val);
+                });
+            }
+
+            kunciFinal = String(rawKunci).trim().toUpperCase();
+            if (kunciFinal.length > 1 && /^[A-E]/.test(kunciFinal)) {
+                kunciFinal = kunciFinal.charAt(0);
+            }
+        }
+
+        const pembahasan = formatTextContent(item.pembahasan || item.explanation || item.bahas || '');
+
+        if (!pertanyaanFinal || !kunciFinal) {
+            console.warn(`[JSON PARSER] Soal index ${index + 1} dilewati karena pertanyaan atau kunci kosong:`, item);
+            return;
+        }
+
+        questions.push({
+            kategori_id: katId,
+            materi_id: matId,
+            pertanyaan: pertanyaanFinal,
+            opsi: opsi,
+            kunci: kunciFinal,
+            tipe: tipe,
+            pembahasan: pembahasan
+        });
+    });
+
+    console.log(`[JSON PARSER] Selesai parsing: ${questions.length} soal berhasil diekstrak.`);
+    return questions;
+}
+
+// 📦 FUNGSI PARSER PDF (FALLBACK/LEGACY)
 function parseQuestions(text, katId, matId) {
     const questions = [];
     const lines = text.split('\n');
@@ -479,7 +839,6 @@ function parseQuestions(text, katId, matId) {
         let line = lines[i].trim();
         if (!line) continue;
 
-        // 1. DETEKSI TEKS BACAAN/INFORMASI
         const teksMatch = line.match(/^(?:TEKS|BACAAN|INFORMASI|STUDI KASUS)\s*[:\-]?\s*(.*)/i);
         if (teksMatch) {
             inTeks = true; inPembahasan = false; currentOpt = null;
@@ -493,25 +852,16 @@ function parseQuestions(text, katId, matId) {
             continue;
         }
 
-        // 2. DETEKSI NOMOR SOAL
         const soalMatch = line.match(/^(\d+)\.\s+(.*)/);
         if (soalMatch) {
-            // Save previous question
             if (q && q.pertanyaan && q.kunci) {
-                console.log('[PARSER] Pushing soal, kunci:', q.kunci);
                 questions.push(q);
-            } else if (q) {
-                console.warn('[PARSER] Skipping soal, missing data:', q);
             }
-            
             inTeks = false; inPembahasan = false; currentOpt = null;
             
-            console.log('[PARSER] Starting new soal:', soalMatch[1]);
-            
-            // Build pertanyaan dengan bacaan jika ada
             let pertanyaanFinal = '';
             if (currentTeksBacaan) {
-                pertanyaanFinal = `<div class="teks-bacaan" style="background: rgba(107, 143, 92, 0.08); padding: 1.2rem; border-left: 4px solid var(--brand-primary); margin-bottom: 1.5rem; border-radius: 4px; line-height: 1.6;">${currentTeksBacaan}</div>`;
+                pertanyaanFinal = `<div class="teks-bacaan">${currentTeksBacaan}</div>`;
             }
             pertanyaanFinal += soalMatch[2];
             
@@ -527,19 +877,16 @@ function parseQuestions(text, katId, matId) {
             continue;
         }
 
-        // If no question started yet, accumulate to bacaan
         if (!q) { 
             currentTeksBacaan += line + '\n'; 
             continue; 
         }
         
-        // If in bacaan mode, accumulate
         if (inTeks) { 
             currentTeksBacaan += line + '\n'; 
             continue; 
         }
 
-        // 3. DETEKSI OPSI (A-E)
         const optMatch = line.match(/^([A-E])\.\s*(.*)/i);
         if (optMatch) {
             currentOpt = optMatch[1].toUpperCase();
@@ -548,92 +895,66 @@ function parseQuestions(text, katId, matId) {
             continue;
         }
 
-        // 4. DETEKSI KUNCI JAWABAN
         const kunciMatch = line.match(/^(?:kunci|jawaban)\s*[:\-]?\s*(.+)/i);
         if (kunciMatch) {
             q.kunci = kunciMatch[1].trim();
-            console.log('[PARSER] Detected kunci:', q.kunci);
             inPembahasan = false; 
             currentOpt = null;
             continue;
         }
 
-        // 5. DETEKSI PEMBAHASAN
         const bahasMatch = line.match(/^pembahasan\s*[:\-]?\s*(.*)/i);
         if (bahasMatch) {
             inPembahasan = true; 
             currentOpt = null;
-            q.pembahasan += bahasMatch[1] ? (bahasMatch[1] + ' ') : '';
+            q.pembahasan += bahasMatch[1] ? (bahasMatch[1] + '<br>') : '';
             continue;
         }
 
-        // 6. GABUNG TEKS MULTI-BARIS
         if (inPembahasan) {
-            q.pembahasan += line + ' ';
+            q.pembahasan += line + '<br>';
         } else if (currentOpt) {
             q.opsi[currentOpt] += ' ' + line;
         } else if (q) {
-            // Add to pertanyaan - keep pipe format as is
             q.pertanyaan += '\n' + line;
         }
     }
 
-    // Process last question
     if (q && q.pertanyaan && q.kunci) {
-        console.log('[PARSER] Processing last soal, kunci:', q.kunci);
         questions.push(q);
-    } else if (q) {
-        console.warn('[PARSER] Last soal skipped, missing data:', q);
     }
-    
-    console.log('[PARSER] Total questions found BEFORE post-process:', questions.length);
 
-    // POST-PROCESS: Detect tipe soal dan convert format
-    questions.forEach((q, index) => {
-        console.log(`[PARSER] Post-processing soal ${index + 1}/${questions.length}...`);
+    // Post-process untuk tipe soal
+    questions.forEach((q) => {
+        if (!q.pertanyaan || !q.kunci) return;
         
-        if (!q.pertanyaan || !q.kunci) {
-            console.warn('[PARSER] Skipping post-process, missing data:', q);
-            return;
-        }
-        
-        // A. Deteksi Benar/Salah dari tabel pipe format
-        // Check for BS table: | Pernyataan | Benar | Salah |
-        const lines = q.pertanyaan.split('\n');
+        // Cek Benar/Salah dari tabel pipe
+        const qLines = q.pertanyaan.split('\n');
         let bsTableLines = [];
         let foundBSHeader = false;
         let bsTableStartLine = -1;
         let bsTableEndLine = -1;
         
-        for (let idx = 0; idx < lines.length; idx++) {
-            const line = lines[idx].trim();
+        for (let idx = 0; idx < qLines.length; idx++) {
+            const line = qLines[idx].trim();
             if (line.match(/^\|(.+)\|$/)) {
                 const cols = line.replace(/^\||\|$/g, '').split('|').map(c => c.trim());
-                // Check if header row
                 if (cols.length >= 3 && /pernyataan/i.test(cols[0]) && /benar/i.test(cols[1]) && /salah/i.test(cols[2])) {
                     foundBSHeader = true;
                     bsTableStartLine = idx;
                     bsTableLines = [];
                 } else if (foundBSHeader) {
-                    bsTableLines.push(cols[0]); // First column is statement
+                    bsTableLines.push(cols[0]);
                     bsTableEndLine = idx;
                 }
             } else if (foundBSHeader) {
-                // Non-table line, BS table ended
                 break;
             }
         }
         
-        // If found BS table and has statements
         if (foundBSHeader && bsTableLines.length > 0 && !Object.values(q.opsi).some(o => o.trim() !== '')) {
-            console.log('[PARSER] ✅ Detected BS table with', bsTableLines.length, 'statements');
-            
-            // Remove ONLY BS table lines from pertanyaan (not all pipe tables!)
-            const filteredLines = lines.filter((line, idx) => {
-                return idx < bsTableStartLine || idx > bsTableEndLine;
-            });
+            const filteredLines = qLines.filter((l, idx) => idx < bsTableStartLine || idx > bsTableEndLine);
             q.pertanyaan = filteredLines.join('\n');
-            
             q.opsi = {
                 A: bsTableLines[0] || '',
                 B: bsTableLines[1] || '',
@@ -642,100 +963,112 @@ function parseQuestions(text, katId, matId) {
                 E: bsTableLines[4] || ''
             };
             q.tipe = 'bs';
-            
-            // Convert kunci
             const keys = q.kunci.split(/[,;\-/\s]+/).filter(Boolean).map(key => {
-                const value = key.toLowerCase();
-                return value === 'benar' || value === 'b' || value === '1' || value === 'a' ? 'B' : 'S';
+                const val = key.toLowerCase();
+                return (val === 'benar' || val === 'b' || val === '1' || val === 'a') ? 'B' : 'S';
             });
             q.kunci = keys.slice(0, bsTableLines.length).join(',');
-            console.log('[PARSER] BS kunci converted to:', q.kunci);
         }
 
-        // B. Convert Isian Singkat ([ISIAN] atau ___)
         if (!q.tipe && (q.pertanyaan.includes('[ISIAN]') || q.pertanyaan.includes('___'))) {
-            console.log('[PARSER] ✅ Detected ISIAN format');
             q.pertanyaan = q.pertanyaan.replace(/\[ISIAN\]|_{3,}/g, '<span class="kotak-isian"></span>');
             q.tipe = 'isian';
         }
 
-        // B2. Deteksi PGK (Pilihan Ganda Kompleks)
-        // Penanda eksplisit [PGK], [MULTI], [MULTI-SELECT], [PILIHAN GANDA KOMPLEKS]
         if (!q.tipe && /\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/i.test(q.pertanyaan)) {
-            console.log('[PARSER] ✅ Detected PGK via tag');
             q.pertanyaan = q.pertanyaan.replace(/\[(?:PGK|MULTI|MULTI[\s-]?SELECT|PILIHAN\s*GANDA\s*KOMPLEKS)\]/gi, '').trim();
             q.tipe = 'pgk';
         }
-        // Atau: kunci jawaban mengandung lebih dari 1 huruf opsi (misal: A,C atau B,D,E)
         if (!q.tipe && q.kunci && /^[A-E]\s*,\s*[A-E](?:\s*,\s*[A-E])*$/i.test(q.kunci.trim())) {
-            console.log('[PARSER] ✅ Detected PGK via multi-key:', q.kunci);
             q.tipe = 'pgk';
         }
-        // Normalisasi kunci PGK: sort dan uppercase
         if (q.tipe === 'pgk' && q.kunci) {
             q.kunci = q.kunci.split(',').map(k => k.trim().toUpperCase()).sort().join(',');
-            console.log('[PARSER] PGK kunci normalized to:', q.kunci);
         }
 
-        // C. Default tipe
-        if (!q.tipe) {
-            console.log('[PARSER] Defaulting to PG');
-            q.tipe = 'pg';
-        }
-        
-        console.log('[PARSER] Final tipe:', q.tipe);
+        if (!q.tipe) q.tipe = 'pg';
 
-        // D. CONVERT SHORTCODE GAMBAR
         q.pertanyaan = convertGambarShortcode(q.pertanyaan);
         ['A', 'B', 'C', 'D', 'E'].forEach(opt => {
-            if (q.opsi[opt]) {
-                q.opsi[opt] = convertGambarShortcode(q.opsi[opt]);
-            }
+            if (q.opsi[opt]) q.opsi[opt] = convertGambarShortcode(q.opsi[opt]);
         });
-        if (q.pembahasan) {
-            q.pembahasan = convertGambarShortcode(q.pembahasan);
-        }
+        if (q.pembahasan) q.pembahasan = convertGambarShortcode(q.pembahasan);
     });
-    
-    console.log('[PARSER] Total questions AFTER post-process:', questions.length);
 
     return questions;
 }
 
+// 👁️ TAMPILKAN PREVIEW HASIL PARSE
 function showPreview() {
     const container = document.getElementById('resultsList');
     const resultsDiv = document.getElementById('scanResults');
-    container.innerHTML = `<p style="margin-bottom:1rem; color: var(--brand-primary); font-weight:bold;">🎉 Berhasil mendeteksi ${parsedQuestions.length} soal!</p>`;
+    container.innerHTML = `<p style="margin-bottom:1rem; color: var(--brand-primary); font-weight:bold;">🎉 Berhasil memproses ${parsedQuestions.length} soal!</p>`;
     
     parsedQuestions.forEach((q, i) => {
-        // Render preview pertanyaan (dengan tabel & kotak isian)
-        let previewPertanyaan = q.pertanyaan
-            .replace(/<span class="kotak-isian"><\/span>/g, '<span style="display:inline-block; width:80px; border-bottom: 2px solid var(--brand-primary); margin: 0 4px;"></span>')
-            .replace(/<table class="tabel-soal">(.*?)<\/table>/gs, '<div style="border:1px solid #ccc; padding:4px; margin:4px 0; font-size:0.8rem;">[TABEL]</div>');
-
         let opsiHTML = '';
         if (q.tipe === 'bs') {
-            opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">⚖️ Tipe: Benar / Salah</p>`;
+            const statements = ['A', 'B', 'C', 'D', 'E'].filter(letter => q.opsi[letter]);
+            const kunciArr = (q.kunci || '').split(',');
+            opsiHTML = `
+                <div style="margin: 0.6rem 0;">
+                    <p style="color: var(--brand-primary); font-weight:bold; margin-bottom: 0.4rem;">⚖️ Tipe: Benar / Salah</p>
+                    <table class="tabel-soal" style="margin: 0.5rem 0;">
+                        <thead>
+                            <tr>
+                                <th style="width: 75%;">Pernyataan</th>
+                                <th style="text-align: center;">Kunci</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${statements.map((letter, idx) => {
+                                const k = kunciArr[idx] || '-';
+                                return `
+                                    <tr>
+                                        <td>${q.opsi[letter]}</td>
+                                        <td style="text-align: center; font-weight: bold; color: ${k === 'B' ? 'var(--brand-primary)' : 'var(--error, #e53935)'};">
+                                            ${k === 'B' ? '✅ Benar' : k === 'S' ? '❌ Salah' : k}
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
         } else if (q.tipe === 'isian') {
-            opsiHTML = `<p style="color: var(--brand-primary); font-weight:bold;">✏️ Tipe: Isian Singkat</p>`;
+            opsiHTML = `
+                <div style="margin: 0.6rem 0;">
+                    <p style="color: var(--brand-primary); font-weight:bold;">✏️ Tipe: Isian Singkat</p>
+                </div>
+            `;
         } else if (q.tipe === 'pgk') {
             opsiHTML = `
-                <p style="color: #00796b; font-weight:bold; margin-bottom:0.5rem;">☑️ Tipe: PG Kompleks (Multi-Select)</p>
-                <p><strong>A.</strong> ${q.opsi.A || '-'} &nbsp;|&nbsp; <strong>B.</strong> ${q.opsi.B || '-'}</p>
-                <p><strong>C.</strong> ${q.opsi.C || '-'} &nbsp;|&nbsp; <strong>D.</strong> ${q.opsi.D || '-'}</p>
-                <p><strong>E.</strong> ${q.opsi.E || '-'}</p>
+                <div style="margin: 0.6rem 0;">
+                    <p style="color: #00796b; font-weight:bold; margin-bottom:0.5rem;">☑️ Tipe: PG Kompleks (Multi-Select)</p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.9rem;">
+                        <p><strong>A.</strong> ${q.opsi.A || '-'}</p>
+                        <p><strong>B.</strong> ${q.opsi.B || '-'}</p>
+                        <p><strong>C.</strong> ${q.opsi.C || '-'}</p>
+                        <p><strong>D.</strong> ${q.opsi.D || '-'}</p>
+                        <p style="grid-column: span 2;"><strong>E.</strong> ${q.opsi.E || '-'}</p>
+                    </div>
+                </div>
             `;
         } else {
             opsiHTML = `
-                <p><strong>A.</strong> ${q.opsi.A || '-'} &nbsp;|&nbsp; <strong>B.</strong> ${q.opsi.B || '-'}</p>
-                <p><strong>C.</strong> ${q.opsi.C || '-'} &nbsp;|&nbsp; <strong>D.</strong> ${q.opsi.D || '-'}</p>
-                <p><strong>E.</strong> ${q.opsi.E || '-'}</p>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; font-size: 0.9rem; margin: 0.6rem 0;">
+                    <p><strong>A.</strong> ${q.opsi.A || '-'}</p>
+                    <p><strong>B.</strong> ${q.opsi.B || '-'}</p>
+                    <p><strong>C.</strong> ${q.opsi.C || '-'}</p>
+                    <p><strong>D.</strong> ${q.opsi.D || '-'}</p>
+                    <p style="grid-column: span 2;"><strong>E.</strong> ${q.opsi.E || '-'}</p>
+                </div>
             `;
         }
 
         container.innerHTML += `
             <div class="soal-preview-item">
-                <h4 style="margin-bottom: 0.5rem; display: flex; align-items: center; justify-content: space-between;">
+                <h4 style="margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between;">
                     <span>
                         Soal ${i + 1} 
                         <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : q.tipe === 'isian' ? '✏️ Isian' : q.tipe === 'pgk' ? '☑️ PGK' : '📝 PG'}</span>
@@ -747,17 +1080,22 @@ function showPreview() {
                         <option value="pgk" ${q.tipe === 'pgk' ? 'selected' : ''}>☑️ PG Kompleks</option>
                     </select>
                 </h4>
-                <div style="font-size: 0.9rem; margin-bottom: 1rem; color: var(--text-secondary); max-height: 200px; overflow-y: auto;">
-                    ${previewPertanyaan}
+                <div style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; color: var(--text-primary); max-height: 300px; overflow-y: auto;">
+                    ${q.pertanyaan}
                 </div>
                 ${opsiHTML}
-                <p class="kunci" style="margin-top: 0.5rem;">🔑 Kunci: <strong>${q.kunci}</strong></p>
-                ${q.pembahasan ? `<details style="margin-top:0.5rem;"><summary style="cursor:pointer; color:var(--brand-primary);">💡 Pembahasan</summary><p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.5rem;">${q.pembahasan}</p></details>` : ''}
+                <p class="kunci" style="margin-top: 0.8rem; font-size: 0.95rem;">🔑 Kunci Jawaban: <strong>${q.kunci}</strong></p>
+                ${q.pembahasan ? `
+                    <details style="margin-top:0.8rem; background: var(--bg-tertiary); padding: 0.6rem 0.8rem; border-radius: 6px;">
+                        <summary style="cursor:pointer; color:var(--brand-primary); font-weight: 600;">💡 Pembahasan</summary>
+                        <div style="font-size:0.88rem; line-height: 1.5; color:var(--text-secondary); margin-top:0.6rem;">${q.pembahasan}</div>
+                    </details>
+                ` : ''}
             </div>
         `;
     });
     
-    // 🚨 TAMBAHKAN EVENT LISTENER UNTUK DROPDOWN TIPE OVERRIDE
+    // Event listener untuk dropdown tipe override
     document.querySelectorAll('.tipe-override').forEach(select => {
         select.addEventListener('change', (e) => {
             const index = parseInt(e.target.getAttribute('data-index'));
@@ -765,17 +1103,30 @@ function showPreview() {
             parsedQuestions[index].tipe = newTipe;
             console.log(`[OVERRIDE] Soal ${index + 1} tipe diubah menjadi: ${newTipe}`);
             
-            // Update badge visual
             const badge = e.target.closest('.soal-preview-item').querySelector('.tipe-badge');
             badge.className = `tipe-badge ${newTipe}`;
             badge.textContent = newTipe === 'bs' ? '⚖️ B/S' : newTipe === 'isian' ? '✏️ Isian' : newTipe === 'pgk' ? '☑️ PGK' : '📝 PG';
         });
     });
+
+    // Render KaTeX pada seluruh kartu preview
+    if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(container, {
+            delimiters: [
+                { left: '$$', right: '$$', display: true },
+                { left: '$', right: '$', display: false },
+                { left: '\\(', right: '\\)', display: false },
+                { left: '\\[', right: '\\]', display: true }
+            ],
+            throwOnError: false
+        });
+    }
     
     resultsDiv.style.display = 'block';
     resultsDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
+// 💾 SIMPAN SEMUA HASIL PARSE KE SUPABASE DATABASE
 async function saveToDatabase() {
     const btn = document.getElementById('btnConfirmSave');
     btn.disabled = true;
@@ -784,24 +1135,27 @@ async function saveToDatabase() {
     let success = 0;
     try {
         for (const q of parsedQuestions) {
-            await window.db.from('bank_soal').insert({
+            const { error } = await window.db.from('bank_soal').insert({
                 kategori_id: q.kategori_id,
                 materi_id: q.materi_id,
                 pertanyaan_html: q.pertanyaan,
-                opsi_a_html: q.opsi.A,
-                opsi_b_html: q.opsi.B,
-                opsi_c_html: q.opsi.C,
-                opsi_d_html: q.opsi.D,
-                opsi_e_html: q.opsi.E,
+                opsi_a_html: q.opsi.A || null,
+                opsi_b_html: q.opsi.B || null,
+                opsi_c_html: q.opsi.C || null,
+                opsi_d_html: q.opsi.D || null,
+                opsi_e_html: q.opsi.E || null,
                 kunci_jawaban: q.kunci,
-                tipe_soal: q.tipe || 'pg', // 🚨 BARU
-                pembahasan_html: `<p>${q.pembahasan}</p>`,
+                tipe_soal: q.tipe || 'pg',
+                pembahasan_html: q.pembahasan ? `<p>${q.pembahasan}</p>` : null,
                 created_by: user.id
             });
+            if (error) throw error;
+            success++;
         }
         await showScyraAlert(`${success} soal berhasil masuk ke Bank Soal Scyra!`, '🚀 Sukses Besar', '🏆');
         document.getElementById('scanResults').style.display = 'none';
         document.getElementById('soalForm').reset();
+        parsedQuestions = [];
     } catch (err) {
         await showScyraAlert('Gagal menyimpan: ' + err.message, '⚠️ Error', '⚠️');
     } finally {
@@ -940,6 +1294,38 @@ function setupEditModal() {
     btnClose.onclick = () => modal.classList.remove('active');
     modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 
+    // 🎨 INIT QUILL EDITORS (hanya sekali)
+    if (document.getElementById('quillPertanyaan') && !quillPertanyaan) {
+        quillPertanyaan = new Quill('#quillPertanyaan', {
+            theme: 'snow',
+            placeholder: 'Ketik pertanyaan soal di sini...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+    }
+    
+    if (document.getElementById('quillPembahasan') && !quillPembahasan) {
+        quillPembahasan = new Quill('#quillPembahasan', {
+            theme: 'snow',
+            placeholder: 'Ketik pembahasan di sini...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+    }
+
     // 🚨 Event listener untuk perubahan tipe soal
     document.getElementById('editTipeSoal').addEventListener('change', (e) => {
         updateFormByTipeSoal(e.target.value);
@@ -986,18 +1372,22 @@ function setupEditModal() {
             return;
         }
         
+        // 🎨 AMBIL CONTENT DARI QUILL EDITORS
+        const rawPertanyaanHTML = quillPertanyaan ? quillPertanyaan.root.innerHTML : document.getElementById('editPertanyaan').value;
+        const rawPembahasanHTML = quillPembahasan ? quillPembahasan.root.innerHTML : document.getElementById('editPembahasan').value;
+        
         const updates = {
             kategori_id: document.getElementById('editKategoriSoal').value,
             materi_id: document.getElementById('editMateriSoal').value,
-            pertanyaan_html: document.getElementById('editPertanyaan').value,
-            opsi_a_html: document.getElementById('editOpsiA').value,
-            opsi_b_html: document.getElementById('editOpsiB').value,
-            opsi_c_html: document.getElementById('editOpsiC').value,
-            opsi_d_html: document.getElementById('editOpsiD').value,
-            opsi_e_html: document.getElementById('editOpsiE').value,
+            pertanyaan_html: convertGambarShortcode(rawPertanyaanHTML),
+            opsi_a_html: convertGambarShortcode(document.getElementById('editOpsiA').value),
+            opsi_b_html: convertGambarShortcode(document.getElementById('editOpsiB').value),
+            opsi_c_html: convertGambarShortcode(document.getElementById('editOpsiC').value),
+            opsi_d_html: convertGambarShortcode(document.getElementById('editOpsiD').value),
+            opsi_e_html: convertGambarShortcode(document.getElementById('editOpsiE').value),
             kunci_jawaban: kunciJawaban,
             tipe_soal: tipeSoal,
-            pembahasan_html: `<p>${document.getElementById('editPembahasan').value}</p>`
+            pembahasan_html: convertGambarShortcode(rawPembahasanHTML)
         };
 
         try {
@@ -1021,13 +1411,24 @@ window.editSoal = async (id) => {
 
     // Isi form dengan data yang ada
     document.getElementById('editSoalId').value = soal.id;
+    
+    // 🎨 LOAD KE QUILL EDITORS
+    if (quillPertanyaan) {
+        quillPertanyaan.root.innerHTML = soal.pertanyaan_html || '';
+    }
     document.getElementById('editPertanyaan').value = soal.pertanyaan_html || '';
+    
     document.getElementById('editOpsiA').value = soal.opsi_a_html || '';
     document.getElementById('editOpsiB').value = soal.opsi_b_html || '';
     document.getElementById('editOpsiC').value = soal.opsi_c_html || '';
     document.getElementById('editOpsiD').value = soal.opsi_d_html || '';
     document.getElementById('editOpsiE').value = soal.opsi_e_html || '';
+    
+    if (quillPembahasan) {
+        quillPembahasan.root.innerHTML = soal.pembahasan_html || '';
+    }
     document.getElementById('editPembahasan').value = (soal.pembahasan_html || '').replace(/<\/?p>/g, '');
+    
     document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg';
     
     // 🚨 Set kunci jawaban berdasarkan tipe soal

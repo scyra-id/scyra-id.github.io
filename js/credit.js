@@ -255,8 +255,10 @@ window.CreditSystem = (function() {
             return { success: true, alreadyUnlocked: true };
         }
         
-        // Deduct credits
-        await deductCredits(creditsRequired, 'usage', `Unlock ${contentType}: ${contentId}`);
+        // Deduct credits jika dibutuhkan
+        if (creditsRequired > 0) {
+            await deductCredits(creditsRequired, 'usage', `Unlock ${contentType}: ${contentId}`);
+        }
         
         const db = getDb();
         

@@ -503,3 +503,229 @@ body.dark-mode .tipe-badge.pgk { background: rgba(0, 150, 136, 0.2); color: #80c
 .url-gambar-item.just-copied code {
     animation: copyFlash 0.6s ease;
 }
+
+.btn-copy-shortcode {
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+.btn-copy-shortcode:hover {
+    background: var(--brand-primary-dark);
+    transform: translateY(-1px);
+}
+
+.btn-preview-img {
+    background: var(--bg-tertiary);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+.btn-preview-img:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+}
+
+/* =====================================================
+   ✏️ MODAL OVERLAY & STYLING
+===================================================== */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(4px);
+    z-index: 10000;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-content {
+    background: var(--bg-secondary);
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 1rem;
+    position: sticky;
+    top: 0;
+    background: var(--bg-secondary);
+    z-index: 10;
+}
+
+.modal-header h2 {
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.btn-close {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-close:hover {
+    color: var(--error);
+    background: rgba(255, 0, 0, 0.1);
+    transform: rotate(90deg);
+}
+
+/* Quill Editor Customization */
+.ql-toolbar.ql-snow {
+    border-radius: 8px 8px 0 0;
+    border-color: var(--border-color);
+    background: var(--bg-tertiary);
+}
+
+.ql-container.ql-snow {
+    border-radius: 0 0 8px 8px;
+    border-color: var(--border-color);
+    font-family: inherit;
+}
+
+.ql-editor {
+    min-height: 200px;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+}
+
+body.dark-mode .ql-toolbar.ql-snow {
+    background: var(--bg-primary);
+}
+
+body.dark-mode .ql-editor {
+    background: var(--bg-secondary);
+}
+
+/* Scrollbar untuk Modal Content */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* =====================================================
+   📊 TABEL, BACAAN & KOTAK ISIAN DI SOAL
+===================================================== */
+.tabel-soal {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    font-size: 0.92rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    background: var(--bg-primary);
+}
+.tabel-soal th, .tabel-soal td {
+    border: 1px solid var(--border-color);
+    padding: 0.6rem 0.8rem;
+    text-align: left;
+}
+.tabel-soal th {
+    background: var(--bg-tertiary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.tabel-soal tr:nth-child(even) {
+    background: rgba(0,0,0,0.02);
+}
+
+.kotak-isian {
+    display: inline-block;
+    min-width: 80px;
+    height: 1.5rem;
+    padding: 0.2rem 0.5rem;
+    border-bottom: 2px solid var(--brand-primary);
+    background: rgba(107, 143, 92, 0.08);
+    border-radius: 4px;
+    margin: 0 4px;
+    vertical-align: middle;
+}
+
+.teks-bacaan {
+    background: rgba(107, 143, 92, 0.08);
+    border-left: 4px solid var(--brand-primary);
+    padding: 1.2rem 1.4rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+}
+
+.teks-bacaan-header {
+    display: none !important;
+}
+
+body.dark-mode .teks-bacaan {
+    background: rgba(163, 196, 145, 0.08);
+    border-left-color: var(--brand-primary);
+    color: var(--text-primary);
+}

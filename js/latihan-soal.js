@@ -41,6 +41,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 result += '\n';
                 continue;
             }
+
+            // Jangan proses baris shortcode gambar sebagai tabel
+            if (line.includes('[GAMBAR:')) {
+                flushTable();
+                result += line + '\n';
+                continue;
+            }
             
             // Check if line is pipe table format
             const isPipeRow = line.includes('|') && /^\|?.*\|.*\|?$/.test(line);
@@ -72,14 +79,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     function renderShortcodes(html) {
         if (!html) return html;
         
-        // First render pipe tables
-        let output = renderPipeTables(html);
-        
-        // Then convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-        output = output.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+        // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img> terlebih dahulu
+        let output = html.replace(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, (match, url, size) => {
             const cleanUrl = url.trim();
             const width = size ? size.trim() : '100%';
             return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
+        });
+
+        // Render pipe tables
+        output = renderPipeTables(output);
+        
+        // Remove any legacy teks-bacaan-header if present
+        output = output.replace(/<div class="teks-bacaan-header">[\s\S]*?<\/div>/gi, '');
+
+        // Then convert [BACAAN]...[/BACAAN] menjadi <div class="teks-bacaan">
+        output = output.replace(/\[BACAAN\]([\s\S]*?)\[\/BACAAN\]/gi, (match, content) => {
+            return `<div class="teks-bacaan">${content.trim()}</div>`;
         });
         
         return output;

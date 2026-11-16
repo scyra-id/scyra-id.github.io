@@ -1,15 +1,91 @@
 document.addEventListener('DOMContentLoaded', async () => {
     // =======================================================
-    // FUNGSI KONVERSI SHORTCODE GAMBAR
+    // FUNGSI KONVERSI SHORTCODE GAMBAR & TABEL
     // =======================================================
+    /**
+     * Render pipe tables to HTML
+     */
+    function renderPipeTables(html) {
+        if (!html) return html;
+        
+        let result = '';
+        let tableRows = [];
+        
+        const flushTable = () => {
+            if (!tableRows.length) return;
+            const rows = tableRows
+                .map((row) => `<tr>${row.map((cell) => `<td>${cell}</td>`).join('')}</tr>`)
+                .join('');
+            result += `<table class="tabel-soal"><tbody>${rows}</tbody></table>`;
+            tableRows = [];
+        };
+        
+        // Process each line
+        const lines = html.split('\n');
+        
+        for (let line of lines) {
+            line = line.trim();
+            if (!line) {
+                result += '\n';
+                continue;
+            }
+
+            // Jangan proses baris shortcode gambar sebagai tabel
+            if (line.includes('[GAMBAR:')) {
+                flushTable();
+                result += line + '\n';
+                continue;
+            }
+            
+            // Check if line is pipe table format
+            const isPipeRow = line.includes('|') && /^\|?.*\|.*\|?$/.test(line);
+            
+            if (isPipeRow) {
+                const cells = line.split('|').map((cell) => cell.trim()).filter(Boolean);
+                if (cells.length > 1) {
+                    tableRows.push(cells);
+                    continue;
+                }
+            }
+            
+            // Not a table row, flush any pending table
+            flushTable();
+            result += line + '\n';
+        }
+        
+        // Flush any remaining table
+        flushTable();
+        
+        // Convert first row to header
+        result = result.replace(/<tbody>\s*<tr>(.*?)<\/tr>/i, (_, firstRow) =>
+            `<thead><tr>${firstRow.replace(/<td/g, '<th').replace(/<\/td>/g, '</th>')}</tr></thead><tbody>`
+        );
+        
+        return result;
+    }
+
     function renderShortcodes(html) {
         if (!html) return html;
+        
         // Convert [GAMBAR: url] atau [GAMBAR: url | SIZE: 50%] menjadi <img>
-        return html.replace(/\[GAMBAR:\s*(.*?)(?:\s*\|\s*SIZE:\s*(.*?))?\]/gi, (match, url, size) => {
+        let output = html.replace(/\[GAMBAR:\s*([^\|\]]+?)(?:\s*\|\s*(?:SIZE:\s*)?([^\]]+?))?\]/gi, (match, url, size) => {
             const cleanUrl = url.trim();
             const width = size ? size.trim() : '100%';
             return `<img src="${cleanUrl}" class="scyra-image" alt="Gambar Soal" style="max-width: ${width}; height: auto; border-radius: 8px; margin: 1rem 0; display: block; cursor: pointer;">`;
         });
+
+        // Render pipe tables
+        output = renderPipeTables(output);
+
+        // Remove any legacy teks-bacaan-header if present
+        output = output.replace(/<div class="teks-bacaan-header">[\s\S]*?<\/div>/gi, '');
+
+        // Convert [BACAAN]...[/BACAAN] menjadi <div class="teks-bacaan">
+        output = output.replace(/\[BACAAN\]([\s\S]*?)\[\/BACAAN\]/gi, (match, content) => {
+            return `<div class="teks-bacaan">${content.trim()}</div>`;
+        });
+        
+        return output;
     }
 
     const loadReview = async () => {
@@ -39,6 +115,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 alert("⛔ Anda tidak memiliki akses ke halaman ini.");
                 return window.location.href = 'dashboard.html';
             }
+
+            // Cek role user untuk akses pembahasan
+            const { data: profData } = await window.db.from('profiles').select('role').eq('id', user.id).single();
+            const userRole = profData?.role || 'user';
+            const canSeePembahasan = ['silver', 'gold', 'admin'].includes(userRole);
 
             // 2. Render Ringkasan Skor. IRT submissions stay pending until the
             // live window is calibrated; normal tryouts keep their percentage.
@@ -174,8 +255,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                             <div class="q-options">${optionsHtml}</div>
                             
                             <div class="q-pembahasan">
-                                <h4>💡 Pembahasan</h4>
-                                ${renderShortcodes(soal.pembahasan_html) || '<p>Tidak ada pembahasan untuk soal ini.</p>'}
+                                ${canSeePembahasan
+                                    ? `<h4>💡 Pembahasan</h4>
+                                       ${renderShortcodes(soal.pembahasan_html) || '<p>Tidak ada pembahasan untuk soal ini.</p>'}`
+                                    : `<div class="pembahasan-locked">
+                                         <div class="pembahasan-locked-icon">🔒</div>
+                                         <h4>Pembahasan Terkunci</h4>
+                                         <p>Upgrade ke <strong>Silver</strong> atau <strong>Gold</strong> untuk membuka pembahasan lengkap dan strategi pengerjaan soal.</p>
+                                         <a href="paketbelajar.html" class="btn-upgrade-pembahasan">Lihat Paket Upgrade</a>
+                                       </div>`
+                                }
                             </div>
                         </div>
                     </div>

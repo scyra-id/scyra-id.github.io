@@ -278,8 +278,8 @@ body.window-blurred .exam-header {
 }
 
 .zoom-tools { display: flex; gap: 0.4rem; margin-right: 1rem; }
-.btn-zoom-exam { background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); width: 34px; height: 34px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s; }
-.btn-zoom-exam:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+.btn-zoom-exam, .tool-btn { background: var(--bg-primary); border: 1px solid var(--border-color); color: var(--text-primary); width: 34px; height: 34px; border-radius: 8px; font-weight: 800; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+.btn-zoom-exam:hover, .tool-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
 
 /* 🚀 TEXT ZOOM ENGINE (UJIAN) */
 .question-card { --zoom-level: 1; }
@@ -297,7 +297,7 @@ body.window-blurred .exam-header {
     border: none;
 }
 
-.question-text, .opt-btn, .bs-btn, .kotak-isian, .tabel-soal {
+.question-text, .opt-btn, .bs-btn, .kotak-isian, .tabel-soal, .teks-bacaan {
     font-size: calc(1.15rem * var(--zoom-level)) !important;
     transition: font-size 0.2s ease;
 }

@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pendaftaran Tryout & Target PTN - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/daftar-tryout.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="images/logo.svg">
+    
+    <!-- Script Tema -->
+    <script>
+        const savedTheme = localStorage.getItem('scyra_theme') || localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.documentElement.classList.add('dark', 'dark-mode', 'dark-theme');
+            window.addEventListener('DOMContentLoaded', () => {
+                document.body.classList.add('dark', 'dark-mode', 'dark-theme');
+            });
+        }
+    </script>
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <!-- Komponen Modular -->
+        <div id="sidebar-placeholder"></div>
+        
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            
+            <div class="dashboard-body">
+                <div class="daftar-to-container">
+                    
+                    <!-- Header -->
+                    <div class="daftar-header">
+                        <a href="tryout.html" class="btn-back-katalog">
+                            <span>←</span> Kembali ke Katalog Tryout
+                        </a>
+                        <div class="daftar-title-wrap">
+                            <div>
+                                <h1 id="toTitle">Pendaftaran Tryout SNBT</h1>
+                                <p id="toSubtitle">Pilih program studi target Anda untuk menganalisis peluang kelulusan.</p>
+                            </div>
+                            <div id="toBadge" class="paket-badge-pill">
+                                <span>🎯</span> <span id="toBadgeText">Memuat Tryout...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SNBT Rules Card -->
+                    <div class="snbt-rules-card">
+                        <h3>📜 Aturan Resmi Pemilihan Program Studi SNBT</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 0.5rem;">
+                            Anda wajib memilih <strong>minimal 2 program studi</strong> dan dapat memilih hingga <strong>maksimal 4 program studi</strong>:
+                        </p>
+                        <div class="snbt-rules-list">
+                            <div class="rule-pill">
+                                <strong>2 Pilihan:</strong>
+                                Bebas memilih program Sarjana (S1) atau Vokasi (D4/D3).
+                            </div>
+                            <div class="rule-pill">
+                                <strong>3 Pilihan:</strong>
+                                Wajib kombinasi Sarjana dan Vokasi (contoh: 2 S1 + 1 Vokasi atau 1 S1 + 2 Vokasi).
+                            </div>
+                            <div class="rule-pill">
+                                <strong>4 Pilihan:</strong>
+                                Terdiri dari 2 Sarjana (S1) dan 2 Vokasi (minimal 1 di antaranya program D3).
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stack 4 Choice Slots -->
+                    <div class="choices-stack" id="choicesContainer">
+                        <!-- Slot 1 (Wajib) -->
+                        <div class="choice-slot-card is-active" id="slot-1" data-slot="1">
+                            <div class="choice-header">
+                                <div class="choice-badge-wrap">
+                                    <div class="choice-number-badge">1</div>
+                                    <div class="choice-title">Pilihan 1</div>
+                                    <span class="choice-req-tag required">Wajib</span>
+                                </div>
+                            </div>
+                            <div class="choice-body" id="slot-body-1">
+                                <div class="ptn-search-box">
+                                    <span class="ptn-search-icon">🔍</span>
+                                    <input type="text" class="ptn-search-input" id="search-input-1" placeholder="Cari prodi atau universitas (contoh: Kedokteran UI, Teknik ITB)..." autocomplete="off">
+                                    <div class="ptn-dropdown-results" id="dropdown-1"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slot 2 (Wajib) -->
+                        <div class="choice-slot-card is-active" id="slot-2" data-slot="2">
+                            <div class="choice-header">
+                                <div class="choice-badge-wrap">
+                                    <div class="choice-number-badge">2</div>
+                                    <div class="choice-title">Pilihan 2</div>
+                                    <span class="choice-req-tag required">Wajib</span>
+                                </div>
+                            </div>
+                            <div class="choice-body" id="slot-body-2">
+                                <div class="ptn-search-box">
+                                    <span class="ptn-search-icon">🔍</span>
+                                    <input type="text" class="ptn-search-input" id="search-input-2" placeholder="Cari prodi atau universitas (contoh: Ilmu Komputer UGM)..." autocomplete="off">
+                                    <div class="ptn-dropdown-results" id="dropdown-2"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slot 3 (Opsional) -->
+                        <div class="choice-slot-card" id="slot-3" data-slot="3" style="display: none;">
+                            <div class="choice-header">
+                                <div class="choice-badge-wrap">
+                                    <div class="choice-number-badge">3</div>
+                                    <div class="choice-title">Pilihan 3</div>
+                                    <span class="choice-req-tag optional">Opsional</span>
+                                </div>
+                                <button type="button" class="btn-remove-choice" onclick="hapusPilihan(3)">✖ Hapus Pilihan 3</button>
+                            </div>
+                            <div class="choice-body" id="slot-body-3">
+                                <div class="ptn-search-box">
+                                    <span class="ptn-search-icon">🔍</span>
+                                    <input type="text" class="ptn-search-input" id="search-input-3" placeholder="Cari prodi pilihan ketiga..." autocomplete="off">
+                                    <div class="ptn-dropdown-results" id="dropdown-3"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Slot 4 (Opsional) -->
+                        <div class="choice-slot-card" id="slot-4" data-slot="4" style="display: none;">
+                            <div class="choice-header">
+                                <div class="choice-badge-wrap">
+                                    <div class="choice-number-badge">4</div>
+                                    <div class="choice-title">Pilihan 4</div>
+                                    <span class="choice-req-tag optional">Opsional</span>
+                                </div>
+                                <button type="button" class="btn-remove-choice" onclick="hapusPilihan(4)">✖ Hapus Pilihan 4</button>
+                            </div>
+                            <div class="choice-body" id="slot-body-4">
+                                <div class="ptn-search-box">
+                                    <span class="ptn-search-icon">🔍</span>
+                                    <input type="text" class="ptn-search-input" id="search-input-4" placeholder="Cari prodi pilihan keempat..." autocomplete="off">
+                                    <div class="ptn-dropdown-results" id="dropdown-4"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Button Add Choice 3 & 4 -->
+                    <div class="add-choice-wrapper" id="addChoiceWrapper">
+                        <button type="button" class="btn-add-choice" id="btnAddChoice3" onclick="tambahPilihan(3)">
+                            <span>➕</span> Tambah Pilihan 3
+                        </button>
+                        <button type="button" class="btn-add-choice" id="btnAddChoice4" onclick="tambahPilihan(4)" style="display: none;">
+                            <span>➕</span> Tambah Pilihan 4
+                        </button>
+                    </div>
+
+                    <!-- Validation Summary Card -->
+                    <div class="validation-summary-card">
+                        <div class="val-summary-header">
+                            <h3>📊 Ringkasan Pilihan & Validasi SNBT</h3>
+                            <div class="val-status-badge invalid" id="valStatusBadge">
+                                <span>⚠️</span> <span id="valStatusText">Belum Lengkap</span>
+                            </div>
+                        </div>
+
+                        <div class="val-counts-row">
+                            <div class="count-box">
+                                <span>Total Pilihan</span>
+                                <strong id="countTotal">0 / 4</strong>
+                            </div>
+                            <div class="count-box">
+                                <span>Sarjana (S1)</span>
+                                <strong id="countS1">0</strong>
+                            </div>
+                            <div class="count-box">
+                                <span>Sarjana Terapan (D4)</span>
+                                <strong id="countD4">0</strong>
+                            </div>
+                            <div class="count-box">
+                                <span>Diploma Tiga (D3)</span>
+                                <strong id="countD3">0</strong>
+                            </div>
+                        </div>
+
+                        <div class="val-message-box invalid" id="valMessageBox">
+                            Silakan pilih minimal 2 program studi (Pilihan 1 dan Pilihan 2) untuk melanjutkan pendaftaran.
+                        </div>
+                    </div>
+
+                    <!-- Confirmation Notice & Submit Button -->
+                    <div class="daftar-action-section">
+                        <div class="permanent-notice-box">
+                            <span style="font-size: 1.3rem;">🔒</span>
+                            <div>
+                                <strong>Pernyataan Permanen:</strong>
+                                Pilihan program studi dan universitas ini bersifat <strong>permanen</strong> setelah Anda mengonfirmasi pendaftaran. Hasil tryout nantinya akan memprediksi peluang kelulusan Anda pada prodi-prodi ini.
+                            </div>
+                        </div>
+
+                        <button type="button" class="btn-submit-pendaftaran" id="btnSubmitDaftar" disabled onclick="submitPendaftaran()">
+                            <span>🚀</span> Konfirmasi & Daftar Tryout
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/credit.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/daftar-tryout.js"></script>
+</body>
+</html>

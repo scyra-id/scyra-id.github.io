@@ -36,6 +36,28 @@ document.addEventListener('DOMContentLoaded', async () => {
              // Cek apakah perlu credit system
              const needsCredit = window.CreditSystem ? await window.CreditSystem.needsCreditSystem() : false;
              const isGold = currentUserRole === 'gold' || currentUserRole === 'admin';
+             const isSilver = currentUserRole === 'silver';
+
+             // Hitung jumlah tryout yang sudah di-unlock Silver (via unlocked_content)
+             let silverUnlockCount = 0;
+             const SILVER_FREE_TRYOUT_LIMIT = 3;
+             if (isSilver && window.CreditSystem) {
+                 try {
+                     const db = window.dbPayment || window.db;
+                     const { data: { user: currentUser } } = await window.db.auth.getUser();
+                     if (currentUser) {
+                         const { count } = await db
+                             .from('unlocked_content')
+                             .select('*', { count: 'exact', head: true })
+                             .eq('user_id', currentUser.id)
+                             .eq('content_type', 'tryout');
+                         silverUnlockCount = count || 0;
+                     }
+                 } catch (e) {
+                     console.warn('⚠️ Gagal hitung unlock Silver:', e.message);
+                 }
+             }
+             const silverHasFreeSlots = isSilver && silverUnlockCount < SILVER_FREE_TRYOUT_LIMIT;
              
              // Tarik data asli dari DB (hanya yang statusnya 'aktif')
              const { data, error } = await window.db.from('paket_tryout')
@@ -49,6 +71,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                  return;
              }
 
+             // Tarik pendaftaran user untuk menandai badge status
+             let registeredPaketIds = new Set();
+             if (userId) {
+                 const { data: userRegs } = await window.db
+                     .from('tryout_pendaftaran')
+                     .select('paket_id')
+                     .eq('user_id', userId);
+                 if (userRegs) {
+                     registeredPaketIds = new Set(userRegs.map(r => r.paket_id));
+                 }
+             }
+
              let html = '';
              const sekarang = new Date();
 
@@ -59,6 +93,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                   const irtMulai = to.irt_window_start ? new Date(to.irt_window_start) : null;
                   const irtSelesai = to.irt_window_end ? new Date(to.irt_window_end) : null;
                  const jmlSubtes = to.subtes_tryout[0]?.count || 0;
+                 const isRegistered = registeredPaketIds.has(to.id);
                  
                  let isLocked = true;
                  let statusLabel = "";
@@ -70,24 +105,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                  // Logika Waktu
                   if (isIrtPackage && (!irtMulai || !irtSelesai)) {
                       statusLabel = '🔒 Belum dikonfigurasi';
-                  } else if (isIrtPackage && sekarang < irtMulai) {
-                      statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(irtMulai)})`;
                   } else if (isIrtPackage && sekarang > irtSelesai) {
-                      // IRT packages remain accessible for premium users after
-                      // their live window, while ordinary packages stay closed.
-                      const isIrtReplayAvailable = isGold;
-                      if (isIrtReplayAvailable) {
+                      // Window IRT sudah lewat
+                      const irtCalibrated = to.irt_status === 'CALIBRATED';
+                      if (isGold && irtCalibrated) {
+                          // Gold + kalibrasi selesai = bisa replay
                           isLocked = false;
-                          statusLabel = '🟢 Bisa Dikerjakan';
+                          statusLabel = '🟢 Bisa Dikerjakan (Replay IRT)';
                           bgGradient = "linear-gradient(90deg, var(--brand-primary), var(--warning))";
                           opacityCard = "1";
-                          clickAction = `onclick="window.location.href='detail-tryout.html?id=${to.id}'"`;
+                          clickAction = `onclick="handleTryoutClick('${to.id}', ${needsCredit}, ${isGold}, ${silverHasFreeSlots})"`;
+                      } else if (isGold && !irtCalibrated) {
+                          // Gold tapi kalibrasi belum selesai
+                          statusLabel = '⏳ Menunggu Kalibrasi IRT...';
                       } else {
+                          // User biasa
                           statusLabel = `🔒 Sudah Berakhir (Tutup: ${formatTgl(irtSelesai)})`;
                       }
-                  } else if (sekarang < mulai) {
-                      statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(mulai)})`;
+                  } else if (isIrtPackage && sekarang < irtMulai) {
+                      statusLabel = `🔒 Belum Dimulai (Buka: ${formatTgl(irtMulai)})`;
                   } else if (sekarang > selesai) {
+                      // Waktu reguler habis (non-IRT atau IRT yang belum lewat window)
                       statusLabel = `🔒 Sudah Berakhir (Tutup: ${formatTgl(selesai)})`;
                  } else {
                      isLocked = false;
@@ -95,18 +133,26 @@ document.addEventListener('DOMContentLoaded', async () => {
                      bgGradient = "linear-gradient(90deg, var(--brand-primary), var(--warning))"; // Sage/Orange (Buka)
                      opacityCard = "1";
                      
-                     // Jika membutuhkan credit dan user bukan gold, tambahin keterangan
-                     if (needsCredit && !isGold) {
+                     // Keterangan credit berdasarkan role
+                     if (needsCredit && !isGold && !silverHasFreeSlots) {
                          creditBadge = `<div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--brand-primary); font-weight: 600;">${CREDIT_ICON} Unlock dengan credit untuk akses penuh</div>`;
-                         clickAction = `onclick="handleTryoutClick('${to.id}', ${needsCredit}, ${isGold})"`;
-                     } else {
-                         clickAction = `onclick="window.location.href='detail-tryout.html?id=${to.id}'"`;
+                     } else if (silverHasFreeSlots) {
+                         creditBadge = `<div style="margin-top: 0.5rem; font-size: 0.8rem; color: var(--brand-primary); font-weight: 600;">🎫 Gratis Silver (${silverUnlockCount}/${SILVER_FREE_TRYOUT_LIMIT} terpakai)</div>`;
                      }
+                     clickAction = `onclick="handleTryoutClick('${to.id}', ${needsCredit}, ${isGold}, ${silverHasFreeSlots})"`;
                  }
+
+                 const regBadge = !isLocked ? (isRegistered 
+                     ? `<span style="background: rgba(107, 143, 92, 0.15); color: var(--brand-primary-dark); padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">✓ Terdaftar</span>`
+                     : `<span style="background: rgba(212, 175, 55, 0.15); color: #b58d10; padding: 0.2rem 0.55rem; border-radius: 6px; font-size: 0.75rem; font-weight: 700;">📝 Pilih Target PTN</span>`)
+                     : '';
 
                  html += `
                  <div class="to-card" style="opacity: ${opacityCard}; ${isLocked ? 'cursor: not-allowed;' : 'cursor: pointer;'}" ${clickAction}>
-                     <div class="to-title">${to.nama_paket} ${isLocked ? '🔒' : ''}</div>
+                     <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.5rem; margin-bottom: 0.25rem;">
+                         <div class="to-title" style="margin: 0;">${to.nama_paket} ${isLocked ? '🔒' : ''}</div>
+                         ${regBadge}
+                     </div>
                      <div class="to-subtitle">${jmlSubtes} Subtes Tersedia</div>
                      
                      <div class="to-meta">
@@ -188,51 +234,115 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
      // ==========================================
-     // HANDLE TRYOUT CLICK (CEK UNLOCK)
+     // NAVIGASI TRYOUT (CEK PENDAFTARAN & TARGET PTN)
      // ==========================================
-     window.handleTryoutClick = async (tryoutId, needsCredit, isGold) => {
+     window.navigateToTryout = async (tryoutId) => {
+         try {
+             const { data: { user } } = await window.db.auth.getUser();
+             if (user) {
+                 const { data: reg } = await window.db
+                     .from('tryout_pendaftaran')
+                     .select('id')
+                     .eq('paket_id', tryoutId)
+                     .eq('user_id', user.id)
+                     .maybeSingle();
+
+                 if (reg) {
+                     window.location.href = `detail-tryout.html?id=${tryoutId}`;
+                     return;
+                 }
+             }
+             // Belum terdaftar -> arahkan ke halaman pilih PTN & pendaftaran
+             window.location.href = `daftar-tryout.html?id=${tryoutId}`;
+         } catch (e) {
+             console.error('Error navigating to tryout:', e);
+             window.location.href = `daftar-tryout.html?id=${tryoutId}`;
+         }
+     };
+
+     // ==========================================
+     // HANDLE TRYOUT CLICK (CEK UNLOCK & DAFTAR)
+     // ==========================================
+     window.handleTryoutClick = async (tryoutId, needsCredit, isGold, silverHasFreeSlots) => {
          if (!needsCredit || isGold) {
-             window.location.href = `detail-tryout.html?id=${tryoutId}`;
-             return;
+             return window.navigateToTryout(tryoutId);
          }
          
          // Cek apakah sudah unlock tryout ini
          if (window.CreditSystem) {
              const isUnlocked = await window.CreditSystem.isContentUnlocked('tryout', tryoutId);
              if (isUnlocked) {
-                 window.location.href = `detail-tryout.html?id=${tryoutId}`;
+                 return window.navigateToTryout(tryoutId);
              } else {
                  // Tampilkan modal unlock
-                 showTryoutUnlockModal(tryoutId);
+                 showTryoutUnlockModal(tryoutId, silverHasFreeSlots);
              }
          } else {
-             window.location.href = `detail-tryout.html?id=${tryoutId}`;
+             return window.navigateToTryout(tryoutId);
          }
      };
      
      // ==========================================
      // MODAL UNLOCK TRYOUT
      // ==========================================
-     window.showTryoutUnlockModal = async (tryoutId) => {
+     window.showTryoutUnlockModal = async (tryoutId, silverHasFreeSlots) => {
          if (!window.CreditSystem) return;
          
          try {
-             const availableCredits = await window.CreditSystem.getAvailableCredits();
              const { data: tryout } = await window.db.from('paket_tryout').select('nama_paket').eq('id', tryoutId).single();
-             
-             const creditCost = 50; // Cost unlock tryout paket
              const tryoutName = tryout ? tryout.nama_paket : 'Tryout ini';
+
+             // CASE 1: Member Silver dengan jatah tryout gratis tersisa
+             if (silverHasFreeSlots) {
+                 let confirmed = false;
+                 if (typeof showScyraConfirm === 'function') {
+                     confirmed = await showScyraConfirm(
+                         `Kamu memiliki akses <strong>Tryout Premium Gratis</strong> dari <strong>Paket Silver</strong>!<br><br>Gunakan jatah gratis untuk membuka <strong>${tryoutName}</strong>?<br><br><span style="font-size:0.85rem; color:var(--text-secondary);">Tidak ada pengurangan credit untuk pembukaan ini.</span>`,
+                         '🎫 Klaim Tryout Silver',
+                         '🎫'
+                     );
+                 } else {
+                     confirmed = confirm(`Gunakan jatah Tryout Gratis Paket Silver untuk membuka ${tryoutName}?\n\nTidak ada pengurangan credit.`);
+                 }
+
+                 if (!confirmed) return;
+
+                 const result = await window.CreditSystem.unlockContent('tryout', tryoutId, 0);
+                 if (result.success) {
+                     if (typeof showScyraAlert === 'function') {
+                         await showScyraAlert(
+                             `Berhasil membuka <strong>${tryoutName}</strong> dengan jatah Paket Silver!<br><br>Kamu sekarang bisa mengerjakan seluruh subtes di paket ini.`,
+                             '✅ Tryout Terbuka',
+                             '🎉'
+                         );
+                     } else {
+                         alert(`✅ Berhasil membuka ${tryoutName} dengan jatah Paket Silver!`);
+                     }
+                     return window.navigateToTryout(tryoutId);
+                 }
+                 return;
+             }
+
+             // CASE 2: User Free atau Silver yang jatah gratisnya sudah habis
+             const availableCredits = await window.CreditSystem.getAvailableCredits();
+             const creditCost = 50; // Cost unlock tryout paket
+             const userRole = await window.CreditSystem.getUserRole();
+             const isSilverUser = userRole === 'silver';
+
+             let confirmPrompt = `Unlock <strong>${tryoutName}</strong> dengan ${creditCost} ${CREDIT_ICON} credit?<br><br>Setelah unlock, kamu bisa mengerjakan semua subtes dalam paket ini berkali-kali tanpa batas.<br><br>Credit tersedia: <strong>${availableCredits} ${CREDIT_ICON}</strong>`;
+             if (isSilverUser) {
+                 confirmPrompt = `Jatah 3 Tryout gratis dari Paket Silver kamu sudah terpakai.<br><br>Unlock <strong>${tryoutName}</strong> dengan ${creditCost} ${CREDIT_ICON} credit?<br><br>Credit tersedia: <strong>${availableCredits} ${CREDIT_ICON}</strong>`;
+             }
              
              if (typeof showScyraConfirm === 'function') {
                  const confirmed = await showScyraConfirm(
-                     `Unlock <strong>${tryoutName}</strong> dengan ${creditCost} ${CREDIT_ICON} credit?<br><br>Setelah unlock, kamu bisa mengerjakan semua subtes dalam paket ini berkali-kali tanpa batas.<br><br>Credit tersedia: <strong>${availableCredits} ${CREDIT_ICON}</strong>`,
+                     confirmPrompt,
                      '🔓 Unlock Tryout',
                      '🔓'
                  );
-                 
                  if (!confirmed) return;
              } else {
-                 const confirmed = confirm(`Unlock ${tryoutName} dengan ${creditCost} credit?\n\nSetelah unlock, kamu bisa mengerjakan semua subtes dalam paket ini berkali-kali.\n\nCredit tersedia: ${availableCredits}`);
+                 const confirmed = confirm(`Unlock ${tryoutName} dengan ${creditCost} credit?\n\nCredit tersedia: ${availableCredits}`);
                  if (!confirmed) return;
              }
              
@@ -268,8 +378,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                  // Update credit display
                  await window.CreditSystem.updateTopbarCredit();
                  
-                 // Redirect ke detail tryout
-                 window.location.href = `detail-tryout.html?id=${tryoutId}`;
+                 // Redirect ke detail tryout atau daftar target PTN
+                 await window.navigateToTryout(tryoutId);
              }
          } catch (error) {
              console.error('Error unlocking tryout:', error);

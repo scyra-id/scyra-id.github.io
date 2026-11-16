@@ -103,6 +103,68 @@
     transform: none;
 }
 
+.btn-action {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    font-family: inherit;
+}
+.btn-action:hover {
+    border-color: var(--brand-primary);
+    color: var(--brand-primary);
+    background: rgba(135, 168, 120, 0.1);
+    transform: translateY(-1px);
+}
+
+.btn-back-admin {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0.5rem 1rem;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    margin-bottom: 1.5rem;
+}
+.btn-back-admin:hover {
+    color: var(--brand-primary);
+    border-color: var(--brand-primary);
+    background: rgba(135, 168, 120, 0.1);
+    transform: translateX(-3px);
+}
+
+.btn-close, .btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-secondary);
+    cursor: pointer;
+    line-height: 1;
+    padding: 0.25rem 0.5rem;
+    border-radius: 6px;
+    transition: color 0.2s, background 0.2s;
+}
+.btn-close:hover, .btn-close-modal:hover {
+    color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+}
+
 /* ===================================================
    GOD MODE: PAKSA SCROLL NYALA (ANTI MACET)
    =================================================== */

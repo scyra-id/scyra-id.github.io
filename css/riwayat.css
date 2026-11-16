@@ -295,24 +295,128 @@
 .ptn-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
 .ptn-item {
     background: var(--bg-tertiary);
-    border-radius: 10px;
-    padding: 1rem;
-    border-left: 4px solid var(--brand-primary);
+    border-radius: 12px;
+    padding: 1.15rem;
+    border: 1px solid var(--border-color);
+    border-left: 5px solid var(--brand-primary);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ptn-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px var(--shadow-color);
+}
+
+.ptn-item.status-aman {
+    border-left-color: var(--brand-primary-dark);
+}
+
+.ptn-item.status-kompetitif {
+    border-left-color: var(--warning);
+}
+
+.ptn-item.status-berisiko {
+    border-left-color: var(--error);
+}
+
+.ptn-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.ptn-choice-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
 }
 
 .ptn-item h4 {
     color: var(--text-primary);
-    margin-bottom: 0.25rem;
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0.15rem 0 0.25rem 0;
 }
 
-.ptn-item span {
+.ptn-univ-name {
     font-size: 0.85rem;
+    color: var(--brand-primary);
+    font-weight: 600;
+}
+
+.ptn-badge-status {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.ptn-badge-status.aman {
+    background: rgba(107, 143, 92, 0.15);
+    color: var(--brand-primary-dark);
+}
+
+.ptn-badge-status.kompetitif {
+    background: rgba(255, 183, 77, 0.18);
+    color: #b56c00;
+}
+
+.ptn-badge-status.berisiko {
+    background: rgba(229, 115, 115, 0.15);
+    color: var(--error);
+}
+
+.ptn-score-comparison {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.82rem;
+    margin: 0.6rem 0;
+    background: var(--bg-secondary);
+    padding: 0.6rem 0.85rem;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.ptn-score-comparison div {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.ptn-score-comparison strong {
+    color: var(--text-primary);
+}
+
+.ptn-status-description {
+    font-size: 0.82rem;
+    line-height: 1.4;
     color: var(--text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.ptn-subtes-tag {
+    margin-top: 0.4rem;
+    padding-top: 0.4rem;
+    border-top: 1px dashed var(--border-color);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+}
+
+.ptn-subtes-tag strong {
+    color: var(--brand-primary-dark);
 }
 
 .btn-distribusi {

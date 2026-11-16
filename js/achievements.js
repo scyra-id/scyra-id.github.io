@@ -208,6 +208,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (el.pickerTitle) el.pickerTitle.textContent = `Pilih Badge untuk Slot ${slotPosition}`;
 
         const currentFeatured = featuredBadges.find(f => f.slot_position === slotPosition);
+        if (currentFeatured?.achievement_category) {
+            pickerSelectedCategory = currentFeatured.achievement_category;
+        }
 
         if (el.pickerOptions) {
             el.pickerOptions.innerHTML = summary.categories.map(cat => {
@@ -234,7 +237,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Show remove button only if slot has existing badge
         if (el.pickerBtnRemove) {
-            el.pickerBtnRemove.style.display = currentFeatured ? 'inline-block' : 'none';
+            el.pickerBtnRemove.style.display = currentFeatured ? 'inline-flex' : 'none';
         }
 
         el.pickerBackdrop.classList.add('open');

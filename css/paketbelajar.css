@@ -190,7 +190,7 @@
     flex-shrink: 0;
 }
 
-.btn-pilih-paket {
+.btn-pilih-paket, .btn-buy-credit {
     width: 100%;
     padding: 0.9rem;
     background: var(--brand-primary);
@@ -204,13 +204,13 @@
     box-shadow: 0 4px 12px rgba(135, 168, 120, 0.3);
 }
 
-.btn-pilih-paket:hover:not(:disabled) {
+.btn-pilih-paket:hover:not(:disabled), .btn-buy-credit:hover:not(:disabled) {
     background: var(--brand-primary-dark);
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(135, 168, 120, 0.4);
 }
 
-.btn-pilih-paket:disabled {
+.btn-pilih-paket:disabled, .btn-buy-credit:disabled {
     background: var(--text-muted);
     cursor: not-allowed;
     opacity: 0.6;

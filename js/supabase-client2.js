@@ -28,6 +28,46 @@ setTimeout(() => {
 
 window.safePaymentQuery = async (table, method = 'select', ...args) => window.dbPayment.from(table)[method](...args);
 
+// Server-side gateway for referral codes and Instagram free-credit requests.
+// It validates the main-database session before accessing the payment database.
+window.ReferralCreditGateway = (function() {
+    'use strict';
+
+    const GATEWAY_URL = `${SUPABASE_URL_PAYMENT.replace(/\/$/, '')}/functions/v1/referral-credit-gateway`;
+
+    async function call(action, payload = {}) {
+        if (!window.db) throw new Error('Koneksi database utama belum siap');
+
+        const { data: { session } } = await window.db.auth.getSession();
+        if (!session?.access_token) throw new Error('Sesi tidak valid. Silakan masuk kembali.');
+
+        const response = await fetch(GATEWAY_URL, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+                'apikey': SUPABASE_ANON_KEY_PAYMENT,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ action, ...payload })
+        });
+
+        let result;
+        try {
+            result = await response.json();
+        } catch (_) {
+            throw new Error('Gateway referral mengembalikan respons tidak valid');
+        }
+
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Permintaan referral tidak dapat diproses');
+        }
+
+        return result.data;
+    }
+
+    return { call };
+})();
+
 // ============================================================================
 // 🎮 SCYRA GAMIFICATION GATEWAY CLIENT
 // All journey data is accessed through the dbPayment Edge Function. The primary

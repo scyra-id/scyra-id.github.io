@@ -448,42 +448,17 @@ async function handleIGCreditSubmit(e) {
     
     try {
         const { data: { user } } = await getAuthDb().auth.getUser();
-        const db = getDb();
-        
-        // Cek apakah user sudah pernah submit request
-        const { data: existingRequest } = await db
-            .from('free_credit_requests')
-            .select('id, status, credits_amount')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-        
-        // Jika masih pending, tampilkan status
-        if (existingRequest && existingRequest.status === 'pending') {
-            showIGStatus('pending', existingRequest);
+        if (!user || !window.ReferralCreditGateway) {
+            throw new Error('Koneksi permintaan credit belum siap');
+        }
+
+        const request = await window.ReferralCreditGateway.call('instagram_credit.submit', { username });
+
+        // Request aktif yang sudah ada tidak dibuat ulang; tampilkan statusnya.
+        if (request.status !== 'pending' || request.alreadyExists) {
+            showIGStatus(request.status, request);
             return;
         }
-        
-        // Jika sudah approved sebelumnya
-        if (existingRequest && existingRequest.status === 'approved') {
-            showIGStatus('approved', existingRequest);
-            return;
-        }
-        
-        // Submit request baru
-        const { data, error } = await db
-            .from('free_credit_requests')
-            .insert({
-                user_id: user.id,
-                instagram_username: username,
-                status: 'pending',
-                credits_amount: 5
-            })
-            .select()
-            .single();
-        
-        if (error) throw error;
         
         // Tampilkan success message
         document.getElementById('igForm').style.display = 'none';
@@ -547,23 +522,9 @@ function showIGStatus(status, requestData) {
 // =========================================================
 async function checkIGRequestStatus() {
     try {
-        const { data: { user } } = await getAuthDb().auth.getUser();
-        if (!user) return;
-        
-        const db = getDb();
-        
-        const { data: latestRequest, error } = await db
-            .from('free_credit_requests')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(1)
-            .single();
-        
-        if (error) {
-            console.warn('⚠️ IG request check failed (non-critical):', error.message);
-            return;
-        }
+        if (!window.ReferralCreditGateway) return;
+
+        const latestRequest = await window.ReferralCreditGateway.call('instagram_credit.status');
         
         if (latestRequest) {
             if (latestRequest.status === 'pending' || latestRequest.status === 'approved') {
