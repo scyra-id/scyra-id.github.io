@@ -59,11 +59,11 @@
 
 /* Kotak Pembahasan yang Muncul Tiba-tiba */
 .pembahasan-box {
-    margin-top: 2.5rem; 
-    padding: 1.5rem; 
-    border-radius: 12px; 
-    background: var(--bg-secondary); 
-    border-left: 6px solid var(--brand-primary);
+    margin-top: 1.75rem; 
+    padding: 0;
+    border-radius: 14px; 
+    background: transparent;
+    border: none;
     animation: fadeIn 0.4s ease;
 }
 

@@ -2055,3 +2055,287 @@ body.dark-mode .teks-bacaan {
     color: var(--text-primary);
 }
 
+/* =========================================================
+   💡 SCYRA PEMBAHASAN UI (NON-TRYOUT: LATIHAN & DRILL)
+   ========================================================= */
+
+/* Wrapper Card */
+.scyra-pembahasan-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    animation: fadeInPembahasan 0.35s ease;
+    text-align: left;
+}
+
+@keyframes fadeInPembahasan {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Feedback Banner (Benar / Salah) */
+.pembahasan-feedback-banner {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.2rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin-bottom: 1.25rem;
+}
+.pembahasan-feedback-banner.correct {
+    background: rgba(46, 125, 50, 0.12);
+    border: 1px solid rgba(76, 175, 80, 0.35);
+    color: #2e7d32;
+}
+body.dark-mode .pembahasan-feedback-banner.correct {
+    background: rgba(76, 175, 80, 0.18);
+    color: #81c784;
+    border-color: rgba(129, 199, 132, 0.4);
+}
+.pembahasan-feedback-banner.wrong {
+    background: rgba(229, 57, 53, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.35);
+    color: #c62828;
+}
+body.dark-mode .pembahasan-feedback-banner.wrong {
+    background: rgba(244, 67, 54, 0.16);
+    color: #ef9a9a;
+    border-color: rgba(239, 154, 154, 0.4);
+}
+
+/* 3 Kotak Menyamping (Grid) */
+.pembahasan-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.85rem;
+    margin-bottom: 1.15rem;
+}
+
+.pembahasan-meta-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.85rem 0.75rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 0.35rem;
+    min-height: 72px;
+}
+
+.pembahasan-meta-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+
+.pembahasan-meta-value {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+/* Badges Tingkat Kesulitan */
+.diff-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.28rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    text-transform: capitalize;
+}
+.diff-badge .diff-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+/* Mudah - Hijau */
+.diff-badge.diff-mudah {
+    background: rgba(46, 125, 50, 0.12);
+    color: #2e7d32;
+    border: 1px solid rgba(46, 125, 50, 0.3);
+}
+.diff-badge.diff-mudah .diff-dot {
+    background-color: #2e7d32;
+}
+body.dark-mode .diff-badge.diff-mudah {
+    background: rgba(76, 175, 80, 0.18);
+    color: #81c784;
+    border-color: rgba(129, 199, 132, 0.35);
+}
+body.dark-mode .diff-badge.diff-mudah .diff-dot {
+    background-color: #81c784;
+}
+
+/* Sedang - Kuning / Amber */
+.diff-badge.diff-sedang {
+    background: rgba(217, 119, 6, 0.12);
+    color: #b45309;
+    border: 1px solid rgba(217, 119, 6, 0.35);
+}
+.diff-badge.diff-sedang .diff-dot {
+    background-color: #d97706;
+}
+body.dark-mode .diff-badge.diff-sedang {
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.35);
+}
+body.dark-mode .diff-badge.diff-sedang .diff-dot {
+    background-color: #fbbf24;
+}
+
+/* Sulit - Merah */
+.diff-badge.diff-sulit {
+    background: rgba(220, 38, 38, 0.12);
+    color: #c62828;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+}
+.diff-badge.diff-sulit .diff-dot {
+    background-color: #dc2626;
+}
+body.dark-mode .diff-badge.diff-sulit {
+    background: rgba(239, 68, 68, 0.18);
+    color: #ef9a9a;
+    border-color: rgba(239, 154, 154, 0.35);
+}
+body.dark-mode .diff-badge.diff-sulit .diff-dot {
+    background-color: #ef9a9a;
+}
+
+/* Kunci Jawaban Highlight */
+.kunci-jawaban-val {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #2e7d32;
+    letter-spacing: 0.5px;
+}
+body.dark-mode .kunci-jawaban-val {
+    color: #81c784;
+}
+
+/* Breadcrumb Subtes > Subbab (Opsi A) */
+.pembahasan-breadcrumb {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: 0.92rem;
+    color: var(--text-secondary);
+    padding: 0.2rem 0;
+    margin-bottom: 0.85rem;
+}
+.pembahasan-breadcrumb .bc-icon {
+    font-size: 0.95rem;
+    margin-right: 0.15rem;
+}
+.pembahasan-breadcrumb .bc-subtes {
+    font-style: italic;
+    color: var(--text-secondary);
+}
+.pembahasan-breadcrumb .bc-sep {
+    color: var(--text-muted);
+    font-weight: 700;
+    user-select: none;
+    margin: 0 0.2rem;
+}
+.pembahasan-breadcrumb .bc-subbab {
+    font-weight: 700;
+    color: var(--text-primary);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--brand-primary);
+}
+
+/* Divider Antara Meta & Konten Pembahasan */
+.pembahasan-divider {
+    height: 1px;
+    background: var(--border-color);
+    margin: 0 0 1.25rem 0;
+}
+
+/* Section Blocks (Opsi 2: Clean Divider Block) */
+.pembahasan-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 1.4rem;
+}
+
+.pembahasan-section-block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.pembahasan-section-block .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1.5px solid var(--border-color);
+}
+
+.pembahasan-section-block .section-num {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--brand-primary);
+    letter-spacing: 0.5px;
+    font-family: inherit;
+    flex-shrink: 0;
+}
+
+.pembahasan-section-block .section-title {
+    font-size: 0.92rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: var(--text-primary);
+}
+
+.pembahasan-section-block .section-body {
+    font-size: 0.98rem;
+    line-height: 1.7;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+.pembahasan-section-block .section-body p {
+    margin-bottom: 0.6rem;
+}
+.pembahasan-section-block .section-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsif Layar HP */
+@media (max-width: 600px) {
+    .pembahasan-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+    .pembahasan-meta-card {
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        min-height: auto;
+    }
+    .scyra-pembahasan-card {
+        padding: 1.15rem;
+    }
+}
+

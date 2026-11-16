@@ -679,6 +679,47 @@ function formatTextContent(text) {
     return content;
 }
 
+// 💡 FORMATTER PEMBAHASAN TERSTRUKTUR (ARRAY OF OBJECTS / SECTIONED STRING)
+function formatPembahasanContent(rawPembahasan) {
+    if (!rawPembahasan) return '';
+    
+    // 1. Format Pendekatan A: Array of { judul, isi }
+    if (Array.isArray(rawPembahasan)) {
+        return rawPembahasan.map((sec, idx) => {
+            const num = String(idx + 1).padStart(2, '0');
+            const judul = String(sec.judul || sec.title || `BAGIAN ${num}`).toUpperCase().trim();
+            const isi = formatTextContent(sec.isi || sec.content || sec.text || '');
+            return `<div class="pembahasan-section-block"><div class="section-header"><span class="section-num">${num} /</span><span class="section-title">${judul}</span></div><div class="section-body">${isi}</div></div>`;
+        }).join('\n');
+    }
+
+    // 2. Format String
+    if (typeof rawPembahasan === 'string') {
+        const str = rawPembahasan.trim();
+        // Cek jika sudah berisi html format section block
+        if (str.includes('pembahasan-section-block')) {
+            return str;
+        }
+
+        // Cek pola "01 / Judul"
+        const sectionRegex = /(?:^|\n)(?:(\d{1,2})\s*\/\s*([^\n<]+))[\r\n]+([\s\S]*?)(?=(?:\n\d{1,2}\s*\/)|$)/g;
+        const matches = [...str.matchAll(sectionRegex)];
+        if (matches.length > 0) {
+            return matches.map((m, idx) => {
+                const num = String(m[1] || (idx + 1)).padStart(2, '0');
+                const judul = m[2].trim().toUpperCase();
+                const isi = formatTextContent(m[3].trim());
+                return `<div class="pembahasan-section-block"><div class="section-header"><span class="section-num">${num} /</span><span class="section-title">${judul}</span></div><div class="section-body">${isi}</div></div>`;
+            }).join('\n');
+        }
+
+        // String biasa / teks pembahasan legacy
+        return formatTextContent(str);
+    }
+
+    return formatTextContent(String(rawPembahasan));
+}
+
 // 🚀 PARSER UTAMA UNTUK FILE JSON
 function parseJsonQuestions(jsonData, katId, matId) {
     let items = [];
@@ -803,7 +844,20 @@ function parseJsonQuestions(jsonData, katId, matId) {
             }
         }
 
-        const pembahasan = formatTextContent(item.pembahasan || item.explanation || item.bahas || '');
+        // 4. Tingkat Kesulitan
+        const rawKesulitan = (item.tingkat_kesulitan || item.kesulitan || item.level || item.difficulty || '').toLowerCase().trim();
+        let tingkatKesulitan = 'sedang';
+        if (rawKesulitan === 'mudah' || rawKesulitan === 'easy') {
+            tingkatKesulitan = 'mudah';
+        } else if (rawKesulitan === 'sulit' || rawKesulitan === 'hard' || rawKesulitan === 'hots') {
+            tingkatKesulitan = 'sulit';
+        } else if (rawKesulitan === 'sedang' || rawKesulitan === 'medium') {
+            tingkatKesulitan = 'sedang';
+        }
+
+        // 5. Pembahasan Terstruktur
+        const rawBahas = item.pembahasan ?? item.explanation ?? item.bahas ?? '';
+        const pembahasan = formatPembahasanContent(rawBahas);
 
         if (!pertanyaanFinal || !kunciFinal) {
             console.warn(`[JSON PARSER] Soal index ${index + 1} dilewati karena pertanyaan atau kunci kosong:`, item);
@@ -817,6 +871,7 @@ function parseJsonQuestions(jsonData, katId, matId) {
             opsi: opsi,
             kunci: kunciFinal,
             tipe: tipe,
+            tingkat_kesulitan: tingkatKesulitan,
             pembahasan: pembahasan
         });
     });
@@ -1068,17 +1123,25 @@ function showPreview() {
 
         container.innerHTML += `
             <div class="soal-preview-item">
-                <h4 style="margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between;">
+                <h4 style="margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
                     <span>
                         Soal ${i + 1} 
                         <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : q.tipe === 'isian' ? '✏️ Isian' : q.tipe === 'pgk' ? '☑️ PGK' : '📝 PG'}</span>
+                        <span class="diff-badge diff-${q.tingkat_kesulitan || 'sedang'}"><span class="diff-dot"></span> ${(q.tingkat_kesulitan || 'sedang').toUpperCase()}</span>
                     </span>
-                    <select class="tipe-override" data-index="${i}" style="padding: 0.4rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; cursor: pointer;">
-                        <option value="pg" ${q.tipe === 'pg' ? 'selected' : ''}>📝 Pilihan Ganda</option>
-                        <option value="bs" ${q.tipe === 'bs' ? 'selected' : ''}>⚖️ Benar/Salah</option>
-                        <option value="isian" ${q.tipe === 'isian' ? 'selected' : ''}>✏️ Isian Singkat</option>
-                        <option value="pgk" ${q.tipe === 'pgk' ? 'selected' : ''}>☑️ PG Kompleks</option>
-                    </select>
+                    <div style="display:flex; gap:0.4rem; align-items:center;">
+                        <select class="diff-override" data-index="${i}" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                            <option value="mudah" ${q.tingkat_kesulitan === 'mudah' ? 'selected' : ''}>🟢 Mudah</option>
+                            <option value="sedang" ${q.tingkat_kesulitan === 'sedang' ? 'selected' : ''}>🟡 Sedang</option>
+                            <option value="sulit" ${q.tingkat_kesulitan === 'sulit' ? 'selected' : ''}>🔴 Sulit / HOTS</option>
+                        </select>
+                        <select class="tipe-override" data-index="${i}" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                            <option value="pg" ${q.tipe === 'pg' ? 'selected' : ''}>📝 Pilihan Ganda</option>
+                            <option value="bs" ${q.tipe === 'bs' ? 'selected' : ''}>⚖️ Benar/Salah</option>
+                            <option value="isian" ${q.tipe === 'isian' ? 'selected' : ''}>✏️ Isian Singkat</option>
+                            <option value="pgk" ${q.tipe === 'pgk' ? 'selected' : ''}>☑️ PG Kompleks</option>
+                        </select>
+                    </div>
                 </h4>
                 <div style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 1rem; color: var(--text-primary); max-height: 300px; overflow-y: auto;">
                     ${q.pertanyaan}
@@ -1109,6 +1172,20 @@ function showPreview() {
         });
     });
 
+    // Event listener untuk dropdown tingkat kesulitan override
+    document.querySelectorAll('.diff-override').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            const newDiff = e.target.value;
+            parsedQuestions[index].tingkat_kesulitan = newDiff;
+            console.log(`[OVERRIDE] Soal ${index + 1} kesulitan diubah menjadi: ${newDiff}`);
+            
+            const badge = e.target.closest('.soal-preview-item').querySelector('.diff-badge');
+            badge.className = `diff-badge diff-${newDiff}`;
+            badge.innerHTML = `<span class="diff-dot"></span> ${newDiff.toUpperCase()}`;
+        });
+    });
+
     // Render KaTeX pada seluruh kartu preview
     if (typeof renderMathInElement !== 'undefined') {
         renderMathInElement(container, {
@@ -1135,7 +1212,7 @@ async function saveToDatabase() {
     let success = 0;
     try {
         for (const q of parsedQuestions) {
-            const { error } = await window.db.from('bank_soal').insert({
+            const insertPayload = {
                 kategori_id: q.kategori_id,
                 materi_id: q.materi_id,
                 pertanyaan_html: q.pertanyaan,
@@ -1146,9 +1223,19 @@ async function saveToDatabase() {
                 opsi_e_html: q.opsi.E || null,
                 kunci_jawaban: q.kunci,
                 tipe_soal: q.tipe || 'pg',
-                pembahasan_html: q.pembahasan ? `<p>${q.pembahasan}</p>` : null,
+                tingkat_kesulitan: q.tingkat_kesulitan || 'sedang',
+                pembahasan_html: q.pembahasan || null,
                 created_by: user.id
-            });
+            };
+
+            let { error } = await window.db.from('bank_soal').insert(insertPayload);
+            // Defensive fallback jika kolom tingkat_kesulitan belum ditambahkan di Supabase
+            if (error && error.message && error.message.toLowerCase().includes('tingkat_kesulitan')) {
+                console.warn('Kolom tingkat_kesulitan belum ada di Supabase, menyimpan tanpa tingkat_kesulitan...');
+                delete insertPayload.tingkat_kesulitan;
+                const retry = await window.db.from('bank_soal').insert(insertPayload);
+                error = retry.error;
+            }
             if (error) throw error;
             success++;
         }
@@ -1387,11 +1474,17 @@ function setupEditModal() {
             opsi_e_html: convertGambarShortcode(document.getElementById('editOpsiE').value),
             kunci_jawaban: kunciJawaban,
             tipe_soal: tipeSoal,
+            tingkat_kesulitan: document.getElementById('editTingkatKesulitan') ? document.getElementById('editTingkatKesulitan').value : 'sedang',
             pembahasan_html: convertGambarShortcode(rawPembahasanHTML)
         };
 
         try {
-            const { error } = await window.db.from('bank_soal').update(updates).eq('id', id);
+            let { error } = await window.db.from('bank_soal').update(updates).eq('id', id);
+            if (error && error.message && error.message.toLowerCase().includes('tingkat_kesulitan')) {
+                delete updates.tingkat_kesulitan;
+                const retry = await window.db.from('bank_soal').update(updates).eq('id', id);
+                error = retry.error;
+            }
             if (error) throw error;
             await showScyraAlert('Soal berhasil diperbarui!', '✅ Sukses', '✅');
             modal.classList.remove('active');
@@ -1430,6 +1523,9 @@ window.editSoal = async (id) => {
     document.getElementById('editPembahasan').value = (soal.pembahasan_html || '').replace(/<\/?p>/g, '');
     
     document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg';
+    if (document.getElementById('editTingkatKesulitan')) {
+        document.getElementById('editTingkatKesulitan').value = soal.tingkat_kesulitan || 'sedang';
+    }
     
     // 🚨 Set kunci jawaban berdasarkan tipe soal
     const tipeSoal = soal.tipe_soal || 'pg';

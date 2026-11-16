@@ -528,3 +528,139 @@ document.addEventListener('keydown', (e) => {
         window.closeFeatureModal();
     }
 });
+
+// =========================================================
+// 💡 GLOBAL SCYRA PEMBAHASAN UI BUILDER (LATIHAN & DRILL)
+// =========================================================
+window.buildPembahasanUI = function({
+    dataSoal,
+    subtes = 'Subtes',
+    subbab = 'Subbab',
+    isBenar = null,
+    showFeedback = true
+}) {
+    if (!dataSoal) return '';
+
+    // 1. Banner Feedback (Benar / Salah)
+    let feedbackBannerHTML = '';
+    if (showFeedback && isBenar !== null && isBenar !== undefined) {
+        feedbackBannerHTML = `
+            <div class="pembahasan-feedback-banner ${isBenar ? 'correct' : 'wrong'}">
+                <span class="feedback-icon">${isBenar ? '🎉' : '❌'}</span>
+                <span>${isBenar ? 'TEPAT SEKALI! JAWABANMU BENAR' : 'YAAH, KURANG TEPAT!'}</span>
+            </div>
+        `;
+    }
+
+    // 2. Tingkat Kesulitan
+    const rawKesulitan = String(dataSoal.tingkat_kesulitan || dataSoal.kesulitan || 'sedang').toLowerCase().trim();
+    let diffClass = 'diff-sedang';
+    let diffLabel = 'Sedang';
+    if (rawKesulitan === 'mudah' || rawKesulitan === 'easy') {
+        diffClass = 'diff-mudah';
+        diffLabel = 'Mudah';
+    } else if (rawKesulitan === 'sulit' || rawKesulitan === 'hard' || rawKesulitan === 'hots') {
+        diffClass = 'diff-sulit';
+        diffLabel = 'Sulit / HOTS';
+    }
+
+    // 3. Tipe Soal
+    const tipeRaw = String(dataSoal.tipe_soal || dataSoal.tipe || 'pg').toLowerCase().trim();
+    let tipeLabel = 'Pilihan Ganda';
+    if (tipeRaw === 'pgk') tipeLabel = 'PG Kompleks';
+    else if (tipeRaw === 'isian') tipeLabel = 'Isian Singkat';
+    else if (tipeRaw === 'bs') tipeLabel = 'Benar / Salah';
+
+    // 4. Kunci Jawaban
+    let kunciTampil = dataSoal.kunci_jawaban || dataSoal.kunci || '-';
+    if (tipeRaw === 'pgk') {
+        kunciTampil = String(kunciTampil).split(',').map(k => k.trim()).join(', ');
+    } else if (tipeRaw === 'bs') {
+        kunciTampil = String(kunciTampil).split(',').map(k => {
+            const trimmed = k.trim().toUpperCase();
+            return trimmed === 'B' ? 'Benar' : trimmed === 'S' ? 'Salah' : trimmed;
+        }).join(', ');
+    }
+
+    // 5. Breadcrumb (Opsi A)
+    const breadcrumbHTML = `
+        <div class="pembahasan-breadcrumb">
+            <span class="bc-icon">📁</span>
+            <span class="bc-subtes"><em>${subtes || 'Subtes'}</em></span>
+            <span class="bc-sep">›</span>
+            <strong class="bc-subbab"><u>${subbab || 'Subbab'}</u></strong>
+        </div>
+    `;
+
+    // 6. Section Pembahasan (Opsi 2: Clean Divider Block)
+    let rawPembahasan = dataSoal.pembahasan_html || dataSoal.pembahasan || '';
+    let sectionsHTML = '';
+
+    if (rawPembahasan.includes('pembahasan-section-block')) {
+        sectionsHTML = rawPembahasan;
+    } else {
+        // Cek pola "01 / Judul"
+        const sectionRegex = /(?:^|\n)(?:(\d{1,2})\s*\/\s*([^\n<]+))[\r\n]+([\s\S]*?)(?=(?:\n\d{1,2}\s*\/)|$)/g;
+        const matches = [...rawPembahasan.matchAll(sectionRegex)];
+
+        if (matches.length > 0) {
+            sectionsHTML = matches.map((m, idx) => {
+                const num = String(m[1] || (idx + 1)).padStart(2, '0');
+                const judul = m[2].trim().toUpperCase();
+                const isi = (typeof renderShortcodes === 'function' ? renderShortcodes(m[3].trim()) : m[3].trim());
+                return `
+                    <div class="pembahasan-section-block">
+                        <div class="section-header">
+                            <span class="section-num">${num} /</span>
+                            <span class="section-title">${judul}</span>
+                        </div>
+                        <div class="section-body">${isi}</div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            const isi = typeof renderShortcodes === 'function' ? renderShortcodes(rawPembahasan) : rawPembahasan;
+            sectionsHTML = `
+                <div class="pembahasan-section-block">
+                    <div class="section-header">
+                        <span class="section-num">01 /</span>
+                        <span class="section-title">PEMBAHASAN LENGKAP</span>
+                    </div>
+                    <div class="section-body">${isi || '<p>Pembahasan belum tersedia.</p>'}</div>
+                </div>
+            `;
+        }
+    }
+
+    return `
+        <div class="scyra-pembahasan-card">
+            ${feedbackBannerHTML}
+            <div class="pembahasan-meta-grid">
+                <div class="pembahasan-meta-card">
+                    <span class="pembahasan-meta-label">⚡ TINGKAT KESULITAN</span>
+                    <div class="pembahasan-meta-value">
+                        <span class="diff-badge ${diffClass}">
+                            <span class="diff-dot"></span>
+                            ${diffLabel}
+                        </span>
+                    </div>
+                </div>
+                <div class="pembahasan-meta-card">
+                    <span class="pembahasan-meta-label">📝 TIPE SOAL</span>
+                    <div class="pembahasan-meta-value">${tipeLabel}</div>
+                </div>
+                <div class="pembahasan-meta-card">
+                    <span class="pembahasan-meta-label">🔑 KUNCI JAWABAN</span>
+                    <div class="pembahasan-meta-value kunci-jawaban-val">${kunciTampil}</div>
+                </div>
+            </div>
+
+            ${breadcrumbHTML}
+            <div class="pembahasan-divider"></div>
+
+            <div class="pembahasan-sections">
+                ${sectionsHTML}
+            </div>
+        </div>
+    `;
+};

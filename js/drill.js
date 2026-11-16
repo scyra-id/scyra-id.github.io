@@ -244,10 +244,11 @@ document.addEventListener('DOMContentLoaded', async () => {
          // A. Ambil data bab yang diminta dari URL (Cek nomor_bab-nya)
             const { data: materiList, error: matErr } = await window.db
                 .from('materi')
-                .select('id, judul, nomor_bab')
+                .select('id, judul, nomor_bab, kategori_id, kategori:kategori_id(nama_mapel)')
                 .in('id', ids);
 
             if (matErr || !materiList) throw new Error("Gagal memuat data bab.");
+            state.materiMap = new Map(materiList.map(m => [m.id, m]));
 
          // B. Pastikan Role User sudah terdeteksi (Fallback fetch kalau session.js telat load)
             let currentRole = window.userRole;
@@ -671,6 +672,23 @@ document.addEventListener('DOMContentLoaded', async () => {
                 opsiHTML += '</div>';
             }
 
+            const mat = state.materiMap ? state.materiMap.get(item.soal.materi_id) : null;
+            const subtesNama = mat?.kategori?.nama_mapel || document.getElementById('drillSubJudul')?.textContent || 'Subtes UTBK';
+            const subbabJudul = mat?.judul || 'Latihan Drill';
+
+            const pembahasanCard = typeof window.buildPembahasanUI === 'function' ? window.buildPembahasanUI({
+                dataSoal: item.soal,
+                subtes: subtesNama,
+                subbab: subbabJudul,
+                isBenar: item.is_benar,
+                showFeedback: false
+            }) : `
+                <div style="margin-top:1rem; border-top: 1px dashed var(--border-color); padding-top:1rem;">
+                    <h4>💡 Pembahasan:</h4>
+                    <div style="margin-top:0.5rem;">${renderShortcodes(item.soal.pembahasan_html) || '<p>Pembahasan belum tersedia.</p>'}</div>
+                </div>
+            `;
+
             reviewHTML += `
                 <div style="text-align: left; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 1rem;">
@@ -679,10 +697,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     </div>
                     <div style="font-size: 1.1rem; margin-bottom: 1rem;">${renderShortcodes(item.soal.pertanyaan_html)}</div>
                     ${opsiHTML} 
-                    <div style="margin-top:1rem; border-top: 1px dashed var(--border-color); padding-top:1rem;">
-                        <h4>💡 Pembahasan:</h4>
-                        <div style="margin-top:0.5rem;">${renderShortcodes(item.soal.pembahasan_html) || '<p>Pembahasan belum tersedia.</p>'}</div>
-                    </div>
+                    ${pembahasanCard}
                 </div>
             `;
         });

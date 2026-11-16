@@ -111,8 +111,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             state.userId = user.id;
 
-            const { data: info } = await window.db.from('materi').select('kategori_id').eq('id', state.materiId).single();
-            if (info) state.kategoriId = info.kategori_id;
+            const { data: info } = await window.db
+                .from('materi')
+                .select('id, judul, kategori_id, kategori:kategori_id(nama_mapel)')
+                .eq('id', state.materiId)
+                .single();
+            if (info) {
+                state.kategoriId = info.kategori_id;
+                state.subbabJudul = info.judul || 'Materi';
+                state.subtesNama = info.kategori?.nama_mapel || 'Subtes UTBK';
+            }
 
             let savedHistory = null;
             if (window.ProgressSystem) {
@@ -307,11 +315,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             boxBahas.style.display = 'block';
-            boxBahas.innerHTML = `
-                <h4 style="margin-bottom:0.5rem; font-size:1.2rem; color:${isBenar ? '#4caf50' : '#f44336'};">${isBenar ? '🎉 TEPAT SEKALI!' : '❌ YAAH, KURANG TEPAT'}</h4>
-                <div style="font-size:0.95rem; margin-bottom:1rem; font-weight:bold; color:var(--text-secondary);">Kunci Jawaban: ${kunciAsli}</div>
-                <div style="line-height: 1.6;">${renderShortcodes(dataSoal.pembahasan_html) || 'Pembahasan belum tersedia.'}</div>
-            `;
+            boxBahas.innerHTML = window.buildPembahasanUI({
+                dataSoal: dataSoal,
+                subtes: state.subtesNama || 'Subtes UTBK',
+                subbab: state.subbabJudul || 'Latihan Subbab',
+                isBenar: isBenar,
+                showFeedback: true
+            });
             if (boxBahas && typeof renderMathInElement !== 'undefined') {
                 renderMathInElement(boxBahas, {
                     delimiters: [
@@ -413,23 +423,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : (item.jawaban_user || '<em style="color:var(--text-muted);">Tidak dijawab</em>');
             const kunciTampil = tipe === 'pgk' ? (item.kunci_asli || '').split(',').map(k => k.trim()).join(', ') : item.kunci_asli;
             
+            const pembahasanCard = window.buildPembahasanUI({
+                dataSoal: item.soal,
+                subtes: state.subtesNama || 'Subtes UTBK',
+                subbab: state.subbabJudul || 'Latihan Subbab',
+                isBenar: isBenar,
+                showFeedback: false
+            });
+
             reviewHTML += `
-                <div style="background:var(--bg-secondary); padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
+                <div style="background:var(--bg-secondary); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid var(--border-color);">
                     <div style="display:flex; justify-content:space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">
                         <strong>Soal ${index + 1}</strong>
                         <strong style="color:${isBenar ? '#4caf50' : '#f44336'}">${isBenar ? '✔️ Benar' : '❌ Salah'}</strong>
                     </div>
                     <div style="margin-bottom: 1rem;">${renderShortcodes(item.soal.pertanyaan_html)}</div>
                     
-                    <div style="font-size:0.95rem; background:var(--bg-primary); padding: 1rem; border-radius:8px;">
-                        <span style="color:var(--text-secondary);">Jawabanmu: <strong>${jawabanTampil}</strong></span> | 
-                        <strong style="color:#4caf50;">Kunci: ${kunciTampil}</strong>
-                        
-                        <div style="margin-top: 1rem; border-top: 1px dashed var(--border-color); padding-top: 1rem;">
-                            <strong style="color:var(--brand-primary);">💡 Pembahasan:</strong><br> 
-                            <div style="margin-top:0.5rem;">${renderShortcodes(item.soal.pembahasan_html)}</div>
-                        </div>
+                    <div style="font-size:0.95rem; margin-bottom: 0.75rem; padding: 0.6rem 0.85rem; background: var(--bg-primary); border-radius: 8px; border: 1px solid var(--border-color);">
+                        <span style="color:var(--text-secondary);">Jawabanmu:</span> <strong>${jawabanTampil}</strong>
                     </div>
+
+                    ${pembahasanCard}
                 </div>
             `;
         });

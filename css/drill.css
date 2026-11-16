@@ -254,11 +254,11 @@
     border-top: 1px dashed var(--border-color);
 }
 .pembahasan-box {
-    background: rgba(107, 143, 92, 0.05); /* Warna brand tipis */
-    border-left: 4px solid var(--brand-primary);
-    padding: 1.2rem;
+    background: transparent;
+    border: none;
+    padding: 0;
     margin-top: 1rem;
-    border-radius: 0 8px 8px 0;
+    border-radius: 0;
 }
 .pembahasan-box h4 { margin: 0 0 0.5rem 0; color: var(--brand-primary); }
 
