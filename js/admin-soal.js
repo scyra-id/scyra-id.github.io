@@ -720,6 +720,103 @@ function formatPembahasanContent(rawPembahasan) {
     return formatTextContent(String(rawPembahasan));
 }
 
+// 📖 HELPER: Ekstrak teks bacaan bersih untuk textarea form edit
+function extractBacaanContent(html) {
+    if (!html) return '';
+    return html
+        .replace(/<img[^>]*src="([^"]+)"[^>]*>/gi, '[GAMBAR: $1]')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<\/p>\s*<p>/gi, '\n\n')
+        .replace(/<\/?(?:p|div|span)[^>]*>/gi, '')
+        .trim();
+}
+
+// 🎨 HELPER: Dekonstruksi HTML Pembahasan dari DB menjadi HTML visual ramah Quill
+function preparePembahasanForQuill(html) {
+    if (!html || typeof html !== 'string') return '';
+    const trimmed = html.trim();
+    if (!trimmed) return '';
+
+    // Jika format HTML section block dari database
+    if (trimmed.includes('pembahasan-section-block')) {
+        const blockRegex = /<div class="pembahasan-section-block">[\s\S]*?<span class="section-num">(\d{1,2})\s*\/?<\/span>[\s\S]*?<span class="section-title">([\s\S]*?)<\/span>[\s\S]*?<div class="section-body">([\s\S]*?)<\/div>\s*<\/div>/gi;
+        const matches = [...trimmed.matchAll(blockRegex)];
+        if (matches.length > 0) {
+            return matches.map(m => {
+                const num = m[1].padStart(2, '0');
+                const title = m[2].trim();
+                const body = m[3].trim();
+                return `<h3>${num} / ${title}</h3><p>${body}</p><p><br></p>`;
+            }).join('');
+        }
+    }
+
+    // Jika format teks "01 / Judul"
+    const sectionRegex = /(?:^|\n)(?:(\d{1,2})\s*\/\s*([^\n<]+))[\r\n]+([\s\S]*?)(?=(?:\n\d{1,2}\s*\/)|$)/g;
+    const matches = [...trimmed.matchAll(sectionRegex)];
+    if (matches.length > 0) {
+        return matches.map((m, idx) => {
+            const num = String(m[1] || (idx + 1)).padStart(2, '0');
+            const judul = m[2].trim().toUpperCase();
+            const isi = m[3].trim().replace(/\n/g, '<br>');
+            return `<h3>${num} / ${judul}</h3><p>${isi}</p><p><br></p>`;
+        }).join('');
+    }
+
+    // Jika pembahasan biasa (string legacy atau paragraf biasa)
+    return trimmed;
+}
+
+// 🧱 HELPER: Rekonstruksi output Quill kembali menjadi .pembahasan-section-block terstruktur
+function formatQuillToPembahasanBlocks(quillHtml) {
+    if (!quillHtml || typeof quillHtml !== 'string') return '';
+    const trimmed = quillHtml.trim();
+    if (!trimmed || trimmed === '<p><br></p>') return '';
+
+    // Regex mengenali tag Heading (h1-h6) atau paragraf berpola "01 / JUDUL"
+    const headerRegex = /(?:<h[1-6]>|<p>(?:<strong>)?)\s*(\d{1,2})\s*\/\s*([^<]+?)\s*(?:<\/strong>)?(?:<\/p>|<\/h[1-6]>)/gi;
+    const sections = [];
+    let lastIndex = 0;
+    let currentMatch = null;
+    let match;
+
+    while ((match = headerRegex.exec(trimmed)) !== null) {
+        if (currentMatch) {
+            const bodyHtml = trimmed.substring(lastIndex, match.index).trim();
+            sections.push({
+                num: currentMatch[1].padStart(2, '0'),
+                judul: currentMatch[2].trim().toUpperCase(),
+                body: bodyHtml
+            });
+        }
+        currentMatch = match;
+        lastIndex = headerRegex.lastIndex;
+    }
+
+    if (currentMatch) {
+        const bodyHtml = trimmed.substring(lastIndex).trim();
+        sections.push({
+            num: currentMatch[1].padStart(2, '0'),
+            judul: currentMatch[2].trim().toUpperCase(),
+            body: bodyHtml
+        });
+    }
+
+    if (sections.length > 0) {
+        return sections.map(sec => {
+            let cleanBody = sec.body
+                .replace(/(?:<p><br\/?><\/p>\s*)+$/gi, '')
+                .replace(/^(?:<p><br\/?><\/p>\s*)+/gi, '')
+                .trim();
+            if (!cleanBody) cleanBody = '<p>-</p>';
+            return `<div class="pembahasan-section-block"><div class="section-header"><span class="section-num">${sec.num} /</span><span class="section-title">${sec.judul}</span></div><div class="section-body">${cleanBody}</div></div>`;
+        }).join('\n');
+    }
+
+    // Fallback: Jika tidak terdeteksi pembagian section, simpan HTML apa adanya
+    return trimmed;
+}
+
 // 🚀 PARSER UTAMA UNTUK FILE JSON
 function parseJsonQuestions(jsonData, katId, matId) {
     let items = [];
@@ -1401,9 +1498,10 @@ function setupEditModal() {
     if (document.getElementById('quillPembahasan') && !quillPembahasan) {
         quillPembahasan = new Quill('#quillPembahasan', {
             theme: 'snow',
-            placeholder: 'Ketik pembahasan di sini...',
+            placeholder: 'Ketik pembahasan di sini (contoh: 01 / ANALISIS SOAL)...',
             modules: {
                 toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
                     ['bold', 'italic', 'underline'],
                     [{ 'list': 'ordered'}, { 'list': 'bullet' }],
                     ['link', 'image'],
@@ -1463,10 +1561,20 @@ function setupEditModal() {
         const rawPertanyaanHTML = quillPertanyaan ? quillPertanyaan.root.innerHTML : document.getElementById('editPertanyaan').value;
         const rawPembahasanHTML = quillPembahasan ? quillPembahasan.root.innerHTML : document.getElementById('editPembahasan').value;
         
+        // Teks Bacaan jika ada
+        const editTeksBacaan = document.getElementById('editTeksBacaan') ? document.getElementById('editTeksBacaan').value.trim() : '';
+        let finalPertanyaanHTML = rawPertanyaanHTML;
+        if (editTeksBacaan) {
+            finalPertanyaanHTML = `<div class="teks-bacaan">${formatTextContent(editTeksBacaan)}</div>\n` + rawPertanyaanHTML;
+        }
+
+        // Rekonstruksi pembahasan ke section blocks jika ada format section
+        const finalPembahasanHTML = formatQuillToPembahasanBlocks(rawPembahasanHTML);
+
         const updates = {
             kategori_id: document.getElementById('editKategoriSoal').value,
             materi_id: document.getElementById('editMateriSoal').value,
-            pertanyaan_html: convertGambarShortcode(rawPertanyaanHTML),
+            pertanyaan_html: convertGambarShortcode(finalPertanyaanHTML),
             opsi_a_html: convertGambarShortcode(document.getElementById('editOpsiA').value),
             opsi_b_html: convertGambarShortcode(document.getElementById('editOpsiB').value),
             opsi_c_html: convertGambarShortcode(document.getElementById('editOpsiC').value),
@@ -1475,7 +1583,7 @@ function setupEditModal() {
             kunci_jawaban: kunciJawaban,
             tipe_soal: tipeSoal,
             tingkat_kesulitan: document.getElementById('editTingkatKesulitan') ? document.getElementById('editTingkatKesulitan').value : 'sedang',
-            pembahasan_html: convertGambarShortcode(rawPembahasanHTML)
+            pembahasan_html: convertGambarShortcode(finalPembahasanHTML)
         };
 
         try {
@@ -1502,32 +1610,70 @@ window.editSoal = async (id) => {
     const { data: soal, error } = await window.db.from('bank_soal').select('*').eq('id', id).single();
     if (error || !soal) return showScyraAlert('Gagal memuat data soal.', '⚠️ Error', '⚠️');
 
-    // Isi form dengan data yang ada
+    // 1. Buka Modal terlebih dahulu agar elemen Quill memiliki dimensi (width/height) yang valid di DOM
+    const modal = document.getElementById('editSoalModal');
+    modal.classList.add('active');
+
+    // 2. Isi form dengan data yang ada
     document.getElementById('editSoalId').value = soal.id;
     
-    // 🎨 LOAD KE QUILL EDITORS
-    if (quillPertanyaan) {
-        quillPertanyaan.root.innerHTML = soal.pertanyaan_html || '';
+    // 3. Ekstrak Teks Bacaan jika ada dari pertanyaan_html agar tidak merusak Quill
+    let rawPertanyaan = soal.pertanyaan_html || '';
+    let teksBacaanVal = '';
+
+    const bacaanDivMatch = rawPertanyaan.match(/<div class="teks-bacaan">([\s\S]*?)<\/div>/i);
+    const bacaanTagMatch = rawPertanyaan.match(/\[BACAAN\]([\s\S]*?)\[\/BACAAN\]/i);
+
+    if (bacaanDivMatch) {
+        teksBacaanVal = extractBacaanContent(bacaanDivMatch[1]);
+        rawPertanyaan = rawPertanyaan.replace(bacaanDivMatch[0], '').trim();
+    } else if (bacaanTagMatch) {
+        teksBacaanVal = bacaanTagMatch[1].trim();
+        rawPertanyaan = rawPertanyaan.replace(bacaanTagMatch[0], '').trim();
     }
-    document.getElementById('editPertanyaan').value = soal.pertanyaan_html || '';
+
+    const editBacaanInput = document.getElementById('editTeksBacaan');
+    if (editBacaanInput) {
+        editBacaanInput.value = teksBacaanVal;
+    }
+
+    // 4. LOAD KE QUILL PERTANYAAN secara aman menggunakan API resmi clipboard
+    if (quillPertanyaan) {
+        quillPertanyaan.setText('');
+        if (rawPertanyaan) {
+            quillPertanyaan.clipboard.dangerouslyPasteHTML(0, rawPertanyaan);
+        }
+        quillPertanyaan.root.classList.toggle('ql-blank', !quillPertanyaan.getText().trim());
+    }
+    document.getElementById('editPertanyaan').value = rawPertanyaan;
     
+    // 5. Opsi Jawaban A-E
     document.getElementById('editOpsiA').value = soal.opsi_a_html || '';
     document.getElementById('editOpsiB').value = soal.opsi_b_html || '';
     document.getElementById('editOpsiC').value = soal.opsi_c_html || '';
     document.getElementById('editOpsiD').value = soal.opsi_d_html || '';
     document.getElementById('editOpsiE').value = soal.opsi_e_html || '';
     
+    // 6. LOAD KE QUILL PEMBAHASAN secara terstruktur
+    const rawPembahasanDB = soal.pembahasan_html || soal.pembahasan || '';
+    const pembahasanQuillHTML = preparePembahasanForQuill(rawPembahasanDB);
+
     if (quillPembahasan) {
-        quillPembahasan.root.innerHTML = soal.pembahasan_html || '';
+        quillPembahasan.setText('');
+        if (pembahasanQuillHTML) {
+            quillPembahasan.clipboard.dangerouslyPasteHTML(0, pembahasanQuillHTML);
+        }
+        quillPembahasan.root.classList.toggle('ql-blank', !quillPembahasan.getText().trim());
     }
-    document.getElementById('editPembahasan').value = (soal.pembahasan_html || '').replace(/<\/?p>/g, '');
+    document.getElementById('editPembahasan').value = rawPembahasanDB;
     
+    // 7. Tipe Soal & Tingkat Kesulitan
     document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg';
     if (document.getElementById('editTingkatKesulitan')) {
         document.getElementById('editTingkatKesulitan').value = soal.tingkat_kesulitan || 'sedang';
     }
     
-    // 🚨 Set kunci jawaban berdasarkan tipe soal
+    // 8. Set kunci jawaban berdasarkan tipe soal
     const tipeSoal = soal.tipe_soal || 'pg';
     if (tipeSoal === 'pg') {
         document.getElementById('editKunciPG').value = soal.kunci_jawaban || 'A';
@@ -1550,14 +1696,14 @@ window.editSoal = async (id) => {
     // 🚨 Update tampilan form berdasarkan tipe soal
     updateFormByTipeSoal(tipeSoal);
 
-    // Populate Dropdown Kategori
+    // 9. Populate Dropdown Kategori
     const editKatSelect = document.getElementById('editKategoriSoal');
     editKatSelect.innerHTML = '';
     kategoriList.forEach(k => {
         editKatSelect.innerHTML += `<option value="${k.id}" ${k.id === soal.kategori_id ? 'selected' : ''}>${k.nama_mapel}</option>`;
     });
 
-    // Populate Dropdown Materi berdasarkan Kategori yang terpilih
+    // 10. Populate Dropdown Materi berdasarkan Kategori yang terpilih
     const editMatSelect = document.getElementById('editMateriSoal');
     editMatSelect.innerHTML = '<option value="">⏳ Memuat...</option>';
     editMatSelect.disabled = true;
@@ -1572,9 +1718,6 @@ window.editSoal = async (id) => {
         editMatSelect.innerHTML += `<option value="${m.id}" ${m.id === soal.materi_id ? 'selected' : ''}>${m.judul}</option>`;
     });
     editMatSelect.disabled = false;
-
-    // Buka Modal
-    document.getElementById('editSoalModal').classList.add('active');
 };
 
 // =========================================================

@@ -262,11 +262,17 @@ transition: transform 0.2s, border-color 0.2s, background 0.2s;
 .opsi-soal-btn:hover { border-color: var(--brand-primary); transform: translateX(5px); background: var(--bg-secondary); }
 /* 5. INFOGRAFIS STANDAR (FYI, TRAP, ALGO, BAHAS) */
 .scyra-fyi { background: linear-gradient(135deg, rgba(168, 216, 234, 0.1), rgba(168, 216, 234, 0.25)); border-left: 5px solid #4fc3f7; padding: 1.5rem; border-radius: 0 12px 12px 0; margin: 1.5rem 0; }
-.scyra-fyi strong { color: #0277bd; display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
+.scyra-fyi strong.scyra-alert-title,
+.scyra-fyi > strong:first-child { color: #0277bd; display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
 .scyra-fyi p { margin: 0; color: var(--text-primary); font-size: 1rem; }
+.scyra-fyi p strong,
+.scyra-fyi p b { display: inline; font-weight: 700; color: inherit; }
 .scyra-trap { background: linear-gradient(135deg, rgba(244, 67, 54, 0.05), rgba(244, 67, 54, 0.15)); border-left: 5px solid var(--error); padding: 1.5rem; border-radius: 0 12px 12px 0; margin: 2rem 0; animation: pulseTrap 2s infinite; }
-.scyra-trap strong { color: var(--error); display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
+.scyra-trap strong.scyra-alert-title,
+.scyra-trap > strong:first-child { color: var(--error); display: block; margin-bottom: 0.5rem; font-size: 1.1rem; }
 .scyra-trap p { margin: 0; color: var(--text-primary); font-size: 1rem; }
+.scyra-trap p strong,
+.scyra-trap p b { display: inline; font-weight: 700; color: inherit; }
 @keyframes pulseTrap { 0% { box-shadow: 0 0 0 0 rgba(229, 115, 115, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(229, 115, 115, 0); } 100% { box-shadow: 0 0 0 0 rgba(229, 115, 115, 0); } }
 /* ================= GRAFIS ALGORITMA & TRIK CEPAT ================= */
 .scyra-algo-container {
@@ -529,7 +535,10 @@ box-shadow: 0 0 0 4px var(--bg-primary);
         margin: 1.2rem 0 !important; 
         border-radius: 8px;
     }
-    .scyra-fyi strong, .scyra-trap strong { 
+    .scyra-fyi strong.scyra-alert-title,
+    .scyra-fyi > strong:first-child,
+    .scyra-trap strong.scyra-alert-title,
+    .scyra-trap > strong:first-child { 
         font-size: 0.95rem; 
     }
     .scyra-fyi p, .scyra-trap p { 

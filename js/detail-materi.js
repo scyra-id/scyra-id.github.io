@@ -72,9 +72,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const content = rendered.replace(/^pembahasan[^:]*:?\s*/i, '');
                 result += `<details class="scyra-pembahasan"><summary>💡 Pembahasan</summary><div class="pembahasan-isi">${content || '<p>Pembahasan tersedia.</p>'}</div></details>`;
             } else if (lower.includes('trap alert') || lower.includes('jebakan maut')) {
-                result += `<div class="scyra-trap"><strong>🚨 TRAP ALERT</strong>${rendered}</div>`;
+                result += `<div class="scyra-trap"><strong class="scyra-alert-title">🚨 TRAP ALERT</strong>${rendered}</div>`;
             } else if (lower.includes('fyi:') || lower.includes('for your information')) {
-                result += `<div class="scyra-fyi"><strong>ℹ️ FYI</strong>${rendered}</div>`;
+                result += `<div class="scyra-fyi"><strong class="scyra-alert-title">ℹ️ FYI</strong>${rendered}</div>`;
             } else if (tag.match(/^H[1-6]$/)) {
                 result += `<${tag.toLowerCase()}>${rendered}</${tag.toLowerCase()}>`;
             } else if (tag === 'IMG') {
@@ -96,6 +96,53 @@ document.addEventListener('DOMContentLoaded', async () => {
     // 🚨 HYBRID 3-LAYER PATTERN DETECTION SYSTEM
     // =======================================================
     
+    /**
+     * Helper untuk menghapus prefix teks/keyword dari awal HTML tanpa merusak struktur tag (seperti <strong>, <b>, dll.)
+     */
+    const stripLeadingPrefixFromHtml = (innerHtml, prefixRegex) => {
+        if (!innerHtml) return '';
+        const temp = document.createElement('div');
+        temp.innerHTML = innerHtml;
+        
+        const walker = document.createTreeWalker(temp, NodeFilter.SHOW_TEXT, null, false);
+        let currentNode = walker.nextNode();
+        let accumulatedText = '';
+        const visitedNodes = [];
+        let match = null;
+        
+        while (currentNode) {
+            accumulatedText += currentNode.nodeValue;
+            visitedNodes.push(currentNode);
+            match = accumulatedText.match(prefixRegex);
+            if (match) {
+                break;
+            }
+            currentNode = walker.nextNode();
+        }
+        
+        if (match) {
+            const matchedLength = match[0].length;
+            let consumed = 0;
+            for (const node of visitedNodes) {
+                const len = node.nodeValue.length;
+                if (consumed + len <= matchedLength) {
+                    node.nodeValue = '';
+                    consumed += len;
+                } else {
+                    const sliceIndex = matchedLength - consumed;
+                    node.nodeValue = node.nodeValue.slice(sliceIndex);
+                    consumed = matchedLength;
+                    break;
+                }
+            }
+        }
+        
+        // Bersihkan tag pembungkus inline yang menjadi kosong (seperti <strong></strong>) akibat prefix terhapus
+        return temp.innerHTML
+            .replace(/<(strong|b|span|i|em)[^>]*>\s*<\/\1>/gi, '')
+            .trim();
+    };
+
     /**
      * Layer 1: Escape Syntax - Backslash prefix disables pattern detection
      * Layer 2: Explicit Tags - Force trigger with [TAG]
@@ -120,7 +167,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (patternConfig.tag) {
             const tagRegex = new RegExp(`\\[${patternConfig.tag}\\]`, 'i');
             if (tagRegex.test(inner)) {
-                const cleanInner = inner.replace(tagRegex, '').trim();
+                const prefixRegex = new RegExp(`^\\s*(?:[•\\-\\*]\\s*)?\\[${patternConfig.tag}\\]\\s*`, 'i');
+                let cleanInner = stripLeadingPrefixFromHtml(inner, prefixRegex);
+                if (cleanInner === inner) {
+                    cleanInner = inner.replace(tagRegex, '').trim();
+                }
                 return { 
                     detected: true, 
                     isTagged: true, 
@@ -136,13 +187,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             // Build stricter regex: must be at start + followed by colon/dash
             const regex = new RegExp(`^\\s*(?:[•\\-\\*]\\s*)?${keyword}\\s*[:\\-]`, 'i');
             if (regex.test(lower)) {
-                // Extract content after keyword and separator
-                const contentRegex = new RegExp(`^.*?${keyword}\\s*[:\\-]?\\s*`, 'i');
-                const cleanInner = inner
-                    .replace(contentRegex, '')
-                    .replace(/^[•\-\*]\s*/, '')
-                    .replace(/<\/?(p|div|strong|b|span)[^>]*>/gi, '')
-                    .trim();
+                // Extract content after keyword and separator while preserving rich text (bold, etc.)
+                const prefixRegex = new RegExp(`^\\s*(?:[•\\-\\*]\\s*)?${keyword}\\s*[:\\-]\\s*`, 'i');
+                const cleanInner = stripLeadingPrefixFromHtml(inner, prefixRegex);
                 return { 
                     detected: true, 
                     isAuto: true, 
@@ -244,13 +291,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         const closeActiveBlock = () => {
             if (activeBlock === 'trap') {
-                let html = `<div class="scyra-trap"><strong>🚨 TRAP ALERT</strong>${blockHtml}</div>`;
+                let html = `<div class="scyra-trap"><strong class="scyra-alert-title">🚨 TRAP ALERT</strong>${blockHtml}</div>`;
                 if (inSplit) { 
                     if (currentSection === 'algo') splitAlgo += html; 
                     else splitCore += html; 
                 } else finalHtml += html;
             } else if (activeBlock === 'fyi') {
-                let html = `<div class="scyra-fyi"><strong>ℹ️ FYI</strong>${blockHtml}</div>`;
+                let html = `<div class="scyra-fyi"><strong class="scyra-alert-title">ℹ️ FYI</strong>${blockHtml}</div>`;
                 if (inSplit) { 
                     if (currentSection === 'algo') splitAlgo += html; 
                     else splitCore += html; 

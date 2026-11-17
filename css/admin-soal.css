@@ -644,6 +644,20 @@ body.dark-mode .tipe-badge.pgk { background: rgba(0, 150, 136, 0.2); color: #80c
     background: var(--bg-primary);
 }
 
+.ql-editor h1, .ql-editor h2, .ql-editor h3 {
+    color: var(--brand-primary);
+    font-weight: 700;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.ql-editor h3 {
+    font-size: 1.05rem;
+    padding-bottom: 0.35rem;
+    border-bottom: 1.5px solid var(--border-color);
+    letter-spacing: 0.5px;
+}
+
 body.dark-mode .ql-toolbar.ql-snow {
     background: var(--bg-primary);
 }
