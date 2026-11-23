@@ -64,6 +64,9 @@
 
                     <!-- TAB 1: JOURNEY MAP (Levels 1–50 Vertical Line) -->
                     <div class="tab-pane active" id="tab-map">
+                        <!-- Teaser Banner Container (Diletakkan di luar map-wrapper agar TIDAK tertembus garis tengah) -->
+                        <div id="journeyTeaserBannerContainer" style="max-width: 750px; margin: 0 auto 1.5rem; display: none;"></div>
+
                         <div class="journey-map-wrapper">
                             <!-- Spine vertical line -->
                             <div class="journey-spine-line">
@@ -118,6 +121,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-config.js"></script>
     <script src="js/gamification-engine.js"></script>
     <script src="js/credit.js"></script>
     <script src="js/main.js"></script>

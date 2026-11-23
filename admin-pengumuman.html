@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengumuman - Scyra</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-pengumuman.css">
+    <link rel="icon" href="images/logo.svg" type="image/svg+xml">
+</head>
+<body class="dashboard-page">
+    <div class="dashboard-layout">
+        <div id="sidebar-placeholder"></div>
+        <main class="main-content">
+            <div id="topbar-placeholder"></div>
+            <div class="sidebar-overlay" id="sidebar-overlay"></div>
+            <section class="dashboard-body">
+                <main class="announcement-admin-container">
+                    <div id="announcementAdminLoading" class="loading-state"><div class="spinner"></div><p>Memverifikasi akses administrator...</p></div>
+                    <div id="announcementAdminContent" hidden>
+                        <div class="announcement-admin-heading">
+                            <div><h1>📣 Pengumuman Pengguna</h1><p>Buat pengumuman untuk seluruh pengguna Scyra.</p></div>
+                            <a href="admin.html" class="announcement-back">← Dashboard Admin</a>
+                        </div>
+                        <section class="announcement-admin-card">
+                            <h2 id="announcementFormTitle">Buat Pengumuman</h2>
+                            <form id="announcementForm">
+                                <input type="hidden" id="announcementId">
+                                <div class="announcement-form-grid">
+                                    <label>Judul<input id="announcementTitle" maxlength="160" required placeholder="Contoh: Jadwal Tryout Mingguan Diperbarui"></label>
+                                    <label>Tautan tujuan <small>(opsional, URL internal)</small><input id="announcementLink" maxlength="500" placeholder="Contoh: tryout.html"></label>
+                                    <label>Berakhir pada <small>(opsional)</small><input id="announcementExpires" type="datetime-local"></label>
+                                </div>
+                                <label>Isi pengumuman<textarea id="announcementContent" maxlength="5000" required rows="6" placeholder="Tulis informasi yang ingin disampaikan kepada seluruh pengguna."></textarea></label>
+                                <div class="announcement-form-actions">
+                                    <button type="button" id="announcementReset" class="announcement-btn secondary">Batal / Kosongkan</button>
+                                    <button type="submit" name="action" value="draft" class="announcement-btn secondary">Simpan Draft</button>
+                                    <button type="submit" name="action" value="published" class="announcement-btn primary">📣 Terbitkan ke Semua User</button>
+                                </div>
+                            </form>
+                        </section>
+                        <section class="announcement-admin-card">
+                            <div class="announcement-list-heading"><h2>Riwayat Pengumuman</h2><button id="refreshAnnouncements" class="announcement-btn secondary">Muat ulang</button></div>
+                            <div id="announcementListAdmin" class="announcement-admin-list"><p class="announcement-list-empty">Memuat pengumuman...</p></div>
+                        </section>
+                    </div>
+                </main>
+            </section>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-client.js"></script>
+    <script src="js/supabase-client2.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/session.js"></script>
+    <script src="js/dashboard-layout.js"></script>
+    <script src="js/admin-pengumuman.js"></script>
+</body>
+</html>

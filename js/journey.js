@@ -141,6 +141,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function renderHeaderStats() {
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
+        if (!isEnabled) {
+            if (el.levelText) el.levelText.textContent = 'Season 1';
+            if (el.xpProgressText) el.xpProgressText.textContent = 'Segera Hadir ⏳';
+            if (el.streakText) el.streakText.textContent = `${journeyData?.daily_streak || 1} Hari 🔥`;
+            if (el.totalXpText) el.totalXpText.textContent = 'Freeze 🔒';
+            if (el.spineFill) el.spineFill.style.height = '0%';
+            return;
+        }
+
         const level = journeyData?.current_level || 1;
         const levelXp = journeyData?.level_xp || 0;
         const xpReq = window.ScyraGamificationEngine
@@ -163,7 +174,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!el.nodesContainer) return;
         el.nodesContainer.innerHTML = '';
 
-        const currentLevel = journeyData?.current_level || 1;
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
+        // Render Teaser Banner di luar map wrapper agar garis spine tengah TIDAK menembus banner
+        const teaserContainer = document.getElementById('journeyTeaserBannerContainer');
+        if (teaserContainer) {
+            if (!isEnabled) {
+                teaserContainer.style.display = 'block';
+                teaserContainer.innerHTML = `
+                    <div style="background: linear-gradient(135deg, rgba(135,168,120,0.12), rgba(245,158,11,0.08)); border: 1px solid var(--border-color); border-radius: 16px; padding: 1.6rem 1.4rem; text-align: center; width: 100%; box-sizing: border-box; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                        <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; background: var(--brand-accent); color: white; padding: 0.35rem 0.85rem; border-radius: 999px; margin-bottom: 0.6rem; letter-spacing: 0.3px;">🚀 SEASON 1: PATH OF LIGHT · SEGERA HADIR</span>
+                        <h3 style="color: var(--text-primary); margin: 0 0 0.5rem; font-size: 1.35rem; font-weight: 800;">Peta Perjalanan Belajar 50 Level</h3>
+                        <p style="color: var(--text-secondary); max-width: 580px; margin: 0 auto; font-size: 0.92rem; line-height: 1.55;">
+                            50 Level petualangan dan hadiah eksklusif Kyra sedang disiapkan. Mulai dari sekarang, pertahankan <strong>Daily Streak</strong> belajarmu agar langsung siap melesat saat Season 1 resmi dibuka!
+                        </p>
+                    </div>
+                `;
+            } else {
+                teaserContainer.style.display = 'none';
+                teaserContainer.innerHTML = '';
+            }
+        }
+
+        const currentLevel = isEnabled ? (journeyData?.current_level || 1) : 1;
 
         // Render levels 1 to 50
         for (let lvl = 1; lvl <= 50; lvl++) {
@@ -248,8 +281,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function handleNodeClick(level, rewardItem, userInventoryItem, status) {
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
         if (!rewardItem) {
             openGenericLevelModal(level, status);
+            return;
+        }
+
+        if (!isEnabled) {
+            openRewardPreviewModal(level, rewardItem, 'locked');
+            if (el.modalSubtitle) {
+                el.modalSubtitle.textContent = `Hadiah ini akan dapat kamu raih di Level ${level} saat Season 1 resmi dirilis.`;
+            }
+            if (el.modalActionClaim) el.modalActionClaim.style.display = 'none';
+            if (el.modalActionEquip) el.modalActionEquip.style.display = 'none';
             return;
         }
 

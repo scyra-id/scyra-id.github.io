@@ -78,7 +78,17 @@ async function loadProfileData(user) {
 
 async function loadFeaturedBadges(user) {
     const container = document.getElementById('profileFeaturedBadges');
-    if (!container || !window.ScyraAchievementEngine) return;
+    if (!container) return;
+
+    const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+    if (!isEnabled) {
+        container.innerHTML = [1, 2, 3].map(slot => {
+            return `<a href="achievements.html" class="profile-badge-slot" title="Featured badge segera hadir di Season 1"><span>+</span><span class="profile-badge-label">Soon</span></a>`;
+        }).join('');
+        return;
+    }
+
+    if (!window.ScyraAchievementEngine) return;
 
     try {
         if (window.syncAuthToPaymentDB) await window.syncAuthToPaymentDB();
@@ -110,7 +120,25 @@ async function loadFeaturedBadges(user) {
 async function loadProfileGamificationIdentity(user) {
     const levelEl = document.getElementById('profilePublicLevel');
     const streakEl = document.getElementById('profilePublicStreak');
+    const studioLink = document.querySelector('.profile-kyra-edit-link');
     if (!window.ScyraGamification) return;
+
+    const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
+    if (!isEnabled) {
+        if (studioLink) {
+            studioLink.textContent = 'Studio Kyra (Soon) ↗';
+            studioLink.title = 'Studio Kyra akan dibuka di Season 1';
+        }
+        if (levelEl) levelEl.textContent = 'Season 1';
+        try {
+            const journey = await window.ScyraGamification.getUserJourneyProgress();
+            if (streakEl && journey) {
+                streakEl.textContent = `🔥 ${journey.daily_streak || 1} Hari Streak`;
+            }
+        } catch (_) {}
+        return;
+    }
 
     const profileLayers = {
         EFFECT: document.getElementById('profileLayerEffect'),

@@ -183,7 +183,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderAchievementWidget(userId) {
         const countNode = el.achievementCount();
-        if (!countNode || !window.ScyraAchievementEngine) return;
+        if (!countNode) return;
+
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+        if (!isEnabled) {
+            countNode.textContent = 'Soon';
+            const widgetEl = countNode.closest('.hud-achievement-widget');
+            if (widgetEl) widgetEl.title = 'Trofi & Medali Pencapaian (Segera Hadir di Season 1)';
+            return;
+        }
+
+        if (!window.ScyraAchievementEngine) return;
 
         try {
             const summary = await window.ScyraAchievementEngine.getFullAchievementSummary(userId);
@@ -194,6 +204,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function renderHeroMascot(userId) {
+        const customizeBtn = document.querySelector('.btn-kyra-customize');
+        const bubble = document.getElementById('kyraSpeechBubble');
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
+        if (!isEnabled) {
+            if (customizeBtn) {
+                customizeBtn.innerHTML = '🎨 Studio Kyra <span style="font-size: 0.72rem; padding: 2px 7px; background: rgba(245, 158, 11, 0.2); color: #f59e0b; border-radius: 999px; margin-left: 4px; font-weight: 700;">SOON</span> <span aria-hidden="true">›</span>';
+                customizeBtn.title = 'Studio Kustomisasi Kyra (Segera Hadir di Season 1)';
+            }
+            if (bubble) {
+                bubble.textContent = '"Hai, Pejuang PTN! Kyra siap menemanimu menembus kampus impian ✨"';
+            }
+            // Kosongkan overlay layer agar maskot dasar tampil bersih tanpa aset broken
+            ['effect', 'outfit', 'back', 'expression', 'face', 'antenna', 'head'].forEach(slot => {
+                const layerEl = document.getElementById(`layer-${slot}`);
+                if (layerEl) layerEl.innerHTML = '';
+            });
+            return;
+        }
+
+        if (customizeBtn) {
+            customizeBtn.innerHTML = '🎨 Masuk Studio Kyra <span aria-hidden="true">›</span>';
+            customizeBtn.title = 'Masuk ke studio untuk mengubah tampilan Kyra';
+        }
+
         if (!window.ScyraGamification) return;
         
         const canvas = document.getElementById('kyraAvatarCanvas');
@@ -248,13 +283,33 @@ document.addEventListener('DOMContentLoaded', () => {
         const textNode = el.xpText();
         const badgeNode = el.unclaimedBadge();
 
+        const isEnabled = gState.gamificationEnabled ?? (window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false);
+
+        if (!isEnabled) {
+            if (levelNode) levelNode.textContent = 'Season 1';
+            if (fillNode) {
+                fillNode.style.width = '100%';
+                fillNode.style.opacity = '0.35';
+                fillNode.style.background = 'var(--brand-accent)';
+            }
+            if (textNode) textNode.textContent = 'Path of Light ⏳';
+            if (badgeNode) badgeNode.style.display = 'none';
+            const journeyWidget = document.getElementById('xpJourneyWidget');
+            if (journeyWidget) journeyWidget.title = 'Peta Perjalanan Belajar (Segera Hadir di Season 1)';
+            return;
+        }
+
         const currentLevel = gState.currentLevel || 1;
         const levelXp = gState.levelXp || 0;
         const xpReq = gState.xpRequired || 100;
         const pct = xpReq > 0 ? Math.min(100, Math.round((levelXp / xpReq) * 100)) : 100;
 
         if (levelNode) levelNode.textContent = `LEVEL ${currentLevel}`;
-        if (fillNode) fillNode.style.width = `${pct}%`;
+        if (fillNode) {
+            fillNode.style.width = `${pct}%`;
+            fillNode.style.opacity = '1';
+            fillNode.style.background = '#4ADE80';
+        }
         if (textNode) {
             if (currentLevel >= 50) {
                 textNode.textContent = `MAX LEVEL (Level 50)`;
@@ -278,6 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const dotNode = el.streakDot();
         if (!btn || !window.ScyraGamification) return;
 
+        const isEnabled = window.ScyraGamificationConfig ? window.ScyraGamificationConfig.isEnabledSync() : false;
+
         const todayKey = `daily_login_${new Date().toISOString().slice(0, 10)}`;
         let claimedToday = false;
         try {
@@ -289,17 +346,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (claimedToday) {
             btn.disabled = true;
             if (statusNode) {
-                statusNode.textContent = '✓ Login Diklaim';
+                statusNode.textContent = isEnabled ? '✓ Login Diklaim' : '✓ Hadir Hari Ini';
                 statusNode.classList.add('claimed');
             }
             if (dotNode) dotNode.classList.add('claimed');
+            btn.title = 'Kamu sudah melakukan absen hari ini.';
         } else {
             btn.disabled = false;
             if (statusNode) {
-                statusNode.textContent = 'Klaim XP';
+                statusNode.textContent = isEnabled ? 'Klaim XP' : 'Absen Harian';
                 statusNode.classList.remove('claimed');
             }
             if (dotNode) dotNode.classList.remove('claimed');
+            btn.title = isEnabled ? 'Klaim XP Login Harian' : 'Absen harian untuk mempertahankan streak belajarmu!';
         }
 
         btn.onclick = async () => {
@@ -308,7 +367,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await window.ScyraGamificationEngine.triggerDailyLogin(userId);
             if (result.success) {
                 if (statusNode) {
-                    statusNode.textContent = '✓ Login Diklaim';
+                    statusNode.textContent = isEnabled ? '✓ Login Diklaim' : '✓ Hadir Hari Ini';
                     statusNode.classList.add('claimed');
                 }
                 if (dotNode) dotNode.classList.add('claimed');
@@ -317,10 +376,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (stLabel && updatedState.dailyStreak) {
                     stLabel.textContent = `${updatedState.dailyStreak} HARI Streak`;
                 }
+
+                if (!isEnabled && typeof showScyraAlert === 'function') {
+                    await showScyraAlert(
+                        `Streak kamu bertambah menjadi <strong>${updatedState.dailyStreak} Hari</strong>! Konsistensi belajarmu luar biasa 🔥`,
+                        'Absen Hari Ini Berhasil! 🔥',
+                        '🎉'
+                    );
+                }
             } else {
                 btn.disabled = false;
                 if (statusNode) {
-                    statusNode.textContent = 'Klaim XP';
+                    statusNode.textContent = isEnabled ? 'Klaim XP' : 'Absen Harian';
                     statusNode.classList.remove('claimed');
                 }
                 if (dotNode) dotNode.classList.remove('claimed');

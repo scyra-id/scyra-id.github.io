@@ -223,6 +223,13 @@
     box-shadow: 0 0 0 4px rgba(135, 168, 120, 0.15);
 }
 
+.ptn-search-hint {
+    margin: 0.45rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.4;
+}
+
 .ptn-search-icon {
     position: absolute;
     left: 1rem;

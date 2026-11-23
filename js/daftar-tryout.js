@@ -23,7 +23,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         4: false
     };
 
-    let cachedPtns = [];
+    // Indeks pencarian dimuat sekali di frontend agar nama prodi dan PTN
+    // dapat dicari bersamaan, tanpa bergantung pada urutan kata yang diketik.
+    let cachedProdis = [];
+    let prodiSearchIndexPromise = null;
     let searchDebounceTimers = {};
 
     // 1. Inisialisasi Auth & Koneksi DB
@@ -130,8 +133,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
 
-            // Preload 145 data PTN untuk search cepat
-            loadPtns();
+            // Preload indeks prodi untuk pencarian realtime di frontend.
+            // Tidak perlu ditunggu di sini; performSearch akan menunggunya bila perlu.
+            prodiSearchIndexPromise = loadProdiSearchIndex();
 
             // Setup Event Listeners untuk slot search inputs
             setupSearchInputs();
@@ -146,18 +150,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // 2. Preload PTN
-    async function loadPtns() {
+    // 2. Preload indeks prodi untuk pencarian frontend
+    async function loadProdiSearchIndex() {
+        const pageSize = 1000;
+        let from = 0;
+        let hasMore = true;
+        const allProdis = [];
+
         try {
-            const { data, error } = await window.db
-                .from('ptn')
-                .select('id, nama_ptn, kode_ptn, jenis_ptn')
-                .order('nama_ptn');
-            if (!error && data) {
-                cachedPtns = data;
+            while (hasMore) {
+                const { data, error } = await window.db
+                    .from('prodi')
+                    .select(`
+                        id, nama_prodi, jenjang, rumpun, kode_prodi,
+                        ptn ( id, nama_ptn, kode_ptn ),
+                        prodi_daya_tampung ( tahun, daya_tampung, peminat ),
+                        prodi_estimasi_skor ( estimasi_skor_min, estimasi_skor_aman )
+                    `)
+                    .eq('aktif', true)
+                    .order('id')
+                    .range(from, from + pageSize - 1);
+
+                if (error) throw error;
+
+                const batch = data || [];
+                allProdis.push(...batch);
+                hasMore = batch.length === pageSize;
+                from += pageSize;
             }
-        } catch (e) {
-            console.warn('Gagal preload PTN:', e);
+
+            cachedProdis = allProdis.map(prodi => ({
+                ...prodi,
+                // Token gabungan memungkinkan: "Teknik Informatika ITS"
+                // dan "ITS Teknik Informatika" menemukan hasil yang sama.
+                searchTokens: tokenizeSearchText(`${prodi.nama_prodi || ''} ${prodi.ptn?.nama_ptn || ''}`)
+            }));
+        } catch (error) {
+            console.warn('Gagal memuat indeks pencarian prodi:', error);
+            throw error;
         }
     }
 
@@ -168,6 +198,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             const dropdown = document.getElementById(`dropdown-${slot}`);
 
             if (!input || !dropdown) return;
+            // setupSearchInputs dipanggil kembali saat slot ditampilkan/direset.
+            // Jangan memasang listener berulang pada input yang sama.
+            if (input.dataset.searchListenerBound === 'true') return;
+            input.dataset.searchListenerBound = 'true';
 
             input.addEventListener('input', () => {
                 const query = input.value.trim();
@@ -209,41 +243,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!dropdown) return;
 
         try {
-            // Cek apakah query mencocokkan nama/kode PTN
-            const qLower = query.toLowerCase();
-            const matchedPtns = cachedPtns.filter(ptn => 
-                ptn.nama_ptn.toLowerCase().includes(qLower) || 
-                (ptn.kode_ptn && ptn.kode_ptn.toLowerCase().includes(qLower))
-            );
-            const matchedPtnIds = matchedPtns.map(p => p.id);
-
-            // Bangun query Supabase
-            let dbQuery = window.db
-                .from('prodi')
-                .select(`
-                    id, nama_prodi, jenjang, rumpun, kode_prodi,
-                    ptn ( id, nama_ptn, kode_ptn ),
-                    prodi_daya_tampung ( tahun, daya_tampung, peminat ),
-                    prodi_estimasi_skor ( estimasi_skor_min, estimasi_skor_aman )
-                `)
-                .eq('aktif', true);
-
-            if (matchedPtnIds.length > 0 && matchedPtnIds.length <= 10) {
-                // Jika query cocok dengan nama kampus, tampilkan prodi kampus tersebut atau nama prodi yang cocok
-                dbQuery = dbQuery.or(`nama_prodi.ilike.%${query}%,ptn_id.in.(${matchedPtnIds.join(',')})`);
-            } else {
-                dbQuery = dbQuery.ilike('nama_prodi', `%${query}%`);
+            if (prodiSearchIndexPromise) {
+                await prodiSearchIndexPromise;
             }
 
-            const { data, error } = await dbQuery.limit(20);
+            // Abaikan hasil pencarian yang sudah tidak sesuai dengan input terbaru.
+            const input = document.getElementById(`search-input-${slot}`);
+            if (!input || input.value.trim() !== query) return;
 
-            if (error) throw error;
+            const queryTokens = tokenizeSearchText(query);
+            if (queryTokens.length === 0) {
+                dropdown.innerHTML = '';
+                dropdown.classList.remove('active');
+                return;
+            }
+
+            const data = cachedProdis
+                .filter(prodi => queryTokens.every(queryToken =>
+                    prodi.searchTokens.some(dataToken => dataToken.startsWith(queryToken))
+                ))
+                .sort((a, b) => getSearchScore(b, queryTokens) - getSearchScore(a, queryTokens))
+                .slice(0, 20);
 
             if (!data || data.length === 0) {
                 dropdown.innerHTML = `
                     <div style="padding: 1.25rem; color: var(--text-secondary); text-align: center;">
                         Tidak ditemukan program studi untuk "<strong>${escapeHtml(query)}</strong>".<br>
-                        <small style="color: var(--text-muted);">Coba ketik kata kunci jurusan (misal: Komputer, Hukum, Akuntansi) atau nama universitas.</small>
+                        <small style="color: var(--text-muted);">Cari dengan nama prodi, PTN, atau keduanya. Pastikan penulisan nama PTN/singkatannya sesuai data.</small>
                     </div>
                 `;
                 return;
@@ -289,6 +315,34 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error('Search error:', err);
             dropdown.innerHTML = `<div style="padding: 1rem; color: var(--error); text-align: center;">Gagal mencari: ${err.message}</div>`;
         }
+    }
+
+    /** Normalisasi agar kapital, tanda baca, dan spasi berlebih tidak memengaruhi pencarian. */
+    function tokenizeSearchText(text) {
+        return String(text || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, ' ')
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+    }
+
+    /**
+     * Urutkan hasil paling relevan terlebih dahulu tanpa mengubah aturan cocoknya:
+     * semua kata query tetap harus ditemukan, dan boleh berada di prodi atau PTN.
+     */
+    function getSearchScore(prodi, queryTokens) {
+        const prodiTokens = tokenizeSearchText(prodi.nama_prodi);
+        const ptnTokens = tokenizeSearchText(prodi.ptn?.nama_ptn);
+
+        return queryTokens.reduce((score, queryToken) => {
+            if (prodiTokens.includes(queryToken) || ptnTokens.includes(queryToken)) return score + 4;
+            if (prodiTokens.some(token => token.startsWith(queryToken))) return score + 2;
+            if (ptnTokens.some(token => token.startsWith(queryToken))) return score + 1;
+            return score;
+        }, 0);
     }
 
     // 5. Pilih Prodi untuk Slot
@@ -359,6 +413,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 <div class="ptn-search-box">
                     <span class="ptn-search-icon">🔍</span>
                     <input type="text" class="ptn-search-input" id="search-input-${slot}" placeholder="Cari prodi atau universitas pilihan ${slot}..." autocomplete="off">
+                    <p class="ptn-search-hint">Cari nama prodi, PTN, atau keduanya. Contoh: Teknik Informatika ITS.</p>
                     <div class="ptn-dropdown-results" id="dropdown-${slot}"></div>
                 </div>
             `;

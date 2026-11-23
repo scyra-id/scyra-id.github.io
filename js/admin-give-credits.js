@@ -317,6 +317,20 @@ async function giveCreditsToUser(db, userId, amount, type, reason) {
         description: `[ADMIN] ${reason}`,
         reference_id: `admin-give-${Date.now()}`
     });
+
+    // Inbox notifikasi berada di database utama agar bisa dibaca dari topbar.
+    // Admin sudah diverifikasi pada saat halaman ini dimuat.
+    const { error: notificationError } = await window.db
+        .from('user_notifications')
+        .insert({
+            user_id: userId,
+            source: 'system',
+            event_type: 'admin_credit',
+            title: 'Kamu menerima credit dari admin',
+            message: `${amount} credit telah ditambahkan ke akunmu. Keterangan: ${reason}`,
+            link_url: 'paketbelajar.html'
+        });
+    if (notificationError) console.warn('Gagal membuat notifikasi credit admin:', notificationError.message);
 }
 
 // =========================================================

@@ -100,6 +100,13 @@
                         </div>
 
                         <div class="admin-card">
+                            <div class="card-icon">📣</div>
+                            <h3>Pengumuman</h3>
+                            <p>Buat pengumuman untuk seluruh pengguna dan atur masa berlakunya.</p>
+                            <a href="admin-pengumuman.html" class="btn-admin" style="display: inline-block; text-decoration: none; text-align: center;">Kelola Pengumuman</a>
+                        </div>
+
+                        <div class="admin-card">
                             <div class="card-icon">👥</div>
                             <h3>Manajemen User</h3>
                             <p>Lihat daftar pengguna yang terdaftar di sistem database SQL.</p>
@@ -117,6 +124,35 @@
                             <div id="resetResult" style="display: none; margin-top: 0.8rem; font-size: 0.9rem; font-weight: 600;"></div>
                         </div>
 
+                        <!-- 🎮 KONTROL FITUR SISTEM GAMIFIKASI -->
+                        <div class="admin-card" id="cardGamificationControl" style="border: 2px solid var(--brand-primary); background: linear-gradient(180deg, var(--bg-secondary) 0%, rgba(135,168,120,0.05) 100%);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+                                <div class="card-icon" style="margin-bottom: 0;">🎮</div>
+                                <span id="gamificationBadgeStatus" style="font-size: 0.75rem; font-weight: 700; padding: 0.35rem 0.75rem; border-radius: 20px; background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">🔴 COMING SOON</span>
+                            </div>
+                            <h3>Sistem Gamifikasi (Scyra Adventure)</h3>
+                            <p style="margin-bottom: 1rem;">Aktifkan fitur XP, Level, Journey, Kyra Studio, dan Trofi secara penuh atau tahan dalam mode Coming Soon.</p>
+
+                            <div style="background: var(--bg-primary); padding: 0.9rem 1.1rem; border-radius: 10px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong style="color: var(--text-primary); display: block; font-size: 0.95rem;" id="gamificationToggleTitle">Status Gamifikasi</strong>
+                                        <span style="font-size: 0.8rem; color: var(--text-secondary);" id="gamificationToggleSubtext">Streak tetap aktif, XP freeze</span>
+                                    </div>
+                                    <label style="display: flex; align-items: center; cursor: pointer; margin: 0;">
+                                        <div style="position: relative; width: 56px; height: 30px;">
+                                            <input type="checkbox" id="gamificationToggle" style="opacity: 0; width: 0; height: 0; position: absolute;">
+                                            <span style="position: absolute; inset: 0; background: var(--border-color); border-radius: 30px; transition: 0.3s;" id="gamificationToggleTrack"></span>
+                                            <span style="position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; background: white; border-radius: 50%; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.2);" id="gamificationToggleThumb"></span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            <div style="font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                                💡 <em>Saat OFF: Seluruh halaman Journey & Studio berstatus Teaser Coming Soon. Daily Streak user tetap aktif berputar tanpa award XP.</em>
+                            </div>
+                        </div>
+
                     </div>
                 </main>
 
@@ -129,6 +165,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="js/supabase-client.js"></script>
     <script src="js/supabase-client2.js"></script>
+    <script src="js/gamification-config.js"></script>
     <script src="js/credit.js"></script>
     <script src="js/main.js"></script>
     <script src="js/session.js"></script>

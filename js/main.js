@@ -148,6 +148,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             document.dispatchEvent(new Event('topbarLoaded'));
             document.dispatchEvent(new Event('headerLoaded')); 
+
+            // Modul notifikasi hanya dimuat pada layout yang memiliki topbar.
+            // Script ini sendiri akan menyembunyikan seluruh UI bagi pengunjung.
+            if (!document.getElementById('notifications-styles')) {
+                const notificationStyles = document.createElement('link');
+                notificationStyles.id = 'notifications-styles';
+                notificationStyles.rel = 'stylesheet';
+                notificationStyles.href = 'css/notifications.css';
+                document.head.appendChild(notificationStyles);
+            }
+            if (!document.getElementById('notifications-script')) {
+                const notificationScript = document.createElement('script');
+                notificationScript.id = 'notifications-script';
+                notificationScript.src = 'js/notifications.js';
+                document.body.appendChild(notificationScript);
+            }
         } catch (e) { console.error('Gagal load topbar:', e); }
     }
 

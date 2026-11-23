@@ -205,6 +205,60 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
+        const isEnabled = window.ScyraGamificationConfig 
+            ? await window.ScyraGamificationConfig.isEnabled() 
+            : false;
+
+        if (!isEnabled) {
+            if (el.count) el.textContent = '⏳ Segera Hadir';
+            if (el.count) el.count.textContent = '⏳ Segera Hadir';
+            
+            // Tampilkan pesan rapi yang membentang penuh di atas 4 kolom grid
+            if (el.slots) {
+                el.slots.innerHTML = `
+                    <div style="grid-column: 1 / -1; width: 100%; box-sizing: border-box; background: rgba(135, 168, 120, 0.08); border: 1px dashed rgba(135, 168, 120, 0.35); border-radius: 12px; padding: 0.75rem 0.9rem; text-align: center; color: var(--text-secondary); font-size: 0.82rem; line-height: 1.45;">
+                        🧵 Lemari kostum & aksesoris Kyra akan dibuka penuh pada <strong>Season 1</strong>
+                    </div>
+                `;
+            }
+
+            // Sembunyikan tombol Simpan & Reset saat mode Coming Soon agar kartu tidak menumpuk ke footer
+            const studioActions = document.querySelector('.studio-actions');
+            if (studioActions) studioActions.style.display = 'none';
+
+            // Nonaktifkan tab & filter item sementara
+            if (el.tabs) {
+                el.tabs.style.opacity = '0.5';
+                el.tabs.style.pointerEvents = 'none';
+            }
+            const filtersEl = document.querySelector('.inventory-filters');
+            if (filtersEl) {
+                filtersEl.style.opacity = '0.5';
+                filtersEl.style.pointerEvents = 'none';
+            }
+
+            if (el.grid) {
+                el.grid.innerHTML = `
+                    <div style="grid-column: 1/-1; background: var(--bg-primary); border: 1.5px dashed var(--border-color); border-radius: 20px; padding: 2.5rem 1.5rem; text-align: center; margin-top: 0.5rem; box-sizing: border-box;">
+                        <div style="font-size: 3.2rem; margin-bottom: 0.75rem;">🧵🎨</div>
+                        <h3 style="color: var(--text-primary); font-size: 1.35rem; margin-bottom: 0.5rem; font-weight: 800;">Studio Kyra Sedang Menyiapkan Lemari Pakaian!</h3>
+                        <p style="color: var(--text-secondary); max-width: 500px; margin: 0 auto 1.4rem; line-height: 1.6; font-size: 0.92rem;">
+                            Nantikan puluhan item aksesoris, ekspresi, pakaian, dan efek visual untuk mendandani Kyra saat <strong>Season 1</strong> resmi dibuka.
+                            Semua hadiah kosmetik ini dapat kamu klaim secara gratis dari perjalanan belajar!
+                        </p>
+                        <div style="display: flex; gap: 0.65rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+                            <span style="background: rgba(135,168,120,0.15); color: var(--brand-primary); font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.82rem;">🧢 Topi & Headwear</span>
+                            <span style="background: rgba(245,158,11,0.15); color: #d97706; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.82rem;">👓 Kacamata & Visor</span>
+                            <span style="background: rgba(59,130,246,0.15); color: #2563eb; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.82rem;">🥋 Jas & Outfit Keren</span>
+                            <span style="background: rgba(168,85,247,0.15); color: #9333ea; font-weight: 600; padding: 0.35rem 0.85rem; border-radius: 999px; font-size: 0.82rem;">✨ Aura & Visual Effect</span>
+                        </div>
+                        <a href="dashboard.html" class="btn-primary-lg" style="display: inline-block; text-decoration: none; font-size: 0.9rem; padding: 0.7rem 1.6rem;">Kembali ke Dashboard</a>
+                    </div>
+                `;
+            }
+            return;
+        }
+
         const api = window.ScyraGamification;
         if (!api) {
             if (el.grid) el.grid.innerHTML = '<div class="inventory-empty"><p>Sistem gamifikasi belum tersedia. Pastikan Edge Function aktif.</p></div>';

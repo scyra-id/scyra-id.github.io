@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // 6. Inisialisasi fitur Reset Tryout
         initResetTryout();
+
+        // 7. Inisialisasi Kontrol Gamifikasi
+        initGamificationControl();
     };
 
     checkAdminAccess();
@@ -124,4 +127,91 @@ function showResetResult(message, type) {
     resetResult.style.color = type === 'success' ? 'var(--success)' : 'var(--error)';
     resetResult.style.display = 'block';
     setTimeout(() => { resetResult.style.display = 'none'; }, 5000);
+}
+
+// ==========================================
+// KONTROL SISTEM GAMIFIKASI (ADMIN)
+// ==========================================
+async function initGamificationControl() {
+    const toggle = document.getElementById('gamificationToggle');
+    if (!toggle) return;
+
+    const track = document.getElementById('gamificationToggleTrack');
+    const thumb = document.getElementById('gamificationToggleThumb');
+    const badge = document.getElementById('gamificationBadgeStatus');
+    const title = document.getElementById('gamificationToggleTitle');
+    const subtext = document.getElementById('gamificationToggleSubtext');
+
+    function updateToggleUI(isActive) {
+        if (isActive) {
+            toggle.checked = true;
+            if (track) track.style.background = 'var(--brand-primary)';
+            if (thumb) thumb.style.transform = 'translateX(26px)';
+            if (badge) {
+                badge.textContent = '🟢 AKTIF PENUH';
+                badge.style.background = 'rgba(74, 222, 128, 0.15)';
+                badge.style.color = '#16a34a';
+                badge.style.borderColor = 'rgba(74, 222, 128, 0.3)';
+            }
+            if (title) title.textContent = 'Gamifikasi Aktif';
+            if (subtext) subtext.textContent = 'XP, Level, Studio & Trofi berjalan penuh';
+        } else {
+            toggle.checked = false;
+            if (track) track.style.background = 'var(--border-color)';
+            if (thumb) thumb.style.transform = 'translateX(3px)';
+            if (badge) {
+                badge.textContent = '🔴 COMING SOON';
+                badge.style.background = 'rgba(239, 68, 68, 0.15)';
+                badge.style.color = '#ef4444';
+                badge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+            }
+            if (title) title.textContent = 'Mode Coming Soon';
+            if (subtext) subtext.textContent = 'Streak tetap aktif, XP & Level freeze';
+        }
+    }
+
+    // 1. Baca status saat ini
+    let currentActive = false;
+    try {
+        if (window.ScyraGamificationConfig) {
+            currentActive = await window.ScyraGamificationConfig.isEnabled(true);
+        }
+    } catch (e) {
+        console.warn('Gagal memuat status gamifikasi:', e);
+    }
+    updateToggleUI(currentActive);
+
+    // 2. Handle interaksi toggle
+    toggle.onchange = async (e) => {
+        const nextState = e.target.checked;
+        toggle.disabled = true;
+
+        try {
+            if (window.ScyraGamificationConfig) {
+                await window.ScyraGamificationConfig.setEnabled(nextState);
+            }
+            currentActive = nextState;
+            updateToggleUI(currentActive);
+
+            if (typeof showScyraAlert === 'function') {
+                await showScyraAlert(
+                    nextState
+                        ? 'Sistem Gamifikasi Berhasil Diaktifkan Penuh! Pengguna kini bisa mendapatkan XP, naik level, dan mengkustomisasi avatar.'
+                        : 'Sistem Gamifikasi Disetel ke Mode Coming Soon. XP dibekukan, namun Daily Streak pengguna tetap aktif berjalan.',
+                    nextState ? '🎮 Gamifikasi Aktif' : '⏳ Mode Coming Soon Aktif',
+                    nextState ? '🚀' : '🔒'
+                );
+            }
+        } catch (err) {
+            console.error('Gagal memperbarui status gamifikasi:', err);
+            updateToggleUI(currentActive);
+            if (typeof showScyraAlert === 'function') {
+                await showScyraAlert('Gagal mengubah pengaturan: ' + (err.message || err), '⚠️ Gagal', '❌');
+            } else {
+                alert('Gagal mengubah pengaturan: ' + (err.message || err));
+            }
+        } finally {
+            toggle.disabled = false;
+        }
+    };
 }

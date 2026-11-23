@@ -58,6 +58,15 @@ document.addEventListener('DOMContentLoaded', async () => {
         const engine = window.ScyraAchievementEngine;
         if (!engine) return;
 
+        const isEnabled = window.ScyraGamificationConfig 
+            ? await window.ScyraGamificationConfig.isEnabled() 
+            : false;
+
+        if (!isEnabled) {
+            renderComingSoonView();
+            return;
+        }
+
         // Sync streak & level achievements from live data
         const api = window.ScyraGamification;
         if (api) {
@@ -155,6 +164,74 @@ document.addEventListener('DOMContentLoaded', async () => {
                 </div>
             `;
         }).join('');
+    }
+
+    function renderComingSoonView() {
+        if (el.overallCount) el.overallCount.textContent = 'Segera Hadir di Season 1';
+        if (el.overallRingText) el.overallRingText.textContent = 'Soon';
+        if (el.overallRingFill) el.overallRingFill.style.strokeDashoffset = CIRCUMFERENCE;
+        if (el.btnEditShowcase) {
+            el.btnEditShowcase.disabled = true;
+            el.btnEditShowcase.style.opacity = '0.6';
+            el.btnEditShowcase.style.cursor = 'not-allowed';
+            el.btnEditShowcase.title = 'Fitur ini akan dibuka saat Season 1 resmi dirilis';
+        }
+
+        const engine = window.ScyraAchievementEngine;
+        const categories = engine ? Object.values(engine.CATEGORIES) : [];
+
+        let bannerHtml = `
+            <div style="grid-column: 1/-1; background: linear-gradient(135deg, rgba(135,168,120,0.12), rgba(245,158,11,0.08)); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.5rem; text-align: center; margin-bottom: 1rem;">
+                <span style="display: inline-block; font-size: 0.75rem; font-weight: 700; background: var(--brand-accent); color: white; padding: 0.3rem 0.8rem; border-radius: 999px; margin-bottom: 0.6rem;">🏆 ACHIEVEMENT HALL · SEGERA HADIR</span>
+                <h3 style="color: var(--text-primary); margin: 0 0 0.5rem; font-size: 1.3rem;">Tantangan Prestasi Pejuang PTN</h3>
+                <p style="color: var(--text-secondary); max-width: 580px; margin: 0 auto; font-size: 0.92rem; line-height: 1.5;">
+                    Kumpulkan medali Bronze, Silver, Gold, hingga Diamond untuk setiap kemajuan belajarmu. Tiap kategori Diamond menghadiahkan item kosmetik eksklusif untuk Kyra di Season 1!
+                </p>
+            </div>
+        `;
+
+        let cardsHtml = categories.map(cat => {
+            const tiersHtml = TIER_ORDER.map(t => {
+                const tierDef = cat.tiers[t];
+                return `<span class="tier-badge tier-locked" style="opacity: 0.8;">${tierDef.icon} ${tierDef.label} (${tierDef.target})</span>`;
+            }).join('');
+
+            return `
+                <div class="ach-category-card" style="opacity: 0.95;">
+                    <div class="ach-card-header">
+                        <div class="ach-card-icon">${cat.icon}</div>
+                        <div>
+                            <h3 class="ach-card-title">${cat.name}</h3>
+                            <p class="ach-card-desc">${cat.description}</p>
+                        </div>
+                    </div>
+
+                    <div class="ach-tier-strip">${tiersHtml}</div>
+
+                    <div class="ach-progress-row">
+                        <div class="ach-progress-label">
+                            <span style="color: var(--brand-accent); font-weight: 600;">⏳ Segera Hadir di Season 1</span>
+                            <span>Bronze s.d. Diamond</span>
+                        </div>
+                        <div class="ach-progress-bar">
+                            <div class="ach-progress-fill" style="width: 100%; opacity: 0.2; background: var(--brand-accent);"></div>
+                        </div>
+                    </div>
+
+                    <div class="ach-diamond-preview">
+                        <div class="ach-diamond-icon">💎</div>
+                        <div>
+                            <div class="ach-diamond-name">${cat.diamondItem.name}</div>
+                            <div class="ach-diamond-tag">Hadiah Kosmetik Eksklusif (Slot ${cat.diamondItem.slot})</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (el.categoriesGrid) {
+            el.categoriesGrid.innerHTML = bannerHtml + cardsHtml;
+        }
     }
 
     // -------------------------------------------------------------------------

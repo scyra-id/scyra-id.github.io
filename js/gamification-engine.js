@@ -38,6 +38,7 @@ window.ScyraGamificationEngine = (function() {
         totalXp: 0,
         xpRequired: 100,
         dailyStreak: 1,
+        gamificationEnabled: false,
         equippedMascot: {
             head: null,
             face: null,
@@ -53,6 +54,20 @@ window.ScyraGamificationEngine = (function() {
         levelUpModalData: null,
         listeners: []
     };
+
+    function isGamificationActiveSync() {
+        if (window.ScyraGamificationConfig) {
+            return window.ScyraGamificationConfig.isEnabledSync();
+        }
+        return false;
+    }
+
+    async function isGamificationActive() {
+        if (window.ScyraGamificationConfig) {
+            return await window.ScyraGamificationConfig.isEnabled();
+        }
+        return false;
+    }
 
     function calculateXpRequired(level) {
         if (level >= MAX_LEVEL) return 0;
@@ -141,6 +156,9 @@ window.ScyraGamificationEngine = (function() {
                 api.getUserMascotInventory(userId)
             ]);
 
+            const isEnabled = await isGamificationActive();
+            state.gamificationEnabled = isEnabled;
+
             const level = journey?.current_level || 1;
             const levelXp = journey?.level_xp || 0;
             const totalXp = journey?.total_xp || 0;
@@ -174,6 +192,7 @@ window.ScyraGamificationEngine = (function() {
     }
 
     function openLevelUpModal(data) {
+        if (!isGamificationActiveSync()) return;
         state.isLevelUpModalOpen = true;
         state.levelUpModalData = data;
         notifyListeners();
@@ -240,12 +259,24 @@ window.ScyraGamificationEngine = (function() {
         const api = getApi();
         if (!api) return { success: false, xpAwarded: 0 };
 
-        const todayStr = new Date().toISOString().slice(0, 10);
-        const activityKey = `daily_login_${todayStr}`;
-
         try {
+            // Streak harian selalu diupdate agar habit konsisten user tetap tercatat
             const updatedStreakRow = await api.updateDailyStreak(userId);
             const newStreak = updatedStreakRow?.daily_streak || state.dailyStreak;
+            state.dailyStreak = newStreak;
+
+            const isEnabled = await isGamificationActive();
+            state.gamificationEnabled = isEnabled;
+
+            // Jika masih mode Coming Soon: jangan bagikan XP dan jangan buka level-up modal
+            if (!isEnabled) {
+                notifyListeners();
+                window.dispatchEvent(new CustomEvent('scyra:streakupdated', { detail: { streak: newStreak } }));
+                return { success: true, xpAwarded: 0, streak: newStreak, isComingSoon: true };
+            }
+
+            const todayStr = new Date().toISOString().slice(0, 10);
+            const activityKey = `daily_login_${todayStr}`;
 
             let totalLoginXp = XP_PAYOUTS.DAILY_LOGIN;
             const milestoneBonus = STREAK_MILESTONE_XP[newStreak] || 0;
@@ -285,10 +316,10 @@ window.ScyraGamificationEngine = (function() {
                 }
 
                 window.dispatchEvent(new CustomEvent('scyra:xpgained', { detail: { amount: totalLoginXp, type: 'daily_login' } }));
-                return { success: true, xpAwarded: totalLoginXp };
+                return { success: true, xpAwarded: totalLoginXp, streak: newStreak };
             }
 
-            return { success: false, xpAwarded: 0 };
+            return { success: true, xpAwarded: 0, streak: newStreak };
         } catch (err) {
             console.error('Error in triggerDailyLogin:', err);
             return { success: false, xpAwarded: 0 };
@@ -299,6 +330,11 @@ window.ScyraGamificationEngine = (function() {
      * Trigger 2: Drill Package (+15 XP)
      */
     async function triggerDrillCompletion(drillId, drillTitle = '', userId = null) {
+        const isEnabled = await isGamificationActive();
+        if (!isEnabled) {
+            return { success: true, xpAwarded: 0, isComingSoon: true };
+        }
+
         const api = getApi();
         if (!api) return { success: false, xpAwarded: 0 };
 
@@ -351,6 +387,11 @@ window.ScyraGamificationEngine = (function() {
      * Trigger 3: Subbab Materi & Quiz (+20 XP)
      */
     async function triggerSubbabCompletion(subbabId, subbabTitle = '', userId = null) {
+        const isEnabled = await isGamificationActive();
+        if (!isEnabled) {
+            return { success: true, xpAwarded: 0, isComingSoon: true };
+        }
+
         const api = getApi();
         if (!api) return { success: false, xpAwarded: 0 };
 
@@ -403,6 +444,11 @@ window.ScyraGamificationEngine = (function() {
      * Trigger 4: Tryout Submission (+100 XP)
      */
     async function triggerTryoutSubmission(tryoutId, tryoutTitle = '', isPremium = false, userId = null) {
+        const isEnabled = await isGamificationActive();
+        if (!isEnabled) {
+            return { success: true, xpAwarded: 0, isComingSoon: true };
+        }
+
         const api = getApi();
         if (!api) return { success: false, xpAwarded: 0 };
 
@@ -471,6 +517,8 @@ window.ScyraGamificationEngine = (function() {
         triggerDailyLogin,
         triggerDrillCompletion,
         triggerSubbabCompletion,
-        triggerTryoutSubmission
+        triggerTryoutSubmission,
+        isGamificationActive,
+        isGamificationActiveSync
     };
 })();

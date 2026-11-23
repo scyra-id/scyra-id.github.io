@@ -7,7 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const mapelGrid = document.getElementById('mapelGrid');
     const babList = document.getElementById('babList');
     const btnBack = document.getElementById('btnBackToMapel');
-    const jenjangSelect = document.getElementById('jenjangSelect');
 
     const babTitle = document.getElementById('babTitle');
     const babIconLarge = document.getElementById('babIconLarge');
@@ -51,8 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .order('nomor_bab', { ascending: true }); // Urutkan by nomor_bab
             if (resMateri.data) dbMateri = resMateri.data;
 
-            const jenjangAwal = jenjangSelect ? jenjangSelect.value : 'utbk';
-            renderMapel(jenjangAwal);
+            renderMapel('utbk');
         } catch (error) {
             console.error("Gagal menarik data:", error);
             mapelGrid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color: var(--error);">Gagal terhubung ke database.</div>';
@@ -60,19 +58,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ========================================================
-    // 2. RENDER MAPEL
+    // 2. RENDER MAPEL (FOKUS UTBK / SNBT)
     // ========================================================
-    function renderMapel(jenjangDipilih) {
+    function renderMapel(jenjangDipilih = 'utbk') {
         mapelGrid.innerHTML = '';
         const filterJenjang = (jenjangDipilih || 'utbk').toLowerCase().trim();
 
         const mapelTersaring = dbKategori.filter(k => {
             const jenjangDB = (k.jenjang || '').toLowerCase().trim();
-            return jenjangDB === filterJenjang;
+            return jenjangDB === filterJenjang || (!jenjangDB && filterJenjang === 'utbk');
         });
 
         if (mapelTersaring.length === 0) {
-            mapelGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color: var(--text-secondary);">Materi untuk jenjang ini belum tersedia. 🚧</div>`;
+            mapelGrid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding: 3rem; color: var(--text-secondary);">Materi UTBK belum tersedia. 🚧</div>`;
             return;
         }
 
@@ -100,7 +98,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // ========================================================
     async function bukaDetailBab(mapel) {
         mapelView.style.display = 'none';
-        if(jenjangSelect) jenjangSelect.parentElement.style.display = 'none'; 
         babView.style.display = 'block';
         babTitle.textContent = mapel.nama_mapel;
         babIconLarge.textContent = mapel.icon || '📚';
@@ -391,19 +388,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // ========================================================
-    // 4. EVENT LISTENER (TOMBOL KEMBALI & FILTER)
+    // 4. EVENT LISTENER (TOMBOL KEMBALI)
     // ========================================================
     btnBack.addEventListener('click', () => {
         babView.style.display = 'none';
         mapelView.style.display = 'block';
-        if(jenjangSelect) jenjangSelect.parentElement.style.display = 'block'; 
     });
-
-    if (jenjangSelect) {
-        jenjangSelect.addEventListener('change', (e) => {
-            renderMapel(e.target.value);
-        });
-    }
 
     // ========================================================
     // 5. JALANKAN SAAT KONEKSI DB SIAP & CEK LOGIN (GUARD)

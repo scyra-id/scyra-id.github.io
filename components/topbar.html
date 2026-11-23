@@ -15,10 +15,21 @@
     </div>
     
     <div class="topbar-right">
-        <button class="btn-icon-topbar" id="notifBtn" aria-label="Notifikasi">
-            🔔
-            <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
-        </button>
+        <div class="notification-center" id="notificationCenter" hidden>
+            <button class="btn-icon-topbar" id="notifBtn" aria-label="Notifikasi" aria-expanded="false">
+                🔔
+                <span class="notif-badge" id="notifBadge" style="display:none;">0</span>
+            </button>
+            <div class="notification-dropdown" id="notificationDropdown" aria-label="Daftar notifikasi">
+                <div class="notification-dropdown__header">
+                    <strong>Notifikasi</strong>
+                    <button type="button" id="markAllNotificationsRead" class="notification-mark-all">Tandai semua dibaca</button>
+                </div>
+                <div class="notification-list" id="notificationList">
+                    <p class="notification-empty">Memuat notifikasi...</p>
+                </div>
+            </div>
+        </div>
         
         <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle Dark Mode">
         <span class="icon-sun">☀️</span>

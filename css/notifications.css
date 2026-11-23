@@ -1,0 +1,38 @@
+/* Notification center and homepage announcement highlight */
+.notification-center { position: relative; }
+.notification-center[hidden] { display: none !important; }
+.notification-dropdown {
+    display: none; position: absolute; top: calc(100% + 0.75rem); right: 0;
+    width: min(390px, calc(100vw - 2rem)); max-height: min(560px, calc(100vh - 7rem));
+    overflow: hidden; background: var(--bg-secondary); border: 1px solid var(--border-color);
+    border-radius: 16px; box-shadow: 0 16px 38px rgba(0,0,0,.18); z-index: 1200;
+}
+.notification-dropdown.is-open { display: block; animation: notificationDrop .16s ease-out; }
+@keyframes notificationDrop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+.notification-dropdown__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1rem .8rem; border-bottom: 1px solid var(--border-color); color: var(--text-primary); }
+.notification-mark-all { border: 0; background: transparent; color: var(--brand-primary); font: inherit; font-size: .78rem; font-weight: 700; cursor: pointer; padding: .3rem; }
+.notification-mark-all:hover { text-decoration: underline; }
+.notification-list { max-height: 460px; overflow-y: auto; }
+.notification-empty { padding: 2rem 1rem; margin: 0; text-align: center; color: var(--text-muted); font-size: .9rem; }
+.notification-item { appearance: none; width: 100%; border: 0; border-bottom: 1px solid var(--border-color); background: transparent; color: inherit; text-align: left; padding: .9rem 1rem; display: flex; align-items: flex-start; gap: .75rem; cursor: pointer; }
+.notification-item:last-child { border-bottom: 0; }
+.notification-item:hover { background: var(--bg-tertiary); }
+.notification-item.is-unread { background: rgba(135, 168, 120, .1); }
+.notification-item__icon { width: 32px; height: 32px; flex: 0 0 32px; display: grid; place-items: center; border-radius: 10px; background: var(--bg-tertiary); font-size: 1rem; }
+.notification-item__content { min-width: 0; display: grid; gap: .18rem; }
+.notification-item__content strong { color: var(--text-primary); font-size: .88rem; line-height: 1.3; }
+.notification-item__meta, .notification-item__content time { color: var(--text-muted); font-size: .72rem; }
+.notification-item__meta { color: var(--brand-primary); font-weight: 700; }
+.notification-item__message { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; color: var(--text-secondary); font-size: .8rem; line-height: 1.35; }
+.announcement-highlight { display: flex; align-items: flex-start; gap: 1rem; max-width: 1200px; margin: 0 auto 1.5rem; padding: 1.15rem 1.25rem; border: 1px solid rgba(135, 168, 120, .42); border-radius: 16px; background: linear-gradient(120deg, rgba(135, 168, 120, .15), var(--bg-secondary)); box-shadow: 0 7px 20px var(--shadow-color); }
+.announcement-highlight.is-unread { border-color: var(--brand-primary); }
+.announcement-highlight__icon { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; border-radius: 12px; background: var(--brand-primary); font-size: 1.25rem; }
+.announcement-highlight__content { min-width: 0; flex: 1; }
+.announcement-highlight__eyebrow { display: flex; align-items: center; gap: .5rem; color: var(--brand-primary-dark); font-size: .72rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.announcement-highlight__eyebrow span { padding: .12rem .45rem; border-radius: 999px; background: var(--error); color: #fff; font-size: .65rem; letter-spacing: 0; }
+.announcement-highlight h2 { margin: .25rem 0; color: var(--text-primary); font-size: 1.05rem; }
+.announcement-highlight p { margin: 0 0 .45rem; color: var(--text-secondary); line-height: 1.5; white-space: pre-line; }
+.announcement-highlight time { color: var(--text-muted); font-size: .75rem; }
+.announcement-highlight__action { flex: 0 0 auto; align-self: center; border: 0; background: transparent; color: var(--brand-primary); font: inherit; font-size: .84rem; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.announcement-highlight__action:hover { text-decoration: underline; }
+@media (max-width: 600px) { .notification-dropdown { position: fixed; top: 70px; right: 1rem; } .announcement-highlight { gap: .75rem; padding: 1rem; flex-wrap: wrap; } .announcement-highlight__action { width: 100%; text-align: left; margin-left: 3.75rem; } }
