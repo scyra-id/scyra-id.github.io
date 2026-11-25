@@ -55,6 +55,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="peruntukanSoal">Peruntukan Soal (Default)</label>
+                    <select id="peruntukanSoal" required>
+                        <option value="latihan">📝 Latihan (Soal di luar tryout: Latihan & Drill)</option>
+                        <option value="tryout">🎯 Tryout (Hanya muncul di Tryout, tidak muncul di Latihan)</option>
+                    </select>
+                    <p class="form-hint">💡 Jika objek soal di file JSON sudah memiliki field <code>"peruntukan"</code> (<code>"latihan"</code> / <code>"tryout"</code>), nilai dari JSON akan diprioritaskan.</p>
+                </div>
+
+                <div class="form-group">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; flex-wrap: wrap; gap: 0.5rem;">
                         <label for="jsonSoalFile" style="margin-bottom: 0;">Pilih File JSON Soal (Bisa Banyak Sekaligus)</label>
                         <button type="button" id="btnDownloadTemplate" class="btn-admin" style="padding: 0.35rem 0.8rem; font-size: 0.85rem; background: var(--brand-primary); color: white; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
@@ -139,14 +148,31 @@
                 </div>
             </div>
 
-            <!-- Filter Kategori -->
+            <!-- Filter Kategori & Peruntukan -->
             <div style="display: flex; gap: 0.8rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
-                <select id="filterKategori" class="form-select" style="flex: 1; min-width: 200px;">
+                <select id="filterKategori" class="form-select" style="flex: 1; min-width: 190px;">
                     <option value="">Semua Kategori</option>
                 </select>
-                <select id="filterMateri" class="form-select" style="flex: 1; min-width: 200px;" disabled>
+                <select id="filterMateri" class="form-select" style="flex: 1; min-width: 190px;" disabled>
                     <option value="">Pilih kategori dulu</option>
                 </select>
+                <select id="filterPeruntukan" class="form-select" style="flex: 1; min-width: 170px;">
+                    <option value="">Semua Peruntukan</option>
+                    <option value="latihan">📝 Latihan</option>
+                    <option value="tryout">🎯 Tryout</option>
+                </select>
+            </div>
+
+            <!-- Bulk Action Bar -->
+            <div id="bulkActionBar" class="bulk-action-bar" style="display: none;">
+                <div class="bulk-info">
+                    <strong><span id="bulkSelectedCount">0</span> soal</strong> dipilih
+                </div>
+                <div class="bulk-buttons">
+                    <button type="button" id="btnBulkLatihan" class="btn-bulk btn-bulk-latihan">📝 Jadikan Latihan</button>
+                    <button type="button" id="btnBulkTryout" class="btn-bulk btn-bulk-tryout">🎯 Jadikan Tryout</button>
+                    <button type="button" id="btnBulkClear" class="btn-bulk btn-bulk-clear">✕ Batal</button>
+                </div>
             </div>
 
             <!-- Tabel Daftar Soal -->
@@ -154,10 +180,14 @@
                 <table class="admin-table soal-table">
                     <thead>
                         <tr>
+                            <th style="width: 40px; text-align: center;">
+                                <input type="checkbox" id="selectAllSoal" title="Pilih semua soal yang tampil">
+                            </th>
                             <th style="width: 110px;">UUID</th>
                             <th>Pertanyaan</th>
                             <th style="width: 120px;">Mapel</th>
                             <th style="width: 150px;">Bab</th>
+                            <th style="width: 105px;">Peruntukan</th>
                             <th style="width: 70px;">Tipe</th>
                             <th style="width: 70px;">Kunci</th>
                             <th style="width: 100px;">Aksi</th>
@@ -165,7 +195,7 @@
                     </thead>
                     <tbody id="soalTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <td colspan="9" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
                                 ⏳ Memuat daftar soal...
                             </td>
                         </tr>
@@ -219,6 +249,13 @@
                     <div class="form-group">
                         <label>Bab / Materi</label>
                         <select id="editMateriSoal" required></select>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label for="editPeruntukanSoal">Peruntukan Soal</label>
+                        <select id="editPeruntukanSoal" required>
+                            <option value="latihan">📝 Latihan (Muncul di Latihan Bab & Drill Soal)</option>
+                            <option value="tryout">🎯 Tryout (Hanya muncul di Tryout, tidak muncul di Latihan)</option>
+                        </select>
                     </div>
                 </div>
 
@@ -313,6 +350,6 @@
     <script src="js/session.js"></script>
     <script src="js/dashboard-layout.js"></script>
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-<script src="js/admin-soal.js?v=20261117-quillfix"></script>
+<script src="js/admin-soal.js?v=20261125-peruntukan"></script>
 </body>
 </html>

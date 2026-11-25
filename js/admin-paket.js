@@ -313,16 +313,20 @@ window.aturPoolSoal = async (paketId) => {
 async function openSubtestPool(subtes) {
     if (!subtes) return;
     activePoolSubtes = subtes;
-    selectedPoolQuestionIds = new Set(activePoolSubtes.soal_pool_ids || []);
     const { data: kategori, error: kategoriError } = await window.db.from('kategori')
         .select('id, nama_mapel, slug').or(`slug.eq.${activePoolSubtes.kategori_db},nama_mapel.eq.${activePoolSubtes.nama_subtes}`).maybeSingle();
     if (kategoriError || !kategori) return safeAlert('Kategori untuk subtes ini tidak ditemukan.', '⚠️ Error', '⚠️');
 
     const { data: questions, error: questionError } = await window.db.from('bank_soal')
-        .select('id, pertanyaan_html, tipe_soal').eq('kategori_id', kategori.id).order('created_at', { ascending: false });
+        .select('id, pertanyaan_html, tipe_soal')
+        .eq('kategori_id', kategori.id)
+        .eq('peruntukan', 'tryout')
+        .order('created_at', { ascending: false });
     if (questionError) return safeAlert(`Gagal memuat bank soal: ${questionError.message}`, '⚠️ Error', '⚠️');
 
     activePoolQuestions = questions || [];
+    const validTryoutIds = new Set(activePoolQuestions.map(q => q.id));
+    selectedPoolQuestionIds = new Set((activePoolSubtes.soal_pool_ids || []).filter(id => validTryoutIds.has(id)));
     document.getElementById('poolModalTitle').textContent = `Pool Soal: ${activePoolSubtes.nama_subtes}`;
     document.getElementById('poolModalInfo').textContent = `Pilih minimal ${activePoolSubtes.jml_soal} soal. Setiap peserta menerima ${activePoolSubtes.jml_soal} soal acak dari pool ini.`;
     document.getElementById('poolSubtestChooser').innerHTML = '';

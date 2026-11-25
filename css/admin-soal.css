@@ -348,10 +348,10 @@ body.dark-mode .mapel-badge {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .soal-table th:nth-child(3),
-    .soal-table td:nth-child(3),
     .soal-table th:nth-child(4),
-    .soal-table td:nth-child(4) {
+    .soal-table td:nth-child(4),
+    .soal-table th:nth-child(5),
+    .soal-table td:nth-child(5) {
         display: none;
     }
     
@@ -742,4 +742,105 @@ body.dark-mode .teks-bacaan {
     background: rgba(163, 196, 145, 0.08);
     border-left-color: var(--brand-primary);
     color: var(--text-primary);
+}
+
+/* =====================================================
+   🎯 BADGE PERUNTUKAN (LATIHAN / TRYOUT) & BULK ACTION
+===================================================== */
+.peruntukan-badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.peruntukan-badge.latihan {
+    background: rgba(76, 175, 80, 0.14);
+    color: #2e7d32;
+}
+
+.peruntukan-badge.tryout {
+    background: rgba(233, 30, 99, 0.14);
+    color: #ad1457;
+}
+
+body.dark-mode .peruntukan-badge.latihan {
+    background: rgba(76, 175, 80, 0.22);
+    color: #81c784;
+}
+
+body.dark-mode .peruntukan-badge.tryout {
+    background: rgba(233, 30, 99, 0.22);
+    color: #f48fb1;
+}
+
+.soal-checkbox,
+#selectAllSoal {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--brand-primary);
+    cursor: pointer;
+}
+
+.bulk-action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    background: rgba(135, 168, 120, 0.12);
+    border: 1px solid var(--brand-primary);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.bulk-info {
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.bulk-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.btn-bulk {
+    border: none;
+    border-radius: 8px;
+    padding: 0.45rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.15s, opacity 0.15s;
+}
+
+.btn-bulk:hover:not(:disabled) {
+    transform: translateY(-1px);
+    opacity: 0.92;
+}
+
+.btn-bulk:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.btn-bulk-latihan {
+    background: #2e7d32;
+    color: #ffffff;
+}
+
+.btn-bulk-tryout {
+    background: #c2185b;
+    color: #ffffff;
+}
+
+.btn-bulk-clear {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
 }

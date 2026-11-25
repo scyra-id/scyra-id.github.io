@@ -329,23 +329,32 @@ window.ReferralSystem = (function() {
         const { data: { user } } = await getAuthDb().auth.getUser();
         if (!user) return null;
         
-        // Get referral code
+        if (window.ReferralCreditGateway) {
+            try {
+                const info = await window.ReferralCreditGateway.call('referral.info');
+                if (info) {
+                    return {
+                        totalReferrals: typeof info.totalReferrals === 'number' ? info.totalReferrals : 0,
+                        maxReferrals: info.maxReferrals || MAX_REFERRALS,
+                        referralCode: info.code || null,
+                        hasUsedReferral: Boolean(info.hasUsedReferral),
+                        referrals: info.referrals || []
+                    };
+                }
+            } catch (err) {
+                console.warn('Gateway referral.info error, fallback to code creation:', err.message);
+            }
+        }
+
+        // Fallback: Get referral code
         const referralCode = await getOrCreateReferralCode();
         
-        const db = getDb();
-        
-        // Get referral count
-        const { count, data: referrals } = await db
-            .from('referral_relationships')
-            .select('referred_id, status, created_at', { count: 'exact' })
-            .eq('referrer_id', user.id)
-            .eq('status', 'completed');
-        
         return {
-            totalReferrals: count || 0,
+            totalReferrals: 0,
             maxReferrals: MAX_REFERRALS,
             referralCode: referralCode,
-            referrals: referrals || []
+            hasUsedReferral: false,
+            referrals: []
         };
     }
     

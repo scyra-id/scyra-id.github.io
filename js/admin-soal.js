@@ -9,6 +9,8 @@ let searchTimeout = null;
 let currentSearchTerm = '';
 let currentFilterKategori = '';
 let currentFilterMateri = '';
+let currentFilterPeruntukan = '';
+let selectedSoalIds = new Set();
 
 // 🎨 QUILL EDITOR INSTANCES
 let quillPertanyaan = null;
@@ -35,6 +37,7 @@ async function initPage() {
     setupTemplateDownload();
     setupImageUploader();
     setupDaftarSoal(); 
+    setupBulkActions();
     setupEditModal();
     await loadDaftarSoal(true); 
 }
@@ -86,13 +89,14 @@ function setupTemplateDownload() {
 
     btn.addEventListener('click', async () => {
         try {
-            const res = await fetch('template_soal_utbk.json');
+            const res = await fetch('template_soal_utbk.json', { cache: 'no-store' });
             let jsonText = '';
             if (res.ok) {
                 jsonText = await res.text();
             } else {
                 jsonText = JSON.stringify([
                     {
+                        "peruntukan": "latihan",
                         "tipe": "pg",
                         "pertanyaan": "Sebuah mobil bergerak dengan kecepatan awal $v_0 = 10\\text{ m/s}$ dan percepatan $a = 2\\text{ m/s}^2$.\n\nBerapakah kecepatannya setelah $t = 5\\text{ detik}$?",
                         "opsi": {
@@ -106,6 +110,7 @@ function setupTemplateDownload() {
                         "pembahasan": "Gunakan rumus GLBB:\n$$v_t = v_0 + a \\cdot t = 10 + (2 \\times 5) = 20\\text{ m/s}$$"
                     },
                     {
+                        "peruntukan": "latihan",
                         "tipe": "pgk",
                         "pertanyaan": "Manakah pernyataan yang BENAR mengenai sistem periodik unsur modern? [Pilih lebih dari satu]",
                         "opsi": {
@@ -119,6 +124,7 @@ function setupTemplateDownload() {
                         "pembahasan": "A, B, dan D benar. Golongan IA adalah alkali, bukan halogen."
                     },
                     {
+                        "peruntukan": "tryout",
                         "tipe": "bs",
                         "pertanyaan": "Tentukan kebenaran pernyataan mengenai sistem respirasi berikut!",
                         "pernyataan": [
@@ -130,6 +136,7 @@ function setupTemplateDownload() {
                         "pembahasan": "Pernyataan 1 Benar, Pernyataan 2 Salah, Pernyataan 3 Benar."
                     },
                     {
+                        "peruntukan": "tryout",
                         "tipe": "isian",
                         "pertanyaan": "Ibu kota negara Indonesia yang baru di Kalimantan Timur adalah [ISIAN].",
                         "kunci": "Nusantara",
@@ -166,6 +173,7 @@ function setupForm() {
         const files = fileInput ? fileInput.files : [];
         const katId = document.getElementById('kategoriSoal').value;
         const matId = document.getElementById('materiSoal').value;
+        const defaultPeruntukan = document.getElementById('peruntukanSoal')?.value === 'tryout' ? 'tryout' : 'latihan';
         if (!katId || !matId) { 
             await showScyraAlert('Pilih kategori dan bab materi terlebih dahulu!', '⚠️ Peringatan', '⚠️'); 
             btnScan.disabled = false; 
@@ -184,7 +192,7 @@ function setupForm() {
                 if (file.name.toLowerCase().endsWith('.pdf')) {
                     // Fallback jika ada yang coba upload PDF
                     const text = await extractTextFromPDF(file);
-                    const questions = parseQuestions(text, katId, matId); 
+                    const questions = parseQuestions(text, katId, matId, defaultPeruntukan); 
                     parsedQuestions.push(...questions);
                 } else {
                     // File JSON
@@ -195,7 +203,7 @@ function setupForm() {
                     } catch (parseErr) {
                         throw new Error(`File "${file.name}" bukan format JSON yang valid: ${parseErr.message}`);
                     }
-                    const questions = parseJsonQuestions(json, katId, matId);
+                    const questions = parseJsonQuestions(json, katId, matId, defaultPeruntukan);
                     parsedQuestions.push(...questions);
                 }
             }
@@ -222,6 +230,7 @@ function setupDaftarSoal() {
     const btnClearSearch = document.getElementById('btnClearSearch');
     const filterKategori = document.getElementById('filterKategori');
     const filterMateri = document.getElementById('filterMateri');
+    const filterPeruntukan = document.getElementById('filterPeruntukan');
     const btnLoadMore = document.getElementById('btnLoadMore');
 
     // 1. SEARCH dengan Debounce (tunggu 400ms setelah user berhenti ngetik)
@@ -275,6 +284,14 @@ function setupDaftarSoal() {
         loadDaftarSoal(true);
     });
 
+    // 4b. Filter Peruntukan
+    if (filterPeruntukan) {
+        filterPeruntukan.addEventListener('change', (e) => {
+            currentFilterPeruntukan = e.target.value;
+            loadDaftarSoal(true);
+        });
+    }
+
     // 5. Load More Button
     btnLoadMore.addEventListener('click', () => {
         loadDaftarSoal(false); // Append, jangan reset
@@ -289,7 +306,9 @@ async function loadDaftarSoal(reset = false) {
     if (reset) {
         currentPage = 0;
         soalList = [];
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding: 2rem;">⏳ Memuat...</td></tr>';
+        selectedSoalIds.clear();
+        updateBulkBarUI();
+        tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding: 2rem;">⏳ Memuat...</td></tr>';
     }
 
     btnLoadMore.disabled = true;
@@ -308,6 +327,10 @@ async function loadDaftarSoal(reset = false) {
         // Filter Materi
         if (currentFilterMateri) {
             query = query.eq('materi_id', currentFilterMateri);
+        }
+        // Filter Peruntukan
+        if (currentFilterPeruntukan) {
+            query = query.eq('peruntukan', currentFilterPeruntukan);
         }
 
         // 🔍 SEARCH LOGIC: UUID atau Kalimat
@@ -365,7 +388,7 @@ async function loadDaftarSoal(reset = false) {
         currentPage++;
     } catch (err) {
         console.error('Load Soal Error:', err);
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color: var(--error); padding: 2rem;">❌ ${err.message}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color: var(--error); padding: 2rem;">❌ ${err.message}</td></tr>`;
     }
 }
 
@@ -375,13 +398,15 @@ function renderSoalTable() {
     if (soalList.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                <td colspan="9" style="text-align: center; padding: 3rem; color: var(--text-secondary);">
                     <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
                     <p style="margin: 0; font-size: 1.1rem;">Belum ada soal${currentSearchTerm ? ' yang cocok dengan pencarian' : ''}.</p>
-                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Upload PDF soal lewat form di atas untuk mulai mengisi bank soal.</p>
+                    <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Upload JSON soal lewat form di atas untuk mulai mengisi bank soal.</p>
                 </td>
             </tr>
         `;
+        syncSelectAllCheckbox();
+        updateBulkBarUI();
         return;
     }
 
@@ -443,7 +468,15 @@ function renderSoalTable() {
             kunciDisplay = `<span class="kunci-badge" style="background: #666; color: white; padding: 0.3rem 0.6rem; border-radius: 6px;">${soal.kunci_jawaban || '?'}</span>`;
         }
 
+        const peruntukanVal = soal.peruntukan === 'tryout' ? 'tryout' : 'latihan';
+        const peruntukanBadge = peruntukanVal === 'tryout'
+            ? '<span class="peruntukan-badge tryout">🎯 Tryout</span>'
+            : '<span class="peruntukan-badge latihan">📝 Latihan</span>';
+
         tr.innerHTML = `
+            <td style="text-align: center;">
+                <input type="checkbox" class="soal-checkbox" data-id="${soal.id}" ${selectedSoalIds.has(soal.id) ? 'checked' : ''}>
+            </td>
             <td>
                 <div class="uuid-cell">
                     <code class="uuid-text" title="${soal.id}">${uuidShort}...</code>
@@ -455,6 +488,7 @@ function renderSoalTable() {
             </td>
             <td><span class="mapel-badge">${katName}</span></td>
             <td><span class="bab-text">${matNum}${matName}</span></td>
+            <td style="text-align: center;">${peruntukanBadge}</td>
             <td style="text-align: center;">${tipeBadge}</td>
             <td style="text-align: center;">${kunciDisplay}</td>
             <td>
@@ -466,6 +500,120 @@ function renderSoalTable() {
         `;
         tbody.appendChild(tr);
     });
+
+    // Pasang event listener checkbox tiap baris
+    tbody.querySelectorAll('.soal-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+            const id = e.target.getAttribute('data-id');
+            if (e.target.checked) selectedSoalIds.add(id);
+            else selectedSoalIds.delete(id);
+            syncSelectAllCheckbox();
+            updateBulkBarUI();
+        });
+    });
+
+    syncSelectAllCheckbox();
+    updateBulkBarUI();
+}
+
+function syncSelectAllCheckbox() {
+    const selectAll = document.getElementById('selectAllSoal');
+    if (!selectAll) return;
+    if (soalList.length === 0) {
+        selectAll.checked = false;
+        selectAll.indeterminate = false;
+        return;
+    }
+    const checkedCount = soalList.filter(s => selectedSoalIds.has(s.id)).length;
+    selectAll.checked = checkedCount === soalList.length;
+    selectAll.indeterminate = checkedCount > 0 && checkedCount < soalList.length;
+}
+
+function updateBulkBarUI() {
+    const bar = document.getElementById('bulkActionBar');
+    const countSpan = document.getElementById('bulkSelectedCount');
+    if (!bar || !countSpan) return;
+    const count = selectedSoalIds.size;
+    countSpan.textContent = count;
+    bar.style.display = count > 0 ? 'flex' : 'none';
+}
+
+function setupBulkActions() {
+    const selectAll = document.getElementById('selectAllSoal');
+    const btnBulkLatihan = document.getElementById('btnBulkLatihan');
+    const btnBulkTryout = document.getElementById('btnBulkTryout');
+    const btnBulkClear = document.getElementById('btnBulkClear');
+
+    if (selectAll) {
+        selectAll.addEventListener('change', (e) => {
+            const checked = e.target.checked;
+            soalList.forEach(s => {
+                if (checked) selectedSoalIds.add(s.id);
+                else selectedSoalIds.delete(s.id);
+            });
+            document.querySelectorAll('.soal-checkbox').forEach(cb => {
+                cb.checked = checked;
+            });
+            updateBulkBarUI();
+        });
+    }
+
+    if (btnBulkClear) {
+        btnBulkClear.addEventListener('click', () => {
+            selectedSoalIds.clear();
+            document.querySelectorAll('.soal-checkbox').forEach(cb => cb.checked = false);
+            syncSelectAllCheckbox();
+            updateBulkBarUI();
+        });
+    }
+
+    if (btnBulkLatihan) {
+        btnBulkLatihan.addEventListener('click', () => bulkUpdatePeruntukan('latihan'));
+    }
+
+    if (btnBulkTryout) {
+        btnBulkTryout.addEventListener('click', () => bulkUpdatePeruntukan('tryout'));
+    }
+}
+
+async function bulkUpdatePeruntukan(targetPeruntukan) {
+    const ids = Array.from(selectedSoalIds);
+    if (ids.length === 0) return;
+
+    const labelTarget = targetPeruntukan === 'tryout' ? '🎯 Tryout' : '📝 Latihan';
+    const isConfirmed = await showScyraConfirm(
+        `Ubah peruntukan <strong>${ids.length} soal</strong> terpilih menjadi <strong>${labelTarget}</strong>?`,
+        '🔄 Ubah Peruntukan Massal',
+        '🔄'
+    );
+    if (!isConfirmed) return;
+
+    const btnLatihan = document.getElementById('btnBulkLatihan');
+    const btnTryout = document.getElementById('btnBulkTryout');
+    if (btnLatihan) btnLatihan.disabled = true;
+    if (btnTryout) btnTryout.disabled = true;
+
+    try {
+        const { error } = await window.db
+            .from('bank_soal')
+            .update({ peruntukan: targetPeruntukan })
+            .in('id', ids);
+
+        if (error) throw error;
+
+        await showScyraAlert(
+            `${ids.length} soal berhasil diubah peruntukannya menjadi <strong>${labelTarget}</strong>.`,
+            '✅ Berhasil',
+            '✅'
+        );
+        selectedSoalIds.clear();
+        await loadDaftarSoal(true);
+    } catch (err) {
+        await showScyraAlert('Gagal mengubah peruntukan: ' + err.message, '⚠️ Error', '⚠️');
+    } finally {
+        if (btnLatihan) btnLatihan.disabled = false;
+        if (btnTryout) btnTryout.disabled = false;
+    }
 }
 
 // 🚨 COPY UUID KE CLIPBOARD
@@ -818,7 +966,7 @@ function formatQuillToPembahasanBlocks(quillHtml) {
 }
 
 // 🚀 PARSER UTAMA UNTUK FILE JSON
-function parseJsonQuestions(jsonData, katId, matId) {
+function parseJsonQuestions(jsonData, katId, matId, defaultPeruntukan = 'latihan') {
     let items = [];
     if (Array.isArray(jsonData)) {
         items = jsonData;
@@ -956,6 +1104,15 @@ function parseJsonQuestions(jsonData, katId, matId) {
         const rawBahas = item.pembahasan ?? item.explanation ?? item.bahas ?? '';
         const pembahasan = formatPembahasanContent(rawBahas);
 
+        // 6. Peruntukan Soal ('latihan' | 'tryout')
+        const rawPeruntukan = (item.peruntukan || item.kategori_penggunaan || item.usage || '').toString().toLowerCase().trim();
+        let peruntukan = defaultPeruntukan === 'tryout' ? 'tryout' : 'latihan';
+        if (rawPeruntukan === 'tryout') {
+            peruntukan = 'tryout';
+        } else if (rawPeruntukan === 'latihan') {
+            peruntukan = 'latihan';
+        }
+
         if (!pertanyaanFinal || !kunciFinal) {
             console.warn(`[JSON PARSER] Soal index ${index + 1} dilewati karena pertanyaan atau kunci kosong:`, item);
             return;
@@ -969,6 +1126,7 @@ function parseJsonQuestions(jsonData, katId, matId) {
             kunci: kunciFinal,
             tipe: tipe,
             tingkat_kesulitan: tingkatKesulitan,
+            peruntukan: peruntukan,
             pembahasan: pembahasan
         });
     });
@@ -978,7 +1136,7 @@ function parseJsonQuestions(jsonData, katId, matId) {
 }
 
 // 📦 FUNGSI PARSER PDF (FALLBACK/LEGACY)
-function parseQuestions(text, katId, matId) {
+function parseQuestions(text, katId, matId, defaultPeruntukan = 'latihan') {
     const questions = [];
     const lines = text.split('\n');
     let q = null;
@@ -1024,7 +1182,8 @@ function parseQuestions(text, katId, matId) {
                 opsi: { A: '', B: '', C: '', D: '', E: '' }, 
                 kunci: '', 
                 pembahasan: '', 
-                tipe: null 
+                tipe: null,
+                peruntukan: defaultPeruntukan === 'tryout' ? 'tryout' : 'latihan'
             };
             continue;
         }
@@ -1218,15 +1377,21 @@ function showPreview() {
             `;
         }
 
+        const qPeruntukan = q.peruntukan === 'tryout' ? 'tryout' : 'latihan';
         container.innerHTML += `
             <div class="soal-preview-item">
                 <h4 style="margin-bottom: 0.8rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.5rem;">
                     <span>
                         Soal ${i + 1} 
+                        <span class="peruntukan-badge ${qPeruntukan}">${qPeruntukan === 'tryout' ? '🎯 TRYOUT' : '📝 LATIHAN'}</span>
                         <span class="tipe-badge ${q.tipe}">${q.tipe === 'bs' ? '⚖️ B/S' : q.tipe === 'isian' ? '✏️ Isian' : q.tipe === 'pgk' ? '☑️ PGK' : '📝 PG'}</span>
                         <span class="diff-badge diff-${q.tingkat_kesulitan || 'sedang'}"><span class="diff-dot"></span> ${(q.tingkat_kesulitan || 'sedang').toUpperCase()}</span>
                     </span>
-                    <div style="display:flex; gap:0.4rem; align-items:center;">
+                    <div style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+                        <select class="peruntukan-override" data-index="${i}" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                            <option value="latihan" ${qPeruntukan === 'latihan' ? 'selected' : ''}>📝 Latihan</option>
+                            <option value="tryout" ${qPeruntukan === 'tryout' ? 'selected' : ''}>🎯 Tryout</option>
+                        </select>
                         <select class="diff-override" data-index="${i}" style="padding: 0.35rem 0.6rem; border-radius: 6px; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
                             <option value="mudah" ${q.tingkat_kesulitan === 'mudah' ? 'selected' : ''}>🟢 Mudah</option>
                             <option value="sedang" ${q.tingkat_kesulitan === 'sedang' ? 'selected' : ''}>🟡 Sedang</option>
@@ -1255,6 +1420,20 @@ function showPreview() {
         `;
     });
     
+    // Event listener untuk dropdown peruntukan override
+    document.querySelectorAll('.peruntukan-override').forEach(select => {
+        select.addEventListener('change', (e) => {
+            const index = parseInt(e.target.getAttribute('data-index'));
+            const newPeruntukan = e.target.value === 'tryout' ? 'tryout' : 'latihan';
+            parsedQuestions[index].peruntukan = newPeruntukan;
+            console.log(`[OVERRIDE] Soal ${index + 1} peruntukan diubah menjadi: ${newPeruntukan}`);
+
+            const badge = e.target.closest('.soal-preview-item').querySelector('.peruntukan-badge');
+            badge.className = `peruntukan-badge ${newPeruntukan}`;
+            badge.textContent = newPeruntukan === 'tryout' ? '🎯 TRYOUT' : '📝 LATIHAN';
+        });
+    });
+
     // Event listener untuk dropdown tipe override
     document.querySelectorAll('.tipe-override').forEach(select => {
         select.addEventListener('change', (e) => {
@@ -1321,6 +1500,7 @@ async function saveToDatabase() {
                 kunci_jawaban: q.kunci,
                 tipe_soal: q.tipe || 'pg',
                 tingkat_kesulitan: q.tingkat_kesulitan || 'sedang',
+                peruntukan: q.peruntukan === 'tryout' ? 'tryout' : 'latihan',
                 pembahasan_html: q.pembahasan || null,
                 created_by: user.id
             };
@@ -1583,6 +1763,7 @@ function setupEditModal() {
             kunci_jawaban: kunciJawaban,
             tipe_soal: tipeSoal,
             tingkat_kesulitan: document.getElementById('editTingkatKesulitan') ? document.getElementById('editTingkatKesulitan').value : 'sedang',
+            peruntukan: document.getElementById('editPeruntukanSoal')?.value === 'tryout' ? 'tryout' : 'latihan',
             pembahasan_html: convertGambarShortcode(finalPembahasanHTML)
         };
 
@@ -1667,10 +1848,13 @@ window.editSoal = async (id) => {
     }
     document.getElementById('editPembahasan').value = rawPembahasanDB;
     
-    // 7. Tipe Soal & Tingkat Kesulitan
+    // 7. Tipe Soal, Tingkat Kesulitan & Peruntukan
     document.getElementById('editTipeSoal').value = soal.tipe_soal || 'pg';
     if (document.getElementById('editTingkatKesulitan')) {
         document.getElementById('editTingkatKesulitan').value = soal.tingkat_kesulitan || 'sedang';
+    }
+    if (document.getElementById('editPeruntukanSoal')) {
+        document.getElementById('editPeruntukanSoal').value = soal.peruntukan === 'tryout' ? 'tryout' : 'latihan';
     }
     
     // 8. Set kunci jawaban berdasarkan tipe soal

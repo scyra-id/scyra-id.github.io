@@ -273,8 +273,12 @@ async function loadGlobalQuestions(user) {
         }
 
         // A configured pool is authoritative. Existing packages without one
-        // continue to draw randomly from their category as before.
-        let questionQuery = window.db.from('bank_soal').select('*').eq('kategori_id', currentKategoriId);
+        // continue to draw randomly from their category as before (hanya peruntukan tryout).
+        let questionQuery = window.db
+            .from('bank_soal')
+            .select('*')
+            .eq('kategori_id', currentKategoriId)
+            .eq('peruntukan', 'tryout');
         if (selectedPoolIds.length) questionQuery = questionQuery.in('id', selectedPoolIds);
         const { data, error } = await questionQuery;
         

@@ -7,10 +7,20 @@
  * Menggunakan database kedua (window.dbPayment) untuk credit/referral tables
  */
 
+// Credit icon HTML helper
+const CREDIT_ICON = `<img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;">`;
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    // Credit icon HTML helper
-    const CREDIT_ICON = `<img src="images/credit_icon.webp" alt="Credit" style="width: 24px; height: 24px; vertical-align: middle;">`;
-    
     // Wait for Supabase clients to be ready
     await waitForDb();
     
@@ -58,49 +68,38 @@ function getAuthDb() {
 // 🎯 INITIALIZE PAGE
 // =========================================================
 async function initializeReferralPage() {
-    // Check eligibility
-    const eligibility = await window.ReferralSystem.checkReferralEligibility();
-    const eligibilityNotice = document.getElementById('eligibilityNotice');
-    const eligibilityMessage = document.getElementById('eligibilityMessage');
-    const btnSubmitReferral = document.getElementById('btnSubmitReferral');
-    
-    if (!eligibility.eligible) {
-        eligibilityNotice.style.display = 'flex';
-        eligibilityMessage.textContent = eligibility.message;
-        btnSubmitReferral.disabled = true;
-    } else {
-        btnSubmitReferral.disabled = false;
-    }
-    
-    // Check if already used referral - pakai dbPayment
-    const { data: { user } } = await getAuthDb().auth.getUser();
-    const db = getDb();
-    
+    // 1. Check eligibility (Section 1)
     try {
-        const { data: existingReferral, error: referralError } = await db
-            .from('referral_relationships')
-            .select('id')
-            .eq('referred_id', user.id)
-            .single();
+        const eligibility = await window.ReferralSystem.checkReferralEligibility();
+        const eligibilityNotice = document.getElementById('eligibilityNotice');
+        const eligibilityMessage = document.getElementById('eligibilityMessage');
+        const btnSubmitReferral = document.getElementById('btnSubmitReferral');
         
-        if (referralError) {
-            console.warn('⚠️ Referral check failed (non-critical):', referralError.message);
-        } else if (existingReferral) {
-            document.getElementById('alreadyUsedNotice').style.display = 'flex';
-            document.getElementById('referralForm').style.display = 'none';
+        if (eligibility && !eligibility.eligible) {
+            if (eligibilityNotice) eligibilityNotice.style.display = 'flex';
+            if (eligibilityMessage) eligibilityMessage.textContent = eligibility.message;
+            if (btnSubmitReferral) btnSubmitReferral.disabled = true;
+        } else if (btnSubmitReferral) {
+            btnSubmitReferral.disabled = false;
         }
     } catch (err) {
-        console.warn('⚠️ Referral relationship check error (non-critical):', err.message);
+        console.warn('⚠️ Eligibility check error (non-critical):', err.message);
     }
     
-    // Load my referral code
-    await loadMyReferralCode();
+    // 2. Load referral code & stats via Gateway
+    try {
+        await loadReferralStats();
+    } catch (err) {
+        console.warn('⚠️ Referral stats load error (non-critical):', err.message);
+        await loadMyReferralCode();
+    }
     
-    // Load referral stats
-    await loadReferralStats();
-    
-    // 📱 Check IG credit request status
-    await checkIGRequestStatus();
+    // 3. Check IG credit request status
+    try {
+        await checkIGRequestStatus();
+    } catch (err) {
+        console.warn('⚠️ IG status check error (non-critical):', err.message);
+    }
 }
 
 // =========================================================
@@ -108,11 +107,17 @@ async function initializeReferralPage() {
 // =========================================================
 async function loadMyReferralCode() {
     const codeDisplay = document.getElementById('myReferralCode');
-    const code = await window.ReferralSystem.getOrCreateReferralCode();
+    if (!codeDisplay) return;
     
-    if (code) {
-        codeDisplay.textContent = code;
-    } else {
+    try {
+        const code = await window.ReferralSystem.getOrCreateReferralCode();
+        if (code) {
+            codeDisplay.textContent = code;
+        } else {
+            codeDisplay.textContent = 'Gagal memuat kode';
+        }
+    } catch (err) {
+        console.error('Error in loadMyReferralCode:', err);
         codeDisplay.textContent = 'Gagal memuat kode';
     }
 }
@@ -124,8 +129,24 @@ async function loadReferralStats() {
     const stats = await window.ReferralSystem.getReferralStats();
     
     if (stats) {
-        document.getElementById('referralCount').textContent = 
-            `${stats.totalReferrals}/${stats.maxReferrals}`;
+        const codeDisplay = document.getElementById('myReferralCode');
+        if (codeDisplay) {
+            codeDisplay.textContent = stats.referralCode || 'Gagal memuat kode';
+        }
+        
+        const countDisplay = document.getElementById('referralCount');
+        if (countDisplay) {
+            countDisplay.textContent = `${stats.totalReferrals || 0}/${stats.maxReferrals || 5}`;
+        }
+        
+        if (stats.hasUsedReferral) {
+            const alreadyUsedNotice = document.getElementById('alreadyUsedNotice');
+            const referralForm = document.getElementById('referralForm');
+            if (alreadyUsedNotice) alreadyUsedNotice.style.display = 'flex';
+            if (referralForm) referralForm.style.display = 'none';
+        }
+    } else {
+        await loadMyReferralCode();
     }
 }
 
@@ -313,18 +334,27 @@ async function handleOTPSubmit(e) {
 // 📋 COPY REFERRAL CODE
 // =========================================================
 async function copyReferralCode() {
-    const code = document.getElementById('myReferralCode').textContent;
+    const codeEl = document.getElementById('myReferralCode');
+    const code = codeEl ? codeEl.textContent.trim() : '';
+    
+    if (!code || code === 'Loading...' || code === 'Gagal memuat kode') {
+        if (typeof showScyraAlert === 'function') {
+            await showScyraAlert('Kode referral belum tersedia untuk disalin. Silakan coba lagi sebentar.', '⚠️ Belum Tersedia', '⚠️');
+        }
+        return;
+    }
     
     try {
         await navigator.clipboard.writeText(code);
         
         const btnCopy = document.getElementById('btnCopyCode');
-        const originalText = btnCopy.textContent;
-        btnCopy.textContent = '✅';
-        
-        setTimeout(() => {
-            btnCopy.textContent = originalText;
-        }, 2000);
+        if (btnCopy) {
+            const originalText = btnCopy.textContent;
+            btnCopy.textContent = '✅';
+            setTimeout(() => {
+                btnCopy.textContent = originalText;
+            }, 2000);
+        }
         
         if (typeof showScyraAlert === 'function') {
             await showScyraAlert(`Kode referral <strong>${code}</strong> berhasil disalin!`, '📋 Disalin!', '📋');
@@ -348,8 +378,18 @@ async function copyReferralCode() {
 // 📤 SHARE REFERRAL CODE
 // =========================================================
 async function shareReferralCode() {
-    const code = document.getElementById('myReferralCode').textContent;
-    const shareText = `🎁 Gabung Scyra dan dapatkan credit gratis! Gunakan kode referral ku: ${code}\n\nDaftar sekarang di scyra.com`;
+    const codeEl = document.getElementById('myReferralCode');
+    const code = codeEl ? codeEl.textContent.trim() : '';
+    
+    if (!code || code === 'Loading...' || code === 'Gagal memuat kode') {
+        if (typeof showScyraAlert === 'function') {
+            await showScyraAlert('Kode referral belum tersedia untuk dibagikan. Silakan coba lagi sebentar.', '⚠️ Belum Tersedia', '⚠️');
+        }
+        return;
+    }
+    
+    const baseUrl = window.location.origin.includes('scyra.my.id') ? 'https://scyra.my.id' : window.location.origin;
+    const shareText = `🎁 Gabung Scyra dan dapatkan credit gratis! Gunakan kode referral ku: ${code}\n\nDaftar sekarang di ${baseUrl}`;
     
     // Check if Web Share API is available
     if (navigator.share) {
@@ -414,7 +454,7 @@ function validateIGForm() {
     
     if (!usernameInput || !btnSubmit) return;
     
-    const username = usernameInput.value.trim().replace('@', '');
+    const username = usernameInput.value.trim().replace(/^@+/, '');
     
     // Validasi username IG (3-30 karakter, alphanumeric + underscore + dot)
     const usernameValid = /^[a-zA-Z0-9._]{3,30}$/.test(username);
@@ -431,50 +471,61 @@ async function handleIGCreditSubmit(e) {
     const usernameInput = document.getElementById('igUsernameInput');
     if (!usernameInput) return;
     
-    const username = usernameInput.value.trim().replace('@', '');
+    const username = usernameInput.value.trim().replace(/^@+/, '');
     
     if (!username || username.length < 3) {
         if (typeof showScyraAlert === 'function') {
-            await showScyraAlert('Username Instagram tidak valid!', '❌ Error', '❌');
+            await showScyraAlert('Username Instagram tidak valid! (Minimal 3 karakter tanpa @)', '❌ Error', '❌');
+        } else {
+            alert('Username Instagram tidak valid! (Minimal 3 karakter tanpa @)');
         }
         return;
     }
     
     // Disable button
     const btnSubmit = document.getElementById('btnSubmitIG');
-    const originalText = btnSubmit.textContent;
-    btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Mengirim...';
+    const originalText = btnSubmit ? btnSubmit.textContent : 'Kirim Permintaan';
+    if (btnSubmit) {
+        btnSubmit.disabled = true;
+        btnSubmit.textContent = 'Mengirim...';
+    }
     
     try {
         const { data: { user } } = await getAuthDb().auth.getUser();
         if (!user || !window.ReferralCreditGateway) {
-            throw new Error('Koneksi permintaan credit belum siap');
+            throw new Error('Koneksi permintaan credit belum siap. Silakan refresh halaman.');
         }
 
         const request = await window.ReferralCreditGateway.call('instagram_credit.submit', { username });
 
         // Request aktif yang sudah ada tidak dibuat ulang; tampilkan statusnya.
-        if (request.status !== 'pending' || request.alreadyExists) {
-            showIGStatus(request.status, request);
+        if (!request || request.status !== 'pending' || request.alreadyExists) {
+            showIGStatus(request ? request.status : 'pending', request || { instagram_username: username, credits_amount: 5 });
             return;
         }
         
         // Tampilkan success message
-        document.getElementById('igForm').style.display = 'none';
-        document.getElementById('igSuccess').style.display = 'block';
+        const igForm = document.getElementById('igForm');
+        const igSuccess = document.getElementById('igSuccess');
+        if (igForm) igForm.style.display = 'none';
+        if (igSuccess) igSuccess.style.display = 'block';
         
     } catch (err) {
         console.error('Error submitting IG credit request:', err);
+        const errMsg = err?.message || 'Gagal mengirim permintaan. Silakan coba lagi.';
         if (typeof showScyraAlert === 'function') {
             await showScyraAlert(
-                'Gagal mengirim permintaan. Silakan coba lagi.',
-                '❌ Error',
+                errMsg,
+                '❌ Gagal Mengirim',
                 '❌'
             );
+        } else {
+            alert(errMsg);
         }
-        btnSubmit.disabled = false;
-        btnSubmit.textContent = originalText;
+        if (btnSubmit) {
+            btnSubmit.disabled = false;
+            btnSubmit.textContent = originalText;
+        }
     }
 }
 
@@ -486,33 +537,41 @@ function showIGStatus(status, requestData) {
     const igStatus = document.getElementById('igStatus');
     const statusTitle = document.getElementById('statusTitle');
     const statusMessage = document.getElementById('statusMessage');
-    const statusIcon = igStatus.querySelector('.status-icon');
     
-    if (!igStatus) return;
+    if (!igStatus || !igForm || !statusTitle || !statusMessage) return;
+    const statusIcon = igStatus.querySelector('.status-icon');
     
     igForm.style.display = 'none';
     igStatus.style.display = 'flex';
     
+    const uname = requestData ? escapeHtml(requestData.instagram_username || '') : '';
+    const credits = (requestData && requestData.credits_amount) ? requestData.credits_amount : 5;
+    
     switch (status) {
         case 'pending':
-            statusIcon.textContent = '⏳';
+            if (statusIcon) statusIcon.textContent = '⏳';
             statusTitle.textContent = 'Menunggu Approval';
-            statusMessage.textContent = `Permintaan kamu dengan username @${requestData.instagram_username} sedang direview oleh admin. Credit ${requestData.credits_amount} ${CREDIT_ICON} akan ditambahkan setelah disetujui.`;
+            statusMessage.innerHTML = `Permintaan kamu dengan username <strong>@${uname}</strong> sedang direview oleh admin. Credit ${credits} ${CREDIT_ICON} akan ditambahkan setelah disetujui.`;
             break;
         case 'approved':
-            statusIcon.textContent = '✅';
+            if (statusIcon) statusIcon.textContent = '✅';
             statusTitle.textContent = 'Disetujui!';
-            statusMessage.textContent = `Permintaan kamu sudah disetujui. ${requestData.credits_amount} ${CREDIT_ICON} credit telah ditambahkan ke akunmu!`;
+            statusMessage.innerHTML = `Permintaan kamu sudah disetujui. ${credits} ${CREDIT_ICON} credit telah ditambahkan ke akunmu!`;
             break;
         case 'rejected':
-            statusIcon.textContent = '❌';
+            if (statusIcon) statusIcon.textContent = '❌';
             statusTitle.textContent = 'Ditolak';
-            statusMessage.textContent = 'Permintaan kamu ditolak. Pastikan kamu sudah follow dan like 3 post terakhir kami. Silakan coba lagi!';
+            statusMessage.innerHTML = 'Permintaan kamu ditolak. Pastikan kamu sudah follow dan like 3 post terakhir kami. Silakan coba lagi!';
             // Tampilkan form lagi untuk retry
             setTimeout(() => {
                 igForm.style.display = 'block';
                 igStatus.style.display = 'none';
             }, 3000);
+            break;
+        default:
+            if (statusIcon) statusIcon.textContent = '⏳';
+            statusTitle.textContent = 'Permintaan Diproses';
+            statusMessage.innerHTML = `Permintaan sedang dalam proses peninjauan.`;
             break;
     }
 }

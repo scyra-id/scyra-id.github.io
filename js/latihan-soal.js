@@ -144,7 +144,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     async function fetchSoal() {
         try {
-            const { data, error } = await window.db.from('bank_soal').select('*').eq('materi_id', state.materiId);
+            const { data, error } = await window.db
+                .from('bank_soal')
+                .select('*')
+                .eq('materi_id', state.materiId)
+                .eq('peruntukan', 'latihan');
             
             if (error || !data || data.length === 0) {
                 document.getElementById('soalText').innerHTML = '<p>🚧 Belum ada soal tersedia untuk bab ini.</p>'; 

@@ -302,10 +302,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.error("RBAC Check Error:", e);
         }
 
-     // 2. Kalau lolos satpam, baru ambil soal dari bank_soal
+     // 2. Kalau lolos satpam, baru ambil soal dari bank_soal (khusus peruntukan latihan)
         try {
             document.querySelector('.soal-text').innerHTML = '<p>⏳ Mengambil data soal dari server...</p>';
-            const { data, error } = await window.db.from('bank_soal').select('*').in('materi_id', ids); 
+            const { data, error } = await window.db
+                .from('bank_soal')
+                .select('*')
+                .in('materi_id', ids)
+                .eq('peruntukan', 'latihan'); 
          
             if (error) throw error;
             if (!data || data.length === 0) {
